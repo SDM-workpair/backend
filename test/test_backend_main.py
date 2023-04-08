@@ -1,5 +1,6 @@
-from app.main import app  # Flask instance of the API
 from fastapi.testclient import TestClient
+
+from app.main import app  # Flask instance of the API
 
 client = TestClient(app)
 
@@ -18,7 +19,4 @@ def test_main_get_inffo():
 def test_main_get_items():
     response = client.get("/items/3?q=3")
     assert response.status_code == 200
-    assert response.json() == {
-        "item_id": 3,
-        "q": "3"
-    }
+    assert response.json() == {"item_id": 3, "q": "3"}

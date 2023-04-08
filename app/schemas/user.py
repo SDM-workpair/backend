@@ -14,10 +14,12 @@ class UserBase(BaseModel):
     is_admin: bool = False
     name: Optional[str] = "--"
 
+
 class UserUpdateNoEmail(BaseModel):
     name: Optional[str] = "--"
     line_id: Optional[str] = None
     image: Optional[str] = None
+
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):
@@ -49,11 +51,14 @@ class User(UserInDBBase):
 class UserInDB(UserInDBBase):
     hashed_password: str
 
+
 class UserGetBase(BaseModel):
     email: Optional[EmailStr] = None
+
     class Config:
         orm_mode = True
 
+
 class UserMessage(BaseModel):
-    message:str
+    message: str
     data: Optional[User] = None

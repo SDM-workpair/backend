@@ -1,8 +1,10 @@
 import uuid
-from app.database.base_class import Base
-from sqlalchemy import DateTime, Column, String, Boolean, ForeignKey, ARRAY
+
+from sqlalchemy import ARRAY, Boolean, Column, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
+
+from app.database.base_class import Base
 
 
 class Group(Base):

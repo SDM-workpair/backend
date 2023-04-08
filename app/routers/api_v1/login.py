@@ -1,24 +1,24 @@
 from datetime import timedelta
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Response, FastAPI
-from fastapi.security import OAuth2PasswordRequestForm
+import loguru
+from fastapi import (APIRouter, Depends, FastAPI, HTTPException, Request,
+                     Response)
 from fastapi.responses import JSONResponse, ORJSONResponse
-
+from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import EmailStr
 from sqlalchemy.orm import Session
-from fastapi import Request
+
 from app import crud, models, schemas
-from app.routers import deps
 from app.core import security
 from app.core.config import settings
-import loguru
-from pydantic import EmailStr
+from app.routers import deps
 
 # from google.oauth2 import id_token
 # from google.auth.transport import requests
 
 
-#from fastapi_sso.sso.google import GoogleSSO
+# from fastapi_sso.sso.google import GoogleSSO
 
 router = APIRouter()
 
@@ -27,9 +27,8 @@ router = APIRouter()
 def login_access_token(
     response: Response,
     db: Session = Depends(deps.get_db),
-    form_data: OAuth2PasswordRequestForm = Depends()
+    form_data: OAuth2PasswordRequestForm = Depends(),
 ) -> Any:
-
     """
     OAuth2 compatible token login, get an access token for future requests
     """
@@ -72,8 +71,8 @@ def login_access_token(
         "lax",
     )
     return {
-            "access_token": access_token,
-            "token_type": "bearer",
+        "access_token": access_token,
+        "token_type": "bearer",
     }
 
 
@@ -83,6 +82,7 @@ def test_token(current_user: models.user = Depends(deps.get_current_user)) -> An
     Test access token
     """
     return current_user
+
 
 # @router.post("/google-login/access-token", response_model=schemas.Token)
 # def google_login_access_token(
@@ -128,4 +128,3 @@ def test_token(current_user: models.user = Depends(deps.get_current_user)) -> An
 #             "access_token": access_token,
 #             "token_type": "bearer",
 #     }
-

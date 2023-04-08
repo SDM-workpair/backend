@@ -40,9 +40,9 @@ services:
             - postgres
         networks:
             - teamatch-network
-    
 
-                
+
+
 
 volumes:
     postgres-db:

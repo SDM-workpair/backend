@@ -2,15 +2,17 @@
 BaseModel.schema will return a dict of the schema
 while BaseModel.schema_json will return a JSON string representation of that dict.
 """
-from uuid import UUID
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
+from uuid import UUID
+
 from pydantic import BaseModel
 
 
 # Shared properties
 class GroupBase(BaseModel):
     group_uuid: UUID
+
 
 # Properties to receive via API on creation
 
@@ -20,6 +22,7 @@ class GroupCreate(GroupBase):
     group_id: str
     room_uuid: UUID
     created_time: datetime = None
+
 
 # Properties to receive via API on update
 

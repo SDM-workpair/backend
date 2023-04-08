@@ -1,6 +1,7 @@
-from app.main import app  # Flask instance of the API
-from app.core.config import settings
 from fastapi.testclient import TestClient
+
+from app.core.config import settings
+from app.main import app  # Flask instance of the API
 
 client = TestClient(app)
 
@@ -22,7 +23,7 @@ def test_get_my_matching_rooms():
         json={"email": "admin@sdm-teamatch.com"},
     )
     assert response.status_code == 200
-    assert response.json()['message'] == 'success'
+    assert response.json()["message"] == "success"
     # assert response.json()['data'][0]['name'] == 'test_matching_room'
 
 
@@ -32,8 +33,10 @@ def test_get_my_matching_rooms_missing_param():
         json={},
     )
     assert response.status_code == 400
-    assert response.json()[
-        'detail'] == "Fail to retrieve user's matching room. Missing parameter: email."
+    assert (
+        response.json()["detail"]
+        == "Fail to retrieve user's matching room. Missing parameter: email."
+    )
 
 
 def test_get_my_matching_rooms_user_not_found():
@@ -42,7 +45,7 @@ def test_get_my_matching_rooms_user_not_found():
         json={"email": "non-registered@gmail.com"},
     )
     assert response.status_code == 400
-    assert response.json()['detail'] == "Fail to find user with this email."
+    assert response.json()["detail"] == "Fail to find user with this email."
 
 
 def test_search_matching_rooms():
@@ -51,7 +54,7 @@ def test_search_matching_rooms():
         json={"user_email": "", "prompt": "SDM", "query_all": True},
     )
     assert response.status_code == 200
-    assert response.json()['message'] == 'success'
+    assert response.json()["message"] == "success"
     # assert response.json()['data'][0]['name'] == 'sdm'
 
 
@@ -61,7 +64,7 @@ def test_search_matching_rooms_with_user():
         json={"user_email": "admin@sdm-teamatch.com", "prompt": "", "query_all": False},
     )
     assert response.status_code == 200
-    assert response.json()['message'] == 'success'
+    assert response.json()["message"] == "success"
     # assert response.json()['data'][0]['name'] == 'test_matching_room'
 
 
@@ -71,15 +74,20 @@ def test_search_matching_rooms_missing_param():
         json={"user_email": "", "prompt": "SDM", "query_all": False},
     )
     assert response.status_code == 400
-    assert response.json()[
-        'detail'] == "Fail to retrieve user's matching room. Missing parameter: email."
+    assert (
+        response.json()["detail"]
+        == "Fail to retrieve user's matching room. Missing parameter: email."
+    )
 
 
 def test_search_matching_rooms_user_not_found():
     response = client.post(
         f"{settings.API_V1_STR}/search/matching-room/list",
-        json={"user_email": "non-registered@gmail.com",
-              "prompt": "", "query_all": False},
+        json={
+            "user_email": "non-registered@gmail.com",
+            "prompt": "",
+            "query_all": False,
+        },
     )
     assert response.status_code == 400
-    assert response.json()['detail'] == "Fail to find user with this email."
+    assert response.json()["detail"] == "Fail to find user with this email."

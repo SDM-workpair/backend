@@ -1,6 +1,7 @@
-import os
 import logging
+import os
 import sys
+
 import uvicorn
 from gunicorn.app.base import BaseApplication
 from gunicorn.glogging import Logger
@@ -8,7 +9,6 @@ from loguru import logger
 
 from app.main import app
 from app.utils import number_of_workers
-
 
 LOG_LEVEL = logging.getLevelName(os.environ.get("LOG_LEVEL", "DEBUG"))
 JSON_LOGS = True if os.environ.get("JSON_LOGS", "0") == "1" else False
@@ -94,11 +94,11 @@ def run():
         "accesslog": "-",
         "errorlog": "-",
         "worker_class": "uvicorn.workers.UvicornWorker",
-        "logger_class": StubbedGunicornLogger
+        "logger_class": StubbedGunicornLogger,
     }
 
     if os.getenv("ENV") == "prod":
-        StandaloneApplication(app, options).run()    
+        StandaloneApplication(app, options).run()
     else:
         uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
 

@@ -1,13 +1,13 @@
 from typing import Any, List
 
-from fastapi import APIRouter, Depends, Body, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Session
 from pydantic.networks import EmailStr
+from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
-from app.routers import deps
 from app.core.config import settings
+from app.routers import deps
 
 router = APIRouter()
 
@@ -21,15 +21,16 @@ def search_matching_rooms(
     """
     Retrieve matching rooms.
     """
-    if (mr_search_in.query_all):
+    if mr_search_in.query_all:
         matching_rooms = crud.matching_room.search_with_user_and_name(
-            db=db, name=mr_search_in.prompt)
+            db=db, name=mr_search_in.prompt
+        )
     else:  # query with user authentication
         #  先看user_email是否找得到user再去query matching room
-        if (mr_search_in.user_email == '' or mr_search_in.user_email is None):
+        if mr_search_in.user_email == "" or mr_search_in.user_email is None:
             raise HTTPException(
                 status_code=400,
-                detail="Fail to retrieve user's matching room. Missing parameter: email."
+                detail="Fail to retrieve user's matching room. Missing parameter: email.",
             )
         user = crud.user.get_by_email(db=db, email=mr_search_in.user_email)
         if not user:
@@ -38,8 +39,9 @@ def search_matching_rooms(
                 detail="Fail to find user with this email.",
             )
         matching_rooms = crud.matching_room.search_with_user_and_name(
-            db=db, user_uuid=user.user_uuid, name=mr_search_in.prompt)
-    return {'message': 'success', 'data': matching_rooms}
+            db=db, user_uuid=user.user_uuid, name=mr_search_in.prompt
+        )
+    return {"message": "success", "data": matching_rooms}
 
 
 @router.post("/group/list", response_model=schemas.GroupWithMessage)
@@ -52,10 +54,10 @@ def search_my_groups(
     Retrieve groups.
     """
     #  先看user_email是否找得到user再去query group
-    if (group_search_in.user_email == '' or group_search_in.user_email is None):
+    if group_search_in.user_email == "" or group_search_in.user_email is None:
         raise HTTPException(
             status_code=400,
-            detail="Fail to retrieve user's group. Missing parameter: email."
+            detail="Fail to retrieve user's group. Missing parameter: email.",
         )
     user = crud.user.get_by_email(db=db, email=group_search_in.user_email)
     if not user:
@@ -64,5 +66,6 @@ def search_my_groups(
             detail="Fail to find user with this email.",
         )
     groups = crud.group.search_with_user_and_name(
-        db=db, user_uuid=user.user_uuid, name=group_search_in.prompt)
-    return {'message': 'success', 'data': groups}
+        db=db, user_uuid=user.user_uuid, name=group_search_in.prompt
+    )
+    return {"message": "success", "data": groups}

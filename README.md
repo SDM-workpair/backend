@@ -5,7 +5,7 @@
 1. 前往 http://localhost:8000/test-google-sso 按google button
 2. 去 http://localhost:8000/docs 操作 get user profile和 update user profile
 3. http://localhost:8000/api/v1/users/logout 登出
-4. 再操作 get user profile or update user profile 都會跳錯誤 錯誤訊息 "Could not validate credentials." 
+4. 再操作 get user profile or update user profile 都會跳錯誤 錯誤訊息 "Could not validate credentials."
 
 ## Database 更動
 1. User: password欄位改nullable

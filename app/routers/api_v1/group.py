@@ -1,13 +1,13 @@
 from typing import Any, List
 
-from fastapi import APIRouter, Depends, Body, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Session
 from pydantic.networks import EmailStr
+from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
-from app.routers import deps
 from app.core.config import settings
+from app.routers import deps
 
 router = APIRouter()
 
@@ -22,10 +22,10 @@ def read_my_groups(
     Retrieve user's groups.
     """
     #  先看user_email是否找得到user再去query group
-    if (user_in.email == '' or user_in.email is None):
+    if user_in.email == "" or user_in.email is None:
         raise HTTPException(
             status_code=400,
-            detail="Fail to retrieve user's group. Missing parameter: email."
+            detail="Fail to retrieve user's group. Missing parameter: email.",
         )
     user = crud.user.get_by_email(db=db, email=user_in.email)
     if not user:
@@ -33,9 +33,8 @@ def read_my_groups(
             status_code=400,
             detail="Fail to find user with this email.",
         )
-    groups = crud.group.search_with_user_and_name(
-        db=db, user_uuid=user.user_uuid)
-    return {'message': 'success', 'data': groups}
+    groups = crud.group.search_with_user_and_name(db=db, user_uuid=user.user_uuid)
+    return {"message": "success", "data": groups}
 
 
 # # TODO: unfinished

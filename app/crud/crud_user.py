@@ -1,12 +1,13 @@
 from typing import Any, Dict, Optional, Union
 
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash, verify_password
 from app.crud.base import CRUDBase
 from app.models.user import User
-from app.schemas.user import UserCreate, UserUpdate, UserInDBBase
-from fastapi.encoders import jsonable_encoder
+from app.schemas.user import UserCreate, UserInDBBase, UserUpdate
+
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def get_by_email(self, db: Session, *, email: str) -> Optional[User]:
@@ -17,10 +18,10 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             obj_in.password = get_password_hash(obj_in.password)
         db_obj = User(
             email=obj_in.email,
-            password= obj_in.password,
+            password=obj_in.password,
             name=obj_in.name,
             is_admin=obj_in.is_admin,
-            is_google_sso=obj_in.is_google_sso
+            is_google_sso=obj_in.is_google_sso,
         )
         db.add(db_obj)
         db.commit()
@@ -40,7 +41,6 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             update_data["hashed_password"] = hashed_password
         return super().update(db, db_obj=db_obj, obj_in=update_data)
 
-
     def authenticate(self, db: Session, *, email: str, password: str) -> Optional[User]:
         user = self.get_by_email(db, email=email)
         if not user:
@@ -54,7 +54,6 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
     def is_admin(self, user: User) -> bool:
         return user.is_admin
-
 
 
 user = CRUDUser(User)

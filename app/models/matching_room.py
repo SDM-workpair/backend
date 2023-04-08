@@ -1,8 +1,10 @@
 import uuid
-from app.database.base_class import Base
-from sqlalchemy import DateTime, Column, String, Boolean, Integer, ForeignKey
+
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
+
+from app.database.base_class import Base
 
 
 class MatchingRoom(Base):
