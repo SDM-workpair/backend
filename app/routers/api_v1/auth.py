@@ -1,24 +1,17 @@
-import os
 from datetime import timedelta
 from typing import Any
 
-import loguru
-from authlib.integrations.starlette_client import OAuth, OAuthError
-from fastapi import (APIRouter, Depends, FastAPI, Form, HTTPException, Request,
-                     Response)
+from fastapi import APIRouter, Depends, Form, Request, Response
 from fastapi.encoders import jsonable_encoder
 from google.auth.transport import requests
 from google.oauth2 import id_token
 from sqlalchemy.orm import Session
-from starlette.config import Config
-from starlette.middleware.sessions import SessionMiddleware
-from starlette.responses import JSONResponse, RedirectResponse
+from starlette.responses import JSONResponse
 
 from app import crud
 from app.core import security
 from app.core.config import settings
 from app.routers import deps
-from app.routers.api_v1.login import login_access_token
 from app.schemas.user import UserCreate
 
 # Create the auth app

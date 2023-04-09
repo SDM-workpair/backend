@@ -2,11 +2,8 @@ from datetime import timedelta
 from typing import Any
 
 import loguru
-from fastapi import (APIRouter, Depends, FastAPI, HTTPException, Request,
-                     Response)
-from fastapi.responses import JSONResponse, ORJSONResponse
+from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas

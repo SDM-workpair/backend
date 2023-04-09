@@ -7,7 +7,6 @@ from starlette.requests import Request
 from starlette.responses import HTMLResponse
 
 from app.core.config import settings
-from app.routers.api_v1 import auth
 from app.routers.api_v1.api import api_router
 from app.utils import get_tw_time
 
@@ -64,7 +63,7 @@ async def test_google_sso(request: Request):
         f"<body>"
         '<script src="https://accounts.google.com/gsi/client" async defer></script>'
         '<div id="g_id_onload"'
-        'data-client_id="768305533256-eg3ift96spolgtm69bo6r3423df13c73.apps.googleusercontent.com"'
+        'data-client_id="1053350950008-u5aj1t8vr0if3hlf80etdaaf7g8odadg.apps.googleusercontent.com"'
         'data-login_uri="http://localhost:8000/api/v1/auth/sso-login"'
         'data-auto_prompt="false">'
         "</div>"

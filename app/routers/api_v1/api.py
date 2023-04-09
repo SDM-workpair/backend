@@ -1,7 +1,14 @@
 from fastapi import APIRouter
 
-from app.routers.api_v1 import (auth, group, login, matching_room,
-                                notification, search, user)
+from app.routers.api_v1 import (
+    auth,
+    group,
+    login,
+    matching_room,
+    notification,
+    search,
+    user,
+)
 
 api_router = APIRouter()
 api_router.include_router(login.router, tags=["login"])

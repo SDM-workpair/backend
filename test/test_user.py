@@ -6,10 +6,6 @@ from base64 import b64encode
 import pytest
 from fastapi.testclient import TestClient
 from itsdangerous import TimestampSigner
-from starlette.middleware.base import (BaseHTTPMiddleware,
-                                       RequestResponseEndpoint)
-from starlette.requests import Request
-from starlette.responses import Response
 
 from app.core.config import settings
 from app.main import app  # Flask instance of the API
@@ -62,7 +58,7 @@ def create_session_cookie(data) -> str:
     ).decode("utf-8")
 
 
-#### Test ####
+# Test
 def test_read_user_me_who_has_logged_in(get_test_client, get_server_api):
     client = get_test_client
     # create new google sso user

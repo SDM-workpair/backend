@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Session
@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session
 from app.crud.base import CRUDBase
 from app.models.matching_room import MatchingRoom
 from app.models.mr_member import MR_Member
-from app.models.user import User
 from app.schemas.matching_room import MatchingRoomCreate, MatchingRoomUpdate
 
 

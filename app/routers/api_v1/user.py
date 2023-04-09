@@ -1,18 +1,15 @@
-from typing import Any, List
+from typing import Any
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
-from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
-from app.core.config import settings
 from app.routers import deps
 
 router = APIRouter()
 
-## TODO
+# TODO
 # @router.get("/", response_model=List[schemas.User])
 # def read_users(
 #     db: Session = Depends(deps.get_db),
