@@ -4,6 +4,7 @@ from app import crud, schemas
 from app.core.config import settings
 from app.database import base  # noqa: F401
 
+
 # make sure all SQL Alchemy models are imported (app.db.base) before initializing DB
 # otherwise, SQL Alchemy might fail to initialize relationships properly
 # for more details: https://github.com/tiangolo/full-stack-fastapi-postgresql/issues/28
@@ -25,3 +26,13 @@ def init_db(db: Session) -> None:
             is_active=True
         )
         user = crud.user.create(db, obj_in=user_in)  # noqa: F841
+
+    # Add fake data
+    # User
+    fake_user1 = crud.user.create(db, obj_in=schemas.UserCreate(
+            email='temp_user1@gmail.com',
+            name='temp_user1',
+            line_id='fakelineid1',
+            is_admin=True,
+            is_active=True
+        ))
