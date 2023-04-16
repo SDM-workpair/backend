@@ -10,14 +10,13 @@ from pydantic import BaseModel
 
 # Shared properties
 class MatchingRoomBase(BaseModel):
-    room_uuid: UUID
+    # room_uuid: UUID
+    room_id: str
 
 # Properties to receive via API on creation
-
-
 class MatchingRoomCreate(MatchingRoomBase):
     name: Optional[str] = None
-    room_id: str
+    # room_id: str
     due_time: datetime
     min_member_num: int
     description: Optional[str] = None
