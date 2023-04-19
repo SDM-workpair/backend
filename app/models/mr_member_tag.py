@@ -10,6 +10,12 @@ class MR_Member_Tag(Base):
     member_uuid = Column(
         UUID(as_uuid=True), ForeignKey("MR_Member.member_uuid"), primary_key=True, nullable=False
     )
-    tag_text = Column(String, nullable=False)
+    tag_text = Column(String, primary_key=True, nullable=False)
+    room_uuid = Column(
+        UUID(as_uuid=True), ForeignKey("MatchingRoom.room_uuid"), nullable=False
+    )
+    user_uuid = Column(
+        UUID(as_uuid=True), ForeignKey("User.user_uuid"), nullable=False
+    )
     is_self_tag = Column(Boolean, nullable=False, default=False)
     is_find_tag = Column(Boolean, nullable=False, default=False)

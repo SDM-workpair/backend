@@ -13,5 +13,8 @@ class MR_Liked_Hated_Member(Base):
     target_member_uuid = Column(
         UUID(as_uuid=True), ForeignKey("MR_Member.member_uuid"), primary_key=True, nullable=False
     )
+    room_uuid = Column(
+        UUID(as_uuid=True), ForeignKey("MatchingRoom.room_uuid"), nullable=False
+    )
     is_liked = Column(Boolean, nullable=False, default=False)
     is_hated = Column(Boolean, nullable=False, default=False)

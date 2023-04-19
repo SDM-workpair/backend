@@ -2,21 +2,22 @@
 BaseModel.schema will return a dict of the schema
 while BaseModel.schema_json will return a JSON string representation of that dict.
 """
-from uuid import UUID
 from typing import Optional, List
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, PrivateAttr
+from uuid import UUID
+
 
 
 # Shared properties
 class MatchingRoomBase(BaseModel):
-    # room_uuid: UUID
     room_id: str
+    # room_uuid: UUID
+
 
 # Properties to receive via API on creation
 class MatchingRoomCreate(MatchingRoomBase):
     name: Optional[str] = None
-    # room_id: str
     due_time: datetime
     min_member_num: int
     description: Optional[str] = None
