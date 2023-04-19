@@ -14,6 +14,14 @@ class MatchingRoomBase(BaseModel):
     room_id: str
 
 # Properties to receive via API on creation
+class MatchingRoomReq(BaseModel):
+    name: Optional[str] = None
+    due_time: datetime
+    min_member_num: int
+    description: Optional[str] = None
+    is_forced_matching: bool = False
+    created_time: datetime = None
+
 class MatchingRoomCreate(MatchingRoomBase):
     name: Optional[str] = None
     due_time: datetime

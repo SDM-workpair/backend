@@ -40,21 +40,11 @@ def read_my_matching_rooms(
 def create_matching_room(
     *,
     db: Session = Depends(deps.get_db),
-    matching_room_in: schemas.MatchingRoomCreate,
-    # current_user: models.user = Depends(deps.get_current_active_superuser),
+    matching_room_in: schemas.MatchingRoomReq,
 ) -> Any:
     """
     Create new matching room.
     """
-    # room_id -> 我們給的 四碼or六碼
-    matching_room = crud.matching_room.get_by_room_id(
-        db, room_id=matching_room_in.room_id)
-    if matching_room:
-        # 改意思
-        raise HTTPException(
-            status_code=400,
-            detail="The matching room with this room_id already exists in the system.",
-        )
     matching_room = crud.matching_room.create(db, obj_in=matching_room_in)
     return {'message': 'success', 'data': matching_room}
 
