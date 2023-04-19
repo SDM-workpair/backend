@@ -1,13 +1,10 @@
-from typing import Any, List
+from typing import Any
 
-from fastapi import APIRouter, Depends, Body, HTTPException
-from fastapi.encoders import jsonable_encoder
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from pydantic.networks import EmailStr
 
-from app import crud, models, schemas
+from app import crud, schemas
 from app.routers import deps
-from app.core.config import settings
 
 router = APIRouter()
 
@@ -22,10 +19,10 @@ def read_my_notifications(
     Retrieve user's notifications.
     """
     #  先看user_email是否找得到user再去query matching room
-    if (user_in.email == '' or user_in.email is None):
+    if user_in.email == "" or user_in.email is None:
         raise HTTPException(
             status_code=400,
-            detail="Fail to retrieve user's notifications. Missing parameter: email."
+            detail="Fail to retrieve user's notifications. Missing parameter: email.",
         )
     user = crud.user.get_by_email(db=db, email=user_in.email)
     if not user:
@@ -34,6 +31,7 @@ def read_my_notifications(
             detail="Fail to find user with this email.",
         )
     notifications = crud.notification.get_by_receiver_uuid(
-        db=db, receiver_uuid=user.user_uuid)
+        db=db, receiver_uuid=user.user_uuid
+    )
 
-    return {'message': 'success', 'data': notifications}
+    return {"message": "success", "data": notifications}

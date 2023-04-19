@@ -1,5 +1,6 @@
 from typing import List, Union
-from pydantic import BaseSettings, AnyHttpUrl, validator
+
+from pydantic import AnyHttpUrl, BaseSettings, validator
 
 
 class Settings(BaseSettings):
@@ -7,7 +8,20 @@ class Settings(BaseSettings):
     APP_NAME: str = "teamatch-backend"
     API_V1_STR: str = "/api/v1"
     test_int: int = 50
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
+    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
+        "http://localhost/",
+        "http://localhost:4200/",
+        "http://localhost:3000/",
+        "http://localhost:8080/",
+        "https://localhost/",
+        "https://localhost:4200/",
+        "https://localhost:3000/",
+        "https://localhost:8080/",
+        "http://backend.sdm-teamatch.com/",
+        "https://stag.sdm-teamatch.com/",
+        "https://sdm-teamatch.com/",
+        "https://app.sdm-teamatch.com/",
+    ]
 
     @validator("BACKEND_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
@@ -25,9 +39,9 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_HOSTNAME: str
 
-    ADMIN_EMAIL: str = "admin@sdm-teamatch.com"
-    ADMIN_NAME: str = "admin"
-    ADMIN_PASSWORD: str = "1234"
+    ADMIN_EMAIL: str
+    ADMIN_NAME: str
+    ADMIN_PASSWORD: str
 
     # auth
     JWT_PUBLIC_KEY: str

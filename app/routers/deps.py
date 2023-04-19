@@ -1,18 +1,17 @@
-from typing import Generator
+from typing import Generator, Optional
 
-from fastapi import Depends, HTTPException, status
+import loguru
+from fastapi import Depends, HTTPException, Request, status
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
-from fastapi.responses import JSONResponse
+
 from app import crud, models, schemas
 from app.core import security
 from app.core.config import settings
 from app.database.session import SessionLocal
-from fastapi import Request
-from typing import Optional
-import loguru
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/login/access-token"
@@ -20,6 +19,7 @@ reusable_oauth2 = OAuth2PasswordBearer(
 # reusable_oauth2 = OAuth2PasswordBearer(
 #     tokenUrl=f"{settings.API_V1_STR}/google-login/access-token"
 # )
+
 
 def get_db() -> Generator:
     try:
@@ -46,11 +46,11 @@ def get_current_user(
         # )
         return JSONResponse(
             status_code=status.HTTP_403_FORBIDDEN,
-            content={"message":f"{e}", "data": None},
+            content={"message": f"{e}", "data": None},
         )
     user = crud.user.get(db, id=token_data.sub)
     if not user:
-        #raise HTTPException(status_code=204, detail="User not found")
+        # raise HTTPException(status_code=204, detail="User not found")
         return JSONResponse(
             status_code=204,
             content={"message": "User not found", "data": None},
@@ -67,7 +67,7 @@ def get_current_active_user(
             status_code=400,
             content={"message": "Inactive user", "data": None},
         )
-        #raise HTTPException(status_code=400, detail="Inactive user")
+        # raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
 
@@ -81,15 +81,17 @@ def get_current_active_superuser(
         # )
         return JSONResponse(
             status_code=400,
-            content={"message": "The user doesn't have enough privileges", "data": None},
+            content={
+                "message": "The user doesn't have enough privileges",
+                "data": None,
+            },
         )
     return current_user
 
+
 async def get_login_user(request: Request) -> Optional[dict]:
-    user = request.session.get('user')
+    user = request.session.get("user")
     if user is not None:
         return user
     else:
-        raise HTTPException(status_code=401, detail='Could not validate credentials.')
-
-    
+        raise HTTPException(status_code=401, detail="Could not validate credentials.")

@@ -1,13 +1,10 @@
-from typing import Any, List
+from typing import Any
 
-from fastapi import APIRouter, Depends, Body, HTTPException
-from fastapi.encoders import jsonable_encoder
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from pydantic.networks import EmailStr
 
-from app import crud, models, schemas
+from app import crud, schemas
 from app.routers import deps
-from app.core.config import settings
 
 router = APIRouter()
 
@@ -22,10 +19,10 @@ def read_my_matching_rooms(
     Retrieve user's matching rooms.
     """
     #  先看email是否找得到user再去query matching room
-    if (user_in.email == '' or user_in.email is None):
+    if user_in.email == "" or user_in.email is None:
         raise HTTPException(
             status_code=400,
-            detail="Fail to retrieve user's matching room. Missing parameter: email."
+            detail="Fail to retrieve user's matching room. Missing parameter: email.",
         )
     user = crud.user.get_by_email(db=db, email=user_in.email)
     if not user:
@@ -34,8 +31,9 @@ def read_my_matching_rooms(
             detail="Fail to find user with this email.",
         )
     matching_rooms = crud.matching_room.search_with_user_and_name(
-        db=db, user_uuid=user.user_uuid)
-    return {'message': 'success', 'data': matching_rooms}
+        db=db, user_uuid=user.user_uuid
+    )
+    return {"message": "success", "data": matching_rooms}
 
 
 @router.post("/create", response_model=schemas.MatchingRoomWithMessage)

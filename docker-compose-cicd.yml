@@ -15,7 +15,7 @@ services:
         ports:
             - "5432:5432"
         env_file:
-            - ./backend/.env
+            - .env
         volumes:
             - postgres-db:/var/lib/postgresql/data
         networks:
@@ -24,26 +24,22 @@ services:
     backend:
         container_name: "fastapi"
         build:
-            context: ./backend
+            context: ./
         ports:
             - "8000:8000"
         volumes:
-            - ./backend:/backend
+            - ./:/backend
         restart: always
         environment:
             - WATCHFILES_FORCE_POLLING=true
             - GUNICORN_WORKERS=1
             - JSON_LOGS=0
             - LOG_LEVEL=DEBUG
-            - PRE_COMMIT_HOME=/backend/.pre-commit
         tty: true
         depends_on:
             - postgres
         networks:
             - teamatch-network
-
-
-
 
 volumes:
     postgres-db:

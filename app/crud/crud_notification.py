@@ -1,25 +1,39 @@
-from typing import Any, Dict, Optional, List
 import uuid
-from datetime import datetime
-from sqlalchemy.orm import Session
+from typing import List, Optional
+
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Session
+
 from app.crud.base import CRUDBase
 from app.models.notification import Notification
 from app.models.notification_template import NotificationTemplate
-from app.schemas.notification import NotificationCreate, NotificationUpdate, NotificationViewModel
+from app.schemas.notification import (
+    NotificationCreate,
+    NotificationUpdate,
+    NotificationViewModel,
+)
 
 
 class CRUDNotification(CRUDBase[Notification, NotificationCreate, NotificationUpdate]):
-    def get_by_sender_uuid(self, db: Session, *, sender_uuid: UUID) -> Optional[List[NotificationViewModel]]:
+    def get_by_sender_uuid(
+        self, db: Session, *, sender_uuid: UUID
+    ) -> Optional[List[NotificationViewModel]]:
         notification_viewmodel_list = []
-        notifications = db.query(Notification).filter(
-            Notification.sender_uuid == sender_uuid).all()
+        notifications = (
+            db.query(Notification).filter(Notification.sender_uuid == sender_uuid).all()
+        )
         for notification in notifications:
-            notification_text = db.query(NotificationTemplate).filter(
-                NotificationTemplate.template_uuid == notification.template_uuid).first().text
+            notification_text = (
+                db.query(NotificationTemplate)
+                .filter(
+                    NotificationTemplate.template_uuid == notification.template_uuid
+                )
+                .first()
+                .text
+            )
             # loop to replace
-            for idx, f in enumerate(notification.f_string.split(';')):
-                notification_text = notification_text.replace('{'+str(idx)+'}', f)
+            for idx, f in enumerate(notification.f_string.split(";")):
+                notification_text = notification_text.replace("{" + str(idx) + "}", f)
             # create a viewmodel and stored needed value
             notifiactionViewModel = NotificationViewModel()
             notifiactionViewModel.receiver_uuid = notification.receiver_uuid
@@ -28,36 +42,55 @@ class CRUDNotification(CRUDBase[Notification, NotificationCreate, NotificationUp
             notification_viewmodel_list.append(notifiactionViewModel)
         return notification_viewmodel_list
 
-    def get_by_receiver_uuid(self, db: Session, *, receiver_uuid: UUID) -> Optional[List[NotificationViewModel]]:
+    def get_by_receiver_uuid(
+        self, db: Session, *, receiver_uuid: UUID
+    ) -> Optional[List[NotificationViewModel]]:
         notification_viewmodel_list = []
-        notifications = db.query(Notification).filter(
-            Notification.receiver_uuid == receiver_uuid).all()
+        notifications = (
+            db.query(Notification)
+            .filter(Notification.receiver_uuid == receiver_uuid)
+            .all()
+        )
         for notification in notifications:
-            notification_text = db.query(NotificationTemplate).filter(
-                NotificationTemplate.template_uuid == notification.template_uuid).first().text
+            notification_text = (
+                db.query(NotificationTemplate)
+                .filter(
+                    NotificationTemplate.template_uuid == notification.template_uuid
+                )
+                .first()
+                .text
+            )
             # loop to replace
-            for idx, f in enumerate(notification.f_string.split(';')):
-                notification_text = notification_text.replace('{'+str(idx)+'}', f)
+            for idx, f in enumerate(notification.f_string.split(";")):
+                notification_text = notification_text.replace("{" + str(idx) + "}", f)
             # create a viewmodel and stored needed value
             notifiactionViewModel = NotificationViewModel(
-                receiver_uuid=notification.receiver_uuid, send_time=notification.send_time, content=notification_text)
+                receiver_uuid=notification.receiver_uuid,
+                send_time=notification.send_time,
+                content=notification_text,
+            )
             notification_viewmodel_list.append(notifiactionViewModel)
         for n in notification_viewmodel_list:
-            print('type >>>', type(n))
+            print("type >>>", type(n))
             print(n)
             print(n.content)
         return notification_viewmodel_list
 
     # TODO: unfinished
-    def create(self, db: Session, *, obj_in: NotificationCreate, from_MQ: bool) -> Notification:
+    def create(
+        self, db: Session, *, obj_in: NotificationCreate, from_MQ: bool
+    ) -> Notification:
         # TODO: notification寫入資料庫的時機? sender => 進到MQ前就存? receiver => 從MQ收到才存?
         # 發送通知
         if not from_MQ:
-            notification_text = db.query(NotificationTemplate).filter(
-                NotificationTemplate.template_uuid == obj_in.template_uuid).first()
+            notification_text = (
+                db.query(NotificationTemplate)
+                .filter(NotificationTemplate.template_uuid == obj_in.template_uuid)
+                .first()
+            )
             # loop to replace
-            for idx, f in enumerate(obj_in.f_string.split(';')):
-                notification_text = notification_text.replace('{'+str(idx)+'}', f)
+            for idx, f in enumerate(obj_in.f_string.split(";")):
+                notification_text = notification_text.replace("{" + str(idx) + "}", f)
 
             db_obj = Notification(
                 notification_uuid=uuid.uuid4(),  # generate a uuid as notification_uuid
@@ -65,7 +98,7 @@ class CRUDNotification(CRUDBase[Notification, NotificationCreate, NotificationUp
                 sender_uuid=obj_in.sender_uuid,
                 send_time=obj_in.send_time,
                 template_uuid=obj_in.template_uuid,  # ?
-                f_string=notification_text
+                f_string=notification_text,
             )
         # 接收通知
         else:

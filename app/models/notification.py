@@ -1,8 +1,10 @@
 import uuid
-from app.database.base_class import Base
-from sqlalchemy import DateTime, Column, String, Boolean, ForeignKey, ARRAY
+
+from sqlalchemy import Column, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
+
+from app.database.base_class import Base
 
 
 class Notification(Base):
@@ -13,9 +15,7 @@ class Notification(Base):
     receiver_uuid = Column(
         UUID(as_uuid=True), ForeignKey("User.user_uuid"), nullable=False
     )
-    sender_uuid = Column(
-        UUID(as_uuid=True), ForeignKey("User.user_uuid")
-    )
+    sender_uuid = Column(UUID(as_uuid=True), ForeignKey("User.user_uuid"))
     send_time = Column(DateTime(timezone=True), nullable=False, default=func.now())
     template_uuid = Column(String, nullable=False)
     f_string = Column(String)

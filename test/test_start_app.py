@@ -1,15 +1,16 @@
 # https://stackoverflow.com/questions/57412825/how-to-start-a-uvicorn-fastapi-in-background-when-testing-with-pytest
-import uvicorn
-import aiohttp
 import asyncio
-import asynctest
-from multiprocessing import Process
 import logging
+from multiprocessing import Process
+
+import aiohttp
+import asynctest
+import uvicorn
 from fastapi import FastAPI
 
 
 class App:
-    """ Core application to test. """
+    """Core application to test."""
 
     def __init__(self):
         self.api = FastAPI()
@@ -18,11 +19,11 @@ class App:
         self.api.on_event("shutdown")(self.close)
 
     async def close(self):
-        """ Gracefull shutdown. """
+        """Gracefull shutdown."""
         logging.warning("Shutting down the app.")
 
     async def read_root(self):
-        """ Read the root. """
+        """Read the root."""
         return {"msg": "Hello World"}
 
 
@@ -30,10 +31,10 @@ class App:
 
 
 class TestApp(asynctest.TestCase):
-    """ Test the app class. """
+    """Test the app class."""
 
     async def setUp(self):
-        """ Bring server up. """
+        """Bring server up."""
         app = App()
         self.proc = Process(
             target=uvicorn.run,
@@ -45,11 +46,11 @@ class TestApp(asynctest.TestCase):
         await asyncio.sleep(0.1)  # time for the server to start
 
     async def tearDown(self):
-        """ Shutdown the app. """
+        """Shutdown the app."""
         self.proc.terminate()
 
     async def test_read_root(self):
-        """ Fetch an endpoint from the app. """
+        """Fetch an endpoint from the app."""
         async with aiohttp.ClientSession() as session:
             async with session.get("http://127.0.0.1:8000/api/healthchecker") as resp:
                 data = await resp.json()

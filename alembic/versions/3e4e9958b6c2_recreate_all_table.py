@@ -1,8 +1,8 @@
-"""Create Demo 1 database table
+"""Recreate all table
 
-Revision ID: c2e93411c48c
+Revision ID: 3e4e9958b6c2
 Revises: 
-Create Date: 2023-04-04 07:34:46.880138
+Create Date: 2023-04-19 10:17:39.070645
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c2e93411c48c'
+revision = '3e4e9958b6c2'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -45,7 +45,7 @@ def upgrade() -> None:
     op.create_table('User',
     sa.Column('user_uuid', sa.UUID(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
-    sa.Column('password', sa.String(), nullable=False),
+    sa.Column('password', sa.String(), nullable=True),
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('line_id', sa.String(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
@@ -53,6 +53,7 @@ def upgrade() -> None:
     sa.Column('image', sa.String(), nullable=True),
     sa.Column('is_admin', sa.Boolean(), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=False),
+    sa.Column('is_google_sso', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('user_uuid'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('line_id')
@@ -100,18 +101,10 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('tag_uuid', 'room_uuid'),
     sa.UniqueConstraint('tag_text')
     )
-    op.create_table('GR_Member',
-    sa.Column('user_uuid', sa.UUID(), nullable=False),
-    sa.Column('group_uuid', sa.UUID(), nullable=False),
-    sa.Column('join_time', sa.DateTime(timezone=True), nullable=True),
-    sa.ForeignKeyConstraint(['group_uuid'], ['Group.group_uuid'], ),
-    sa.ForeignKeyConstraint(['user_uuid'], ['User.user_uuid'], ),
-    sa.PrimaryKeyConstraint('user_uuid', 'group_uuid')
-    )
     op.create_table('MR_Member',
     sa.Column('user_uuid', sa.UUID(), nullable=False),
     sa.Column('room_uuid', sa.UUID(), nullable=False),
-    sa.Column('member_uuid', sa.UUID(), nullable=False),
+    sa.Column('member_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('join_time', sa.DateTime(timezone=True), nullable=True),
     sa.Column('leave_time', sa.DateTime(timezone=True), nullable=True),
     sa.Column('is_left', sa.Boolean(), nullable=False),
@@ -120,33 +113,47 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['bind_uuid'], ['BindUser.bind_uuid'], ),
     sa.ForeignKeyConstraint(['room_uuid'], ['MatchingRoom.room_uuid'], ),
     sa.ForeignKeyConstraint(['user_uuid'], ['User.user_uuid'], ),
-    sa.PrimaryKeyConstraint('user_uuid', 'room_uuid', 'member_uuid'),
-    sa.UniqueConstraint('member_uuid')
+    sa.PrimaryKeyConstraint('member_id'),
+    sa.UniqueConstraint('member_id')
+    )
+    op.create_table('GR_Member',
+    sa.Column('member_id', sa.Integer(), nullable=False),
+    sa.Column('group_uuid', sa.UUID(), nullable=False),
+    sa.Column('join_time', sa.DateTime(timezone=True), nullable=True),
+    sa.ForeignKeyConstraint(['group_uuid'], ['Group.group_uuid'], ),
+    sa.ForeignKeyConstraint(['member_id'], ['MR_Member.member_id'], ),
+    sa.PrimaryKeyConstraint('member_id', 'group_uuid')
     )
     op.create_table('MR_Liked_Hated_Member',
-    sa.Column('member_uuid', sa.UUID(), nullable=False),
-    sa.Column('target_member_uuid', sa.UUID(), nullable=False),
+    sa.Column('member_id', sa.Integer(), nullable=False),
+    sa.Column('target_member_id', sa.Integer(), nullable=False),
+    sa.Column('room_uuid', sa.UUID(), nullable=False),
     sa.Column('is_liked', sa.Boolean(), nullable=False),
     sa.Column('is_hated', sa.Boolean(), nullable=False),
-    sa.ForeignKeyConstraint(['member_uuid'], ['MR_Member.member_uuid'], ),
-    sa.ForeignKeyConstraint(['target_member_uuid'], ['MR_Member.member_uuid'], ),
-    sa.PrimaryKeyConstraint('member_uuid', 'target_member_uuid')
+    sa.ForeignKeyConstraint(['member_id'], ['MR_Member.member_id'], ),
+    sa.ForeignKeyConstraint(['room_uuid'], ['MatchingRoom.room_uuid'], ),
+    sa.ForeignKeyConstraint(['target_member_id'], ['MR_Member.member_id'], ),
+    sa.PrimaryKeyConstraint('member_id', 'target_member_id')
     )
     op.create_table('MR_Member_Tag',
-    sa.Column('member_uuid', sa.UUID(), nullable=False),
+    sa.Column('member_id', sa.Integer(), nullable=False),
     sa.Column('tag_text', sa.String(), nullable=False),
+    sa.Column('room_uuid', sa.UUID(), nullable=False),
     sa.Column('is_self_tag', sa.Boolean(), nullable=False),
     sa.Column('is_find_tag', sa.Boolean(), nullable=False),
-    sa.ForeignKeyConstraint(['member_uuid'], ['MR_Member.member_uuid'], ),
-    sa.PrimaryKeyConstraint('member_uuid')
+    sa.ForeignKeyConstraint(['member_id'], ['MR_Member.member_id'], ),
+    sa.ForeignKeyConstraint(['room_uuid'], ['MatchingRoom.room_uuid'], ),
+    sa.PrimaryKeyConstraint('member_id', 'tag_text')
     )
     op.create_table('MR_Rcmed_Member',
-    sa.Column('member_uuid', sa.UUID(), nullable=False),
-    sa.Column('rcmed_member_uuid', sa.UUID(), nullable=False),
+    sa.Column('member_id', sa.Integer(), nullable=False),
+    sa.Column('rcmed_member_id', sa.Integer(), nullable=False),
+    sa.Column('room_uuid', sa.UUID(), nullable=False),
     sa.Column('order', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['member_uuid'], ['MR_Member.member_uuid'], ),
-    sa.ForeignKeyConstraint(['rcmed_member_uuid'], ['MR_Member.member_uuid'], ),
-    sa.PrimaryKeyConstraint('member_uuid', 'rcmed_member_uuid')
+    sa.ForeignKeyConstraint(['member_id'], ['MR_Member.member_id'], ),
+    sa.ForeignKeyConstraint(['rcmed_member_id'], ['MR_Member.member_id'], ),
+    sa.ForeignKeyConstraint(['room_uuid'], ['MatchingRoom.room_uuid'], ),
+    sa.PrimaryKeyConstraint('member_id', 'rcmed_member_id')
     )
     # ### end Alembic commands ###
 
@@ -156,8 +163,8 @@ def downgrade() -> None:
     op.drop_table('MR_Rcmed_Member')
     op.drop_table('MR_Member_Tag')
     op.drop_table('MR_Liked_Hated_Member')
-    op.drop_table('MR_Member')
     op.drop_table('GR_Member')
+    op.drop_table('MR_Member')
     op.drop_table('Tag')
     op.drop_table('Notification')
     op.drop_table('MatchingEvent')

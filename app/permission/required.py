@@ -60,7 +60,7 @@
 #         # assert type(user) == type(self.guest)
 #         current_session = self.__create_token(response, user)
 #         return current_session['user']
-    
+
 #     def logout(self, request: Request):
 #         authorization = request.cookies.get("authorization", None)
 #         try:
@@ -68,7 +68,7 @@
 #             return current_session['user']
 #         except :
 #             raise ApiException(code=1005, message="当前未登录，登出发生错误")
-        
+
 #     def __call__(self, *roles, **kwargs):
 #         login_only = kwargs.get("login_only", False)
 #         roles = [ self.roles[x] for x in roles ]
