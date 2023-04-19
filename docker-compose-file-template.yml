@@ -35,6 +35,7 @@ services:
             - GUNICORN_WORKERS=1
             - JSON_LOGS=0
             - LOG_LEVEL=DEBUG
+            - PRE_COMMIT_HOME=/backend/.pre-commit
         tty: true
         depends_on:
             - postgres
