@@ -1,6 +1,6 @@
 import uuid
 from app.database.base_class import Base
-from sqlalchemy import DateTime, Column, String, Boolean, ForeignKey, ARRAY
+from sqlalchemy import DateTime, Column, String, Boolean, ForeignKey, ARRAY, Sequence, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
@@ -13,8 +13,8 @@ class MR_Member(Base):
     room_uuid = Column(
         UUID(as_uuid=True), ForeignKey("MatchingRoom.room_uuid"), primary_key=True, nullable=False
     )
-    member_uuid = Column(
-        UUID(as_uuid=True), primary_key=True, unique=True, nullable=False, default=uuid.uuid4
+    member_id = Column(
+        Integer, Sequence(start=0, increment=True) #?
     )
     join_time = Column(DateTime(timezone=True), default=func.now())
     grouped_time = Column(DateTime(timezone=True)) #要改
