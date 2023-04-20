@@ -1,8 +1,8 @@
 """Recreate all table
 
-Revision ID: 3e4e9958b6c2
+Revision ID: f05ab6635930
 Revises: 
-Create Date: 2023-04-19 10:17:39.070645
+Create Date: 2023-04-20 11:19:01.256601
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3e4e9958b6c2'
+revision = 'f05ab6635930'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -106,8 +106,8 @@ def upgrade() -> None:
     sa.Column('room_uuid', sa.UUID(), nullable=False),
     sa.Column('member_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('join_time', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('leave_time', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('is_left', sa.Boolean(), nullable=False),
+    sa.Column('grouped_time', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('is_grouped', sa.Boolean(), nullable=False),
     sa.Column('is_bound', sa.Boolean(), nullable=False),
     sa.Column('bind_uuid', sa.UUID(), nullable=True),
     sa.ForeignKeyConstraint(['bind_uuid'], ['BindUser.bind_uuid'], ),
