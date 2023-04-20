@@ -52,6 +52,7 @@ def join_matching_room(
                                     user_uuid=user.user_uuid,
                                     room_uuid=matching_room.room_uuid
                                 )
+    loguru.logger.info(new_mr_member)
 
     return {'message': 'success', 'data': new_mr_member}
 
