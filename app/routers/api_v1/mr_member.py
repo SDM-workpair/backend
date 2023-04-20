@@ -54,3 +54,45 @@ def join_matching_room(
                                 )
 
     return {'message': 'success', 'data': new_mr_member}
+
+
+@router.delete("/")
+def leave_matching_room(
+    mr_member_in: schemas.MR_Member_Req,
+    db: Session = Depends(deps.get_db),
+) -> Any:
+    """
+    Leave matching room and delete MR_Member
+    """
+    # Check if user exists
+    user = crud.user.get_by_email(db=db, email=mr_member_in.user.email)
+    if not user:
+        raise HTTPException(
+            status_code=400,
+            detail="User does not exist in the system.",
+        )
+
+    # Check if matching room exists
+    matching_room = crud.matching_room.get_by_room_id(db=db, room_id=mr_member_in.matching_room.room_id)
+    if not matching_room:
+        raise HTTPException(
+            status_code=400,
+            detail="Matching room does not exist in the system.",
+        )
+
+    # Check if user is in matching room
+    mr_member = crud.mr_member.get_by_room_uuid_and_user_uuid(
+                                    db=db, 
+                                    room_uuid=matching_room.room_uuid, 
+                                    user_uuid=user.user_uuid
+                                )
+    if not mr_member:
+        raise HTTPException(
+            status_code=400,
+            detail="User is not in the matching room.",
+        )
+
+    # Create MR_Member
+    result = crud.mr_member.delete(db=db, db_obj=mr_member)
+
+    return {'message': 'success', 'data': result}

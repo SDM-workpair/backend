@@ -31,11 +31,9 @@ class CRUDMR_Member(CRUDBase[MR_Member, MR_Member_Create, MR_Member_Update]):
         db.refresh(db_obj)
         return db_obj
 
-    def delete(self, db: Session, *, db_obj: MatchingRoom, room_id: str):
-        if room_id is not None or room_id != "":
-            db_obj = self.get_by_room_id(room_id)
-            db.delete(db_obj)
-            db.commit()
+    def delete(self, db: Session, *, db_obj: MR_Member):
+        db.delete(db_obj)
+        db.commit()
         return True
 
 
