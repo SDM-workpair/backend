@@ -20,7 +20,6 @@ class MatchingRoomReq(BaseModel):
     min_member_num: int
     description: Optional[str] = None
     is_forced_matching: bool = False
-    created_time: datetime = None
 
 class MatchingRoomCreate(MatchingRoomBase):
     name: Optional[str] = None

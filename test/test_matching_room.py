@@ -9,7 +9,7 @@ client = TestClient(app)
 def test_create_matching_room():
     response = client.post(
         f"{settings.API_V1_STR}/matching-room/create",
-        json={"name": "test_mr", "room_id": "test_mr001", "due_time": "2023-04-06T01:27:50.024Z",
+        json={"name": "test_mr", "due_time": "2023-04-06T01:27:50.024Z",
               "min_member_num": 3, "description": "desc", "is_forced_matching": False}
     )
     assert response.status_code == 200
