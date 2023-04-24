@@ -10,7 +10,7 @@ import loguru
 router = APIRouter()
 
 @router.post("/create-self-tag") #response-model
-async def create_mr_member_tag(
+async def create_mr_member_self_tag(
     mr_member_tag_in: schemas.MR_Member_Tag_Create,
     db: Session = Depends(deps.get_db),
 ) -> Any:
@@ -38,7 +38,6 @@ async def create_mr_member_tag(
     return {'message': 'success', 'data': mr_member_tag_list}
 
 
-# TODO
 @router.post("/create-find-tag") #response-model
 async def create_mr_member_find_tag(
     mr_member_tag_in: schemas.MR_Member_Tag_Create,
@@ -63,6 +62,6 @@ async def create_mr_member_find_tag(
                                             is_self_tag=False,
                                             is_find_tag=True,
                                             mr_member_tag_in= mr_member_tag_in)
-    
+    # 不知為啥回傳後只剩最後一個
     return {'message': 'success', 'data':mr_member_tag_list}
 
