@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.routers import deps
+import loguru
 
 router = APIRouter()
 
@@ -23,7 +24,7 @@ def read_my_matching_rooms(
     return {"message": "success", "data": matching_rooms}
 
 
-@router.post("/create", response_model=schemas.MatchingRoomWithMessage)
+@router.post("/create", response_model=schemas.MatchingRoomWithRoomId)
 def create_matching_room(
     *,
     db: Session = Depends(deps.get_db),
@@ -35,7 +36,9 @@ def create_matching_room(
     Create new matching room.
     """
     matching_room = crud.matching_room.create(db, obj_in=matching_room_in)
-    return {'message': 'success', 'data': matching_room}
+    data = {'room_id':matching_room.room_id}
+
+    return {'message': 'success', 'data': data}
 
 
 

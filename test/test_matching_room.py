@@ -29,16 +29,6 @@ fake_matching_room.created_time = None
 def create_session_cookie(data) -> str:
     signer = TimestampSigner(str(settings.GOOGLE_SECRET_KEY))
 
-def test_create_matching_room():
-    response = client.post(
-        f"{settings.API_V1_STR}/matching-room/create",
-        json={"name": "test_mr", "due_time": "2023-04-06T01:27:50.024Z",
-              "min_member_num": 3, "description": "desc", "is_forced_matching": False}
-    )
-    assert response.status_code == 200
-    assert response.json()['message'] == 'success'
-    assert response.json()['data']['name'] == 'test_mr'
-
 
 def get_user_authentication_headers():
     email = "admin@sdm-teamatch.com"
@@ -51,6 +41,8 @@ def get_user_authentication_headers():
     )
     headers = {"Authorization": f"Bearer {access_token}"}
     return headers
+
+
 
 
 class TestMatchingRoomAPI(unittest.TestCase):
@@ -133,3 +125,13 @@ class TestMatchingRoomAPI(unittest.TestCase):
         )
         assert response.status_code == 401
         assert response.json()["detail"] == "Not authenticated"
+
+def test_create_matching_room():
+    response = client.post(
+        f"{settings.API_V1_STR}/matching-room/create",
+        json={"name": "test_mr", "due_time": "2023-04-06T01:27:50.024Z",
+            "min_member_num": 3, "description": "desc", "is_forced_matching": False},
+        headers=get_user_authentication_headers(),
+    )
+    assert response.status_code == 200
+    assert response.json()['message'] == 'success'

@@ -10,7 +10,7 @@ import loguru
 router = APIRouter()
 
 
-@router.post("/create")
+@router.post("/create" , response_model=schemas.MR_Member_Res)
 def join_matching_room(
     mr_member_in: schemas.MR_Member_Req,
     db: Session = Depends(deps.get_db),
@@ -53,9 +53,21 @@ def join_matching_room(
                                     user_uuid=user.user_uuid,
                                     room_uuid=matching_room.room_uuid
                                 )
-    loguru.logger.info(new_mr_member)
 
-    return {'message': 'success', 'data': new_mr_member}
+    # Recreate response model
+    data = {
+        "member_id": new_mr_member.member_id,
+        "user":{
+            'email':user.email,
+            'is_admin':user.is_admin,
+            'name':user.name
+        },
+        "matching_room":{
+            'room_id':matching_room.room_id
+        } 
+    }
+
+    return {'message': 'success', 'data': data}
 
 
 @router.delete("/")

@@ -71,6 +71,9 @@ class MatchingRoomWithMessage(BaseModel):
     message: str
     data: Optional[MatchingRoom] = None
 
+class MatchingRoomWithRoomId(BaseModel):
+    message: str
+    data: Optional[MatchingRoomBase] = None
 
 class MatchingRoomWithSearch(BaseModel):
     prompt: str

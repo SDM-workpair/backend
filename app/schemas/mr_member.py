@@ -24,6 +24,13 @@ class MR_Member_Create(MR_Member_Base):
     matching_room: MatchingRoomBase
     join_time: datetime = None
 
+class MR_Member_Res_Base(MR_Member_Base):
+    user: UserBase
+    matching_room: MatchingRoomBase
+
+class MR_Member_Res(BaseModel):
+    message: str
+    data: MR_Member_Res_Base
 
 # Properties to receive via API on update
 class MR_Member_Update(MR_Member_Base):

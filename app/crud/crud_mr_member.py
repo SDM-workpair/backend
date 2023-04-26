@@ -35,6 +35,7 @@ class CRUDMR_Member(CRUDBase[MR_Member, MR_Member_Create, MR_Member_Update]):
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
+        
         return db_obj
 
     def delete(self, db: Session, *, db_obj: MR_Member):
