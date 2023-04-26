@@ -64,7 +64,7 @@ async def test_google_sso(request: Request):
         '<script src="https://accounts.google.com/gsi/client" async defer></script>'
         '<div id="g_id_onload"'
         'data-client_id="768305533256-eg3ift96spolgtm69bo6r3423df13c73.apps.googleusercontent.com"'
-        'data-login_uri="http://localhost:8000/api/v1/auth/sso-login"'
+        'data-callback="handleCallback"'
         'data-auto_prompt="false">'
         "</div>"
         '<div class="g_id_signin"'
@@ -75,6 +75,20 @@ async def test_google_sso(request: Request):
         'data-shape="rectangular"'
         'data-logo_alignment="left">'
         "</div>"
+        "<script>"
+        "function handleCallback(response) {"
+        'fetch("http://localhost:8000/api/v1/auth/sso-login", {'
+        "method: 'POST',"
+        "headers: {"
+        "'Content-Type': 'application/json'"
+        "},"
+        "body: JSON.stringify({credential: response.credential})"
+        "})"
+        ".catch(error => {"
+        "console.error('Error:', error);"
+        "});"
+        "}"
+        "</script>"
         "</body>"
     )
     return HTMLResponse(html)

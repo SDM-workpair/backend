@@ -3,35 +3,44 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app import crud, schemas
+from app import crud, models, schemas
 from app.routers import deps
 
 router = APIRouter()
 
 
-@router.post("/my-list", response_model=schemas.GroupWithMessage)
+@router.get("/my-list", response_model=schemas.GroupWithMessage)
 def read_my_groups(
-    user_in: schemas.User,
-    db: Session = Depends(deps.get_db)  # ,
-    # current_user: models.user = Depends(deps.get_current_active_superuser),
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve user's groups.
     """
-    #  先看user_email是否找得到user再去query group
-    if user_in.email == "" or user_in.email is None:
-        raise HTTPException(
-            status_code=400,
-            detail="Fail to retrieve user's group. Missing parameter: email.",
-        )
-    user = crud.user.get_by_email(db=db, email=user_in.email)
-    if not user:
-        raise HTTPException(
-            status_code=400,
-            detail="Fail to find user with this email.",
-        )
-    groups = crud.group.search_with_user_and_name(db=db, user_uuid=user.user_uuid)
+    groups = crud.group.search_with_user_and_name(
+        db=db, user_uuid=current_user.user_uuid
+    )
     return {"message": "success", "data": groups}
+
+
+@router.post("/members", response_model=schemas.UsersMessage)
+def get_group_members(
+    gr_member_search_in: schemas.GR_MemberWithSearch,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Retrieve group members with group_id.
+    """
+    if gr_member_search_in.group_id == "":
+        raise HTTPException(
+            status_code=400,
+            detail="Fail to get group members. Missing parameter: group_id.",
+        )
+    members = crud.gr_member.get_all_members_by_group_id(
+        db=db, group_id=gr_member_search_in.group_id
+    )
+    return {"message": "success", "data": members}
 
 
 # # TODO: unfinished

@@ -1,7 +1,7 @@
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Sequence
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
-from app.database.session import engine
+
 from app.database.base_class import Base
 
 
@@ -25,7 +25,7 @@ class MR_Member(Base):
         nullable=False,
     )
     join_time = Column(DateTime(timezone=True), default=func.now())
-    grouped_time = Column(DateTime(timezone=True)) 
-    is_grouped = Column(Boolean, nullable=False, default=False) 
+    grouped_time = Column(DateTime(timezone=True))
+    is_grouped = Column(Boolean, nullable=False, default=False)
     is_bound = Column(Boolean, nullable=False, default=False)
     bind_uuid = Column(UUID(as_uuid=True), ForeignKey("BindUser.bind_uuid"))

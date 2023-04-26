@@ -3,9 +3,9 @@
 
 ## Google sso 後端測試:
 1. 前往 http://localhost:8000/test-google-sso 按google button
-2. 去 http://localhost:8000/docs 操作 get user profile和 update user profile
-3. http://localhost:8000/api/v1/users/logout 登出
-4. 再操作 get user profile or update user profile 都會跳錯誤 錯誤訊息 "Could not validate credentials."
+2. 如果是未登入過的 google 帳號，會在Database建一個新帳號
+3. 在 http://localhost:8000/docs ，API旁邊有一個鎖符號的話表示需要驗證 user，點鎖後username輸入剛剛的google email，密碼隨便輸入就可以登入
+4. 登入後， ex: read user me, update user profile之類的 API 就可以使用，登出後再打 API 會出現 401 error
 
 ## Database 更動
 1. User: password欄位改nullable

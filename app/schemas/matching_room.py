@@ -57,6 +57,7 @@ class MatchingRoom(MatchingRoomInDBBase):
 
 # Additional properties stored in DB
 class MatchingRoomInDB(MatchingRoomInDBBase):
+    room_uuid: UUID
     is_closed: bool = False
     finish_time: datetime
 
@@ -72,6 +73,5 @@ class MatchingRoomWithMessage(BaseModel):
 
 
 class MatchingRoomWithSearch(BaseModel):
-    user_email: str
     prompt: str
     query_all: bool

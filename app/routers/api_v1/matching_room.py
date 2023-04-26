@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
@@ -9,29 +9,16 @@ from app.routers import deps
 router = APIRouter()
 
 
-@router.post("/my-list", response_model=schemas.MatchingRoomsWithMessage)
+@router.get("/my-list", response_model=schemas.MatchingRoomsWithMessage)
 def read_my_matching_rooms(
-    user_in: schemas.User,
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve user's matching rooms.
     """
-    #  先看email是否找得到user再去query matching room
-    if user_in.email == "" or user_in.email is None:
-        raise HTTPException(
-            status_code=400,
-            detail="Fail to retrieve user's matching room. Missing parameter: email.",
-        )
-    user = crud.user.get_by_email(db=db, email=user_in.email)
-    if not user:
-        raise HTTPException(
-            status_code=400,
-            detail="Fail to find user with this email.",
-        )
     matching_rooms = crud.matching_room.search_with_user_and_name(
-        db=db, user_uuid=user.user_uuid
+        db=db, user_uuid=current_user.user_uuid
     )
     return {"message": "success", "data": matching_rooms}
 

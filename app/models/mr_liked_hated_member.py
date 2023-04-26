@@ -4,6 +4,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from app.database.base_class import Base
 from app.models.mr_member import MR_Member
 
+
 class MR_Liked_Hated_Member(Base):
     __tablename__ = "MR_Liked_Hated_Member"
     member_id = Column(

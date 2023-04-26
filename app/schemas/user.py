@@ -3,7 +3,7 @@ BaseModel.schema will return a dict of the schema
 while BaseModel.schema_json will return a JSON string representation of that dict.
 """
 
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, EmailStr
 
@@ -66,3 +66,8 @@ class UserCredential(BaseModel):
 class UserMessage(BaseModel):
     message: str
     data: Optional[User] = None
+
+
+class UsersMessage(BaseModel):
+    message: str
+    data: Optional[List[User]] = None

@@ -19,6 +19,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             email=obj_in.email,
             password=obj_in.password,
             name=obj_in.name,
+            image=obj_in.image,
             is_admin=obj_in.is_admin,
             is_google_sso=obj_in.is_google_sso,
         )
@@ -44,8 +45,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         user = self.get_by_email(db, email=email)
         if not user:
             return None
-        if not verify_password(password, user.password):
-            return None
+        if not user.is_google_sso:
+            if not verify_password(password, user.password):
+                return None
         return user
 
     def is_active(self, user: User) -> bool:

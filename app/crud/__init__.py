@@ -1,3 +1,4 @@
+from .crud_gr_member import gr_member
 from .crud_group import group
 from .crud_matching_room import matching_room
 from .crud_notification import notification

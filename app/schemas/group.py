@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 # Shared properties
 class GroupBase(BaseModel):
-    group_uuid: UUID
+    pass
 
 
 # Properties to receive via API on creation
@@ -48,7 +48,7 @@ class Group(GroupInDBBase):
 
 # Additional properties stored in DB
 class GroupInDB(GroupInDBBase):
-    pass
+    group_uuid: UUID
 
 
 class GroupWithMessage(BaseModel):
@@ -57,5 +57,4 @@ class GroupWithMessage(BaseModel):
 
 
 class GroupWithSearch(BaseModel):
-    user_email: str
     prompt: str
