@@ -3,7 +3,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app import crud, schemas
+from app import crud, models, schemas
 from app.routers import deps
 
 router = APIRouter()
@@ -13,7 +13,7 @@ router = APIRouter()
 def read_my_matching_rooms(
     user_in: schemas.User,
     db: Session = Depends(deps.get_db),
-    # current_user: models.user = Depends(deps.get_current_active_superuser),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve user's matching rooms.
@@ -41,6 +41,8 @@ def create_matching_room(
     *,
     db: Session = Depends(deps.get_db),
     matching_room_in: schemas.MatchingRoomReq,
+    current_user: models.User = Depends(deps.get_current_active_user),
+
 ) -> Any:
     """
     Create new matching room.

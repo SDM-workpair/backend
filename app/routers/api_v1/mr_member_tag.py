@@ -3,7 +3,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import ARRAY
-from app import crud, schemas
+from app import crud, models, schemas
 from app.routers import deps
 import loguru
 
@@ -13,6 +13,7 @@ router = APIRouter()
 async def create_mr_member_self_tag(
     mr_member_tag_in: schemas.MR_Member_Tag_Create,
     db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create MR_Member self-tag
@@ -41,6 +42,7 @@ async def create_mr_member_self_tag(
 async def create_mr_member_find_tag(
     mr_member_tag_in: schemas.MR_Member_Tag_Create,
     db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create MR_Member find-tag
