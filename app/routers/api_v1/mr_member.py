@@ -3,7 +3,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app import crud, schemas
+from app import crud, models, schemas
 from app.routers import deps
 import loguru
 
@@ -14,6 +14,7 @@ router = APIRouter()
 def join_matching_room(
     mr_member_in: schemas.MR_Member_Req,
     db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create MR_Member
@@ -61,6 +62,7 @@ def join_matching_room(
 def leave_matching_room(
     mr_member_in: schemas.MR_Member_Req,
     db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Leave matching room and delete MR_Member
