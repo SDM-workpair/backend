@@ -28,9 +28,12 @@ class MR_Member_Res_Base(MR_Member_Base):
     user: UserBase
     matching_room: MatchingRoomBase
 
-class MR_Member_Res(BaseModel):
+class MR_Member_Create_Res(BaseModel):
     message: str
     data: MR_Member_Res_Base
+
+class MR_Member_Del_Res(BaseModel):
+    message: str
 
 # Properties to receive via API on update
 class MR_Member_Update(MR_Member_Base):

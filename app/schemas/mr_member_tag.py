@@ -42,4 +42,8 @@ class MR_Member_Tag_InDBBase(MR_Member_Tag_Base):
 class MR_Member_Tag(MR_Member_Tag_Base):
     pass
 
+class MR_Member_Tag_Res(BaseModel):
+    message: str
+    data: List[str]
+
 

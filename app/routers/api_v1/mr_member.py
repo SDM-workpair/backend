@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
@@ -10,7 +10,7 @@ import loguru
 router = APIRouter()
 
 
-@router.post("/create" , response_model=schemas.MR_Member_Res)
+@router.post("/create" , response_model=schemas.MR_Member_Create_Res)
 def join_matching_room(
     mr_member_in: schemas.MR_Member_Req,
     db: Session = Depends(deps.get_db),
@@ -70,7 +70,7 @@ def join_matching_room(
     return {'message': 'success', 'data': data}
 
 
-@router.delete("/")
+@router.delete("/", response_model=schemas.MR_Member_Del_Res)
 def leave_matching_room(
     mr_member_in: schemas.MR_Member_Req,
     db: Session = Depends(deps.get_db),
@@ -107,7 +107,10 @@ def leave_matching_room(
             detail="User is not in the matching room.",
         )
 
-    # Create MR_Member
+    # Delete MR_Member
     result = crud.mr_member.delete(db=db, db_obj=mr_member)
 
-    return {'message': 'success', 'data': result}
+    if result:
+        return {'message': 'success'}
+    
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

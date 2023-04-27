@@ -9,7 +9,7 @@ import loguru
 
 router = APIRouter()
 
-@router.post("/create-self-tag")
+@router.post("/create-self-tag", response_model=schemas.MR_Member_Tag_Res)
 async def create_mr_member_self_tag(
     mr_member_tag_in: schemas.MR_Member_Tag_Create,
     db: Session = Depends(deps.get_db),
@@ -38,7 +38,7 @@ async def create_mr_member_self_tag(
     return {'message': 'success', 'data': mr_member_tag_list}
 
 
-@router.post("/create-find-tag")
+@router.post("/create-find-tag", response_model=schemas.MR_Member_Tag_Res)
 async def create_mr_member_find_tag(
     mr_member_tag_in: schemas.MR_Member_Tag_Create,
     db: Session = Depends(deps.get_db),
