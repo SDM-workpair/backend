@@ -9,6 +9,7 @@ from starlette.responses import HTMLResponse
 from app.core.config import settings
 from app.routers.api_v1.api import api_router
 from app.utils import get_tw_time
+import app.core.scheduler.matching_event
 
 app = FastAPI(
     title=settings.APP_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json)"

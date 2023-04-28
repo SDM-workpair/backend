@@ -15,7 +15,12 @@ class MatchingRoomBase(BaseModel):
 
 
 # Properties to receive via API on creation
-
+class MatchingRoomReq(BaseModel):
+    name: Optional[str] = None
+    due_time: datetime
+    min_member_num: int
+    description: Optional[str] = None
+    is_forced_matching: bool = False
 
 class MatchingRoomCreate(MatchingRoomBase):
     name: Optional[str] = None
@@ -72,3 +77,7 @@ class MatchingRoomWithMessage(BaseModel):
 class MatchingRoomWithSearch(BaseModel):
     prompt: str
     query_all: bool
+
+class MatchingRoomWithRoomId(BaseModel):
+    message: str
+    room_id: str

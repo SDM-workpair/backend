@@ -7,6 +7,8 @@ from .matching_room import (
     MatchingRoomsWithMessage,
     MatchingRoomWithMessage,
     MatchingRoomWithSearch,
+    MatchingRoomReq,
+    MatchingRoomWithRoomId
 )
 from .notification import (
     Notification,
