@@ -36,9 +36,8 @@ def create_matching_room(
     Create new matching room.
     """
     matching_room = crud.matching_room.create(db, obj_in=matching_room_in)
-    data = {'room_id':matching_room.room_id}
 
-    return {'message': 'success', 'data': data}
+    return {'message': 'success', 'room_id':matching_room.room_id}
 
 
 

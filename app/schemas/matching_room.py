@@ -73,7 +73,7 @@ class MatchingRoomWithMessage(BaseModel):
 
 class MatchingRoomWithRoomId(BaseModel):
     message: str
-    data: Optional[MatchingRoomBase] = None
+    room_id: str
 
 class MatchingRoomWithSearch(BaseModel):
     prompt: str
