@@ -123,17 +123,7 @@ def test_delete_mr_member(self) -> None:
     """
 
 def test_mr_member_self_tag():
-    loguru.logger.info({
-                "mr_member": {
-                    "member_id": test_mr_member.member_id
-                },
-                "tag_text_list": [
-                    random_lower_string()
-                ],
-                "matching_room": test_mr_member.created_room
-            },)
 
-    # mr_member
     response = client.post(
         f"{settings.API_V1_STR}/mr-member-tag/create-self-tag",
         json={
@@ -150,17 +140,7 @@ def test_mr_member_self_tag():
     assert response.json()["message"] == "success"
 
 def test_mr_member_find_tag():
-    loguru.logger.info({
-                "mr_member": {
-                    "member_id": test_mr_member.member_id
-                },
-                "tag_text_list": [
-                    random_lower_string()
-                ],
-                "matching_room": test_mr_member.created_room
-            },)
 
-    # mr_member
     response = client.post(
         f"{settings.API_V1_STR}/mr-member-tag/create-find-tag",
         json={
