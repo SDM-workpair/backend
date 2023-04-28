@@ -21,3 +21,22 @@ class MatchingRoom(Base):
     created_time = Column(DateTime(timezone=True), default=func.now())
     is_closed = Column(Boolean, nullable=False, default=False)
     finish_time = Column(DateTime(timezone=True), nullable=True)
+
+
+"""
+Matching event scheduler
+"""
+
+from sqlalchemy import event
+import loguru
+from app.core.scheduler.matching_event import matching_event
+
+@event.listens_for(MatchingRoom, 'after_insert')
+def receive_after_insert(mapper, connection, target):
+    "listen for the 'after_insert' event"
+    # loguru.logger.info(mapper)
+    # loguru.logger.info(connection)
+    # loguru.logger.info(target.due_time)
+    matching_event(target.due_time)
+    
+    # ... (event handling logic) ...
