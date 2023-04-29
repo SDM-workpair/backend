@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 # Shared properties
 class NotificationBase(BaseModel):
-    notification_uuid: UUID
+    pass
 
 
 # Properties to receive via API on creation
@@ -50,7 +50,7 @@ class Notification(NotificationInDBBase):
 
 # Additional properties stored in DB
 class NotificationInDB(NotificationInDBBase):
-    pass
+    notification_uuid: UUID
 
 
 class NotificationViewModel(BaseModel):

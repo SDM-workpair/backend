@@ -1,12 +1,11 @@
 from datetime import timedelta
 from typing import Any
 
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.encoders import jsonable_encoder
 from google.auth.transport import requests
 from google.oauth2 import id_token
 from sqlalchemy.orm import Session
-from starlette.responses import JSONResponse
 
 from app import crud, schemas
 from app.core import security
@@ -18,7 +17,7 @@ from app.schemas.user import UserCreate, UserCredential
 router = APIRouter()
 
 
-@router.post("/sso-login", response_model=schemas.MatchingRoomsWithMessage)
+@router.post("/sso-login", response_model=schemas.SSOLoginMessage)
 # def google_auth(request:Request, response: Response, db: Session =Depends(deps.get_db), credential:str= Form(...)) -> Any: # for google 重新導向URI(google重新導向怪怪的應該不會用這個ㄌ)
 def google_auth(
     request: Request,
@@ -30,8 +29,8 @@ def google_auth(
     Google credential decode and authentication
     """
     # Supplied by g_id_onload
-    # tokenid = credential
     tokenid = credential.credential
+    # tokenid = credential
     try:
         idinfo = id_token.verify_oauth2_token(
             tokenid,
@@ -39,7 +38,16 @@ def google_auth(
             settings.GOOGLE_CLIENT_ID,
             clock_skew_in_seconds=5,
         )
+        userid = idinfo["sub"]
+        print(userid)
+    except ValueError:
+        # Invalid token
+        raise HTTPException(
+            status_code=401,
+            detail="Unauthorized",
+        )
 
+    try:
         # # 檢查此google帳號是否已建立帳號
         user = crud.user.get_by_email(db, email=idinfo["email"])
 
@@ -91,14 +99,19 @@ def google_auth(
             "token_type": "bearer",
         }
 
-        # 回傳 Matching room list
         matching_rooms = crud.matching_room.search_with_user_and_name(db)
 
-        return {"message": "success", "data": matching_rooms}
-
-    except ValueError:
-        # Invalid token
-        return JSONResponse(
-            status_code=401,
-            content={"message": "Unauthorized", "data": None},
+        # 回傳 token, user, Matching room list
+        return {
+            "message": "success",
+            "data": {
+                "access_token": access_token["access_token"],
+                "user": user,
+                "matching_rooms": matching_rooms,
+            },
+        }
+    except KeyError:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing some user info from google authentication. Please use another way to create new account.",
         )

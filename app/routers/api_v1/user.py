@@ -1,7 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.encoders import jsonable_encoder
+from sqlalchemy import exc
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
@@ -47,15 +47,11 @@ def create_user(
 @router.get("/profile/me", response_model=schemas.user.UserMessage)
 def read_user_me(
     db: Session = Depends(deps.get_db),
-    # current_user: models.User = Depends(deps.get_current_active_user),
-    current_user: models.User = Depends(deps.get_login_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get current logged-in user's profile.
     """
-    current_user = crud.user.get_by_email(
-        db, email=jsonable_encoder(current_user)["email"]
-    )
 
     return {"message": "success", "data": current_user}
 
@@ -90,16 +86,14 @@ def update_user_profile(
     *,
     db: Session = Depends(deps.get_db),
     user_in: schemas.user.UserUpdateNoEmail,
-    # current_user: models.User = Depends(deps.get_current_active_user),
-    current_user: models.User = Depends(deps.get_login_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update current logged-in user's profile.
     """
-    user = crud.user.get_by_email(db, email=jsonable_encoder(current_user["email"]))
     try:
-        user = crud.user.update(db, db_obj=user, obj_in=user_in)
-    except Exception:
+        user = crud.user.update(db, db_obj=current_user, obj_in=user_in)
+    except exc.IntegrityError:
         raise HTTPException(
             status_code=400,
             detail="duplicate line_id",

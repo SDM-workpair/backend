@@ -52,14 +52,20 @@ class CRUDNotification(CRUDBase[Notification, NotificationCreate, NotificationUp
             .all()
         )
         for notification in notifications:
-            notification_text = (
+            notification_text = ""
+            notification_obj = (
                 db.query(NotificationTemplate)
                 .filter(
                     NotificationTemplate.template_uuid == notification.template_uuid
                 )
                 .first()
-                .text
             )
+            if notification_obj is None:
+                raise ValueError(
+                    f"Fail to retrieve notification_template with template_uuid={notification.template_uuid}"
+                )
+            else:
+                notification_text = notification_obj.text
             # loop to replace
             for idx, f in enumerate(notification.f_string.split(";")):
                 notification_text = notification_text.replace("{" + str(idx) + "}", f)
@@ -70,10 +76,6 @@ class CRUDNotification(CRUDBase[Notification, NotificationCreate, NotificationUp
                 content=notification_text,
             )
             notification_viewmodel_list.append(notifiactionViewModel)
-        for n in notification_viewmodel_list:
-            print("type >>>", type(n))
-            print(n)
-            print(n.content)
         return notification_viewmodel_list
 
     # TODO: unfinished

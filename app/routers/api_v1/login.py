@@ -11,12 +11,6 @@ from app.core import security
 from app.core.config import settings
 from app.routers import deps
 
-# from google.oauth2 import id_token
-# from google.auth.transport import requests
-
-
-# from fastapi_sso.sso.google import GoogleSSO
-
 router = APIRouter()
 
 
@@ -79,49 +73,3 @@ def test_token(current_user: models.user = Depends(deps.get_current_user)) -> An
     Test access token
     """
     return current_user
-
-
-# @router.post("/google-login/access-token", response_model=schemas.Token)
-# def google_login_access_token(
-#     response: Response,
-#     db: Session = Depends(deps.get_db),
-#     form_data: OAuth2PasswordRequestForm = Depends()
-# ) -> Any:
-
-#     """
-#     已驗證google登入帳號，直接產生token
-#     """
-#     user = crud.user.get_by_email(db, email=form_data.username)
-#     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-
-#     access_token = security.create_access_token(
-#         user.user_uuid, expires_delta=access_token_expires
-#     )
-
-#     response.set_cookie(
-#         "access_token",
-#         access_token,
-#         settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-#         settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-#         "/",
-#         None,
-#         False,
-#         True,
-#         "lax",
-#     )
-
-#     response.set_cookie(
-#         "logged_in",
-#         "True",
-#         settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-#         settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-#         "/",
-#         None,
-#         False,
-#         False,
-#         "lax",
-#     )
-#     return {
-#             "access_token": access_token,
-#             "token_type": "bearer",
-#     }

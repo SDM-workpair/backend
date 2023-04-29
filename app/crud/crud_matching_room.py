@@ -30,9 +30,11 @@ class CRUDMatchingRoom(CRUDBase[MatchingRoom, MatchingRoomCreate, MatchingRoomUp
         # filter out matching rooms for user first
         if user_uuid:
             mr_members = db.query(MR_Member).filter(MR_Member.user_uuid == user_uuid)
+            print("mr_members >>> ", mr_members)
             matching_rooms = matching_rooms.filter(
                 MatchingRoom.room_uuid.in_([x.room_uuid for x in mr_members])
             )
+            print("matching_rooms >>> ", matching_rooms)
         if name != "":
             matching_rooms = matching_rooms.filter(
                 MatchingRoom.name.ilike("%{}%".format(name))
