@@ -2,7 +2,7 @@ import random
 from abc import ABC, abstractmethod
 from typing import List, Tuple
 
-import numpy as np
+from numpy import dot, linalg, zeros
 
 
 class GroupingStrategy(ABC):
@@ -77,11 +77,11 @@ class SimilarityGrouping(GroupingStrategy):
         num_groups = len(slots)
 
         # Compute pairwise cosine similarity matrix
-        sim_matrix = np.zeros((num_users, num_users))
+        sim_matrix = zeros((num_users, num_users))
         for i in range(num_users):
             for j in range(i + 1, num_users):
-                sim = np.dot(users[i][1], users[j][1]) / (
-                    np.linalg.norm(users[i][1]) * np.linalg.norm(users[j][1])
+                sim = dot(users[i][1], users[j][1]) / (
+                    linalg.norm(users[i][1]) * linalg.norm(users[j][1])
                 )
                 sim_matrix[i][j] = sim
                 sim_matrix[j][i] = sim
@@ -104,3 +104,38 @@ class SimilarityGrouping(GroupingStrategy):
             groups[i] = [users[user_id][0] for user_id in group]
 
         return groups
+
+
+if __name__ == "__main__":
+    users_pref = [
+        (1, [0, 1, 1, -1]),
+        (2, [-1, 0, 1, -1]),
+        (3, [1, -1, -1, 1]),
+        (4, [-1, 1, 0, 1]),
+        (5, [1, -1, -1, 1]),
+    ]
+
+    # algorithm testing
+    print("test")
+    slots = [3, 2, 1]
+
+    print("Tinder")
+    tg = TinderGrouping()
+    groups_tinder = tg.group_users(users_pref, slots)
+
+    for i, group in groups_tinder.items():
+        print(f"Group {i+1}: {group}")
+
+    print("Random")
+    rg = RandomGrouping()
+    groups_random = rg.group_users(users_pref, slots)
+
+    for i, group in groups_random.items():
+        print(f"Group {i+1}: {group}")
+
+    print("Similarity")
+    sg = SimilarityGrouping()
+    groups = sg.group_users(users_pref, slots)
+
+    for i, group in groups.items():
+        print(f"Group {i+1}: {group}")

@@ -165,3 +165,10 @@ cython_debug/
 
 # pre-commit files
 ./pre-commit/
+./pre-commit/*
+./.pre-commit/*
+.lock
+db.db
+
+# profile
+prof/
