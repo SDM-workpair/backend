@@ -62,3 +62,8 @@ class NotificationViewModel(BaseModel):
 class NotificationTextWithMessage(BaseModel):
     message: str
     data: Optional[List[NotificationViewModel]] = None
+
+
+class NotificationPollingMessage(BaseModel):
+    message: str
+    data: int

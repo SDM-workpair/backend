@@ -110,5 +110,11 @@ class CRUDNotification(CRUDBase[Notification, NotificationCreate, NotificationUp
         db.refresh(db_obj)
         return db_obj
 
+    def set_notifications_read(self, db: Session, *, user_uuid: UUID) -> None:
+        db.query(Notification).filter(Notification.receiver_uuid == user_uuid).update(
+            {"is_read": True}
+        )
+        db.commit()
+
 
 notification = CRUDNotification(Notification)

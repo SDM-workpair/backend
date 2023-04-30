@@ -27,3 +27,27 @@ def read_my_notifications(
         )
 
     return {"message": "success", "data": notifications}
+
+
+@router.get("/set-read", response_model=schemas.NotificationTextWithMessage)
+def set_notification_read(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Set user's all notifications read.
+    """
+    crud.notification.set_notifications_read(db=db, user_uuid=current_user.user_uuid)
+    return {"message": "success"}
+
+
+@router.get("/my-list/polling", response_model=schemas.NotificationPollingMessage)
+def polling_my_notification(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Return numbers of new notification.
+    """
+    # TODO: retrieve new notification
+    return {"message": "success", "data": 1}
