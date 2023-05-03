@@ -39,8 +39,7 @@ def join_matching_room(
     mr_member = crud.mr_member.get_by_room_uuid_and_user_uuid(
                                     db=db, 
                                     room_uuid=matching_room.room_uuid, 
-                                    # user_uuid=user.user_uuid
-                                    user_uuid='397d0336-3df4-4325-a1b3-cc4ef8e8e0ab'
+                                    user_uuid=user.user_uuid
                                 )
     if mr_member:
         raise HTTPException(
@@ -51,8 +50,7 @@ def join_matching_room(
     # Create MR_Member
     new_mr_member = crud.mr_member.create(
                                     db=db,
-                                    # user_uuid=user.user_uuid,
-                                    user_uuid='397d0336-3df4-4325-a1b3-cc4ef8e8e0ab',
+                                    user_uuid=user.user_uuid,
                                     room_uuid=matching_room.room_uuid
                                 )
 
@@ -101,8 +99,7 @@ def leave_matching_room(
     mr_member = crud.mr_member.get_by_room_uuid_and_user_uuid(
                                     db=db, 
                                     room_uuid=matching_room.room_uuid, 
-                                    # user_uuid=user.user_uuid
-                                    user_uuid='397d0336-3df4-4325-a1b3-cc4ef8e8e0ab'
+                                    user_uuid=user.user_uuid
                                 )
     if not mr_member:
         raise HTTPException(

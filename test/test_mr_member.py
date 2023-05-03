@@ -79,6 +79,7 @@ def test_client(session):
     yield TestClient(app)
     del app.dependency_overrides[get_db]
 """
+
 """
 Test MR Member
 """
@@ -196,8 +197,6 @@ def test_delete_mr_member(self) -> None:
     """
 
 def test_mr_member_self_tag():
-    loguru.logger.info(test_mr_member.created_room)
-
     response = test_client.post(
         f"{settings.API_V1_STR}/mr-member-tag/create-self-tag",
         json={
@@ -214,7 +213,6 @@ def test_mr_member_self_tag():
     assert response.json()["message"] == "success"
 
 def test_mr_member_find_tag():
-
     response = test_client.post(
         f"{settings.API_V1_STR}/mr-member-tag/create-find-tag",
         json={
