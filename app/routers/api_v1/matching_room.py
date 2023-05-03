@@ -14,12 +14,14 @@ router = APIRouter()
 def read_my_matching_rooms(
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
+    # current_user: models.User = '397d0336-3df4-4325-a1b3-cc4ef8e8e0ab',
 ) -> Any:
     """
     Retrieve user's matching rooms.
     """
-    matching_rooms = crud.matching_room.search_with_user_and_name(
+    matching_rooms = crud.matching_room.seagitrch_with_user_and_name(
         db=db, user_uuid=current_user.user_uuid
+        # db=db, user_uuid='397d0336-3df4-4325-a1b3-cc4ef8e8e0ab'
     )
     return {"message": "success", "data": matching_rooms}
 

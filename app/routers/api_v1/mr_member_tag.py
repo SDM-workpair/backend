@@ -16,7 +16,7 @@ async def create_mr_member_self_tag(
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Create MR_Member self-tag
+    Create MR_Member self-tag 
     """
     # Check if MR_Member exists
     mr_member_in = crud.mr_member.get_by_member_id(
