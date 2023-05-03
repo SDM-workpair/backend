@@ -13,7 +13,77 @@ from datetime import datetime, timedelta
 from app.core import security
 import unittest
 
-client = TestClient(app)
+import sqlalchemy as sa
+from app.routers.deps import get_db
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy_utils.functions import create_database, database_exists
+from app.database.base_class import Base
+import pytest
+
+
+"""
+DB Testing
+
+SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@\
+{settings.POSTGRES_HOST}:{settings.DATABASE_PORT}/test.db"
+
+engine = sa.create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+if not database_exists(SQLALCHEMY_DATABASE_URL):
+    create_database(SQLALCHEMY_DATABASE_URL)
+
+# Set up the database once
+Base.metadata.drop_all(bind=engine)
+Base.metadata.create_all(bind=engine)
+
+
+# This fixture creates a nested transaction,
+# recreates it when the application code calls session.commit
+# and rolls it back at the end.
+# Based on: https://docs.sqlalchemy.org/en/14/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
+@pytest.fixture()
+def session():
+    connection = engine.connect()
+    transaction = connection.begin()
+    session = TestingSessionLocal(bind=connection)
+
+    # Begin a nested transaction (using SAVEPOINT).
+    nested = connection.begin_nested()
+
+    # If the application code calls session.commit, it will end the nested
+    # transaction. Need to start a new one when that happens.
+    @sa.event.listens_for(session, "after_transaction_end")
+    def end_savepoint(session, transaction):
+        nonlocal nested
+        if not nested.is_active:
+            nested = connection.begin_nested()
+
+    yield session
+
+    # Rollback the overall transaction, restoring the state before the test ran.
+    session.close()
+    transaction.rollback()
+    connection.close()
+
+
+# A fixture for the fastapi test client which depends on the
+# previous session fixture. Instead of creating a new session in the
+# dependency override, it uses the one provided by the session fixture.
+@pytest.fixture()
+def test_client(session):
+    def override_get_db():
+        yield session
+
+    app.dependency_overrides[get_db] = override_get_db
+    yield TestClient(app)
+    del app.dependency_overrides[get_db]
+"""
+"""
+Test MR Member
+"""
+
+test_client = TestClient(app)
 
 def random_lower_string():
     return "".join(random.choices(string.ascii_lowercase, k=32))
@@ -44,7 +114,9 @@ class Test_MR_Member:
     name = ''
     password = ''
     created_user = {}
-    created_room = {}
+    created_room = {
+        "room_id": 0
+    }
     member_id = ''
 
     def __init__(self, email, name, password) -> None:
@@ -62,21 +134,22 @@ test_mr_member = Test_MR_Member(
 def test_create_mr_member():
     # create user
     data = {"email": test_mr_member.email, "name": test_mr_member.name, "password": test_mr_member.password}
-    response = client.post(f"{settings.API_V1_STR}/users/", json=data)
+    response = test_client.post(f"{settings.API_V1_STR}/users/", json=data)
     test_mr_member.created_user = response.json()["data"]
 
     # matching room
-    response = client.post(
+    response = test_client.post(
         f"{settings.API_V1_STR}/matching-room/create",
         json={"name": "test_mr", "due_time": "2023-04-06T01:27:50.024Z",
             "min_member_num": 3, "description": "desc", "is_forced_matching": False},
         headers=get_user_authentication_headers(),
 
     )
-    test_mr_member.created_room = response.json()["data"]
+
+    test_mr_member.created_room["room_id"] = response.json()["room_id"]
 
     # mr_member
-    response = client.post(
+    response = test_client.post(
         f"{settings.API_V1_STR}/mr-member/create",
         json={
                 "user": {
@@ -123,8 +196,9 @@ def test_delete_mr_member(self) -> None:
     """
 
 def test_mr_member_self_tag():
+    loguru.logger.info(test_mr_member.created_room)
 
-    response = client.post(
+    response = test_client.post(
         f"{settings.API_V1_STR}/mr-member-tag/create-self-tag",
         json={
                 "mr_member":{
@@ -141,7 +215,7 @@ def test_mr_member_self_tag():
 
 def test_mr_member_find_tag():
 
-    response = client.post(
+    response = test_client.post(
         f"{settings.API_V1_STR}/mr-member-tag/create-find-tag",
         json={
                 "mr_member":{

@@ -8,14 +8,19 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.testclient import TestClient
 from itsdangerous import TimestampSigner
 
+import sqlalchemy as sa
 from app import crud, schemas
 from app.core import security
 from app.core.config import settings
 from app.database.session import db_session
 from app.main import app  # Flask instance of the API
 
+
 client = TestClient(app)
 
+"""
+Test Matching Room
+"""
 # fake data for test
 fake_matching_room = schemas.MatchingRoom(
     room_id="test_room_id", due_time=datetime.now(), min_member_num=3
