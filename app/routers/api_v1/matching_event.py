@@ -31,7 +31,7 @@ def initiate_matching_event(
         )
     # result = matching_event(matching_room)
 
-    result = [['user1', 'user2'],['user3', 'user4', 'user5'],['user6', 'user7']]
+    result = [[1, 2],[3, 4, 5],[6, 7]] #要是int
 
     # 可能要寫到一個method裡面(scheduler也會call)
     group_list = []
@@ -40,14 +40,18 @@ def initiate_matching_event(
         # Create Group
         group_id += 1
         new_group_schema = schemas.GroupCreate(
-            name=matching_room.room_id + "_" + group_id,
-            group_id=group_id,
+            name=matching_room.room_id + "_" + str(group_id),
+            group_id=str(group_id),
             room_uuid=matching_room.room_uuid
         )
         new_group = crud.group.create(db=db, obj_in=new_group_schema)
+        loguru.logger.info(new_group.group_uuid)
+        loguru.logger.info(new_group.create_time)
+
         gr_mem_list = []
         for gr_member in group:
             # Create GR_member
+            loguru.logger.info(gr_member)
             new_gr_mem_schema = schemas.GR_MemberCreate(
                 member_id=gr_member,
                 group_uuid=new_group.group_uuid,
