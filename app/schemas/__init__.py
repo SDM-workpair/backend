@@ -1,4 +1,4 @@
-from .gr_member import GR_Member, GR_MemberWithSearch
+from .gr_member import GR_Member, GR_MemberWithSearch, GR_MemberCreate
 from .group import Group, GroupCreate, GroupInDB, GroupWithMessage, GroupWithSearch
 from .matching_room import (
     MatchingRoom,

@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.routers import deps
+import loguru
 
 # from app.core.scheduler import matching_event
 
@@ -28,6 +29,37 @@ def initiate_matching_event(
             status_code=400,
             detail="Matching room with this room_id does not exist in this system.",
         )
-    # matching_event(matching_room)
+    # result = matching_event(matching_room)
 
-    return {'message': 'success', 'data':'group data'}
+    result = [['user1', 'user2'],['user3', 'user4', 'user5'],['user6', 'user7']]
+
+    # 可能要寫到一個method裡面(scheduler也會call)
+    group_list = []
+    group_id = 0
+    for group in result:
+        # Create Group
+        group_id += 1
+        new_group_schema = schemas.GroupCreate(
+            name=matching_room.room_id + "_" + group_id,
+            group_id=group_id,
+            room_uuid=matching_room.room_uuid
+        )
+        new_group = crud.group.create(db=db, obj_in=new_group_schema)
+        gr_mem_list = []
+        for gr_member in group:
+            # Create GR_member
+            new_gr_mem_schema = schemas.GR_MemberCreate(
+                member_id=gr_member,
+                group_uuid=new_group.group_uuid,
+                join_time=new_group.create_time
+            )
+            new_gr_mem = crud.gr_member.create(db=db, obj_in=new_gr_mem_schema)
+            gr_mem_list.append(new_gr_mem)
+            loguru.logger.info(new_gr_mem)
+            # Call notification method for every Group Mem
+            # gr_user_uuid = crud.member
+            # notify
+
+        group_list.append(gr_mem_list)
+
+    return {'message': 'success', 'data':group_list}
