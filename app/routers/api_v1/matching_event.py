@@ -57,8 +57,8 @@ def initiate_matching_event(
             gr_mem_list.append(new_gr_mem)
             loguru.logger.info(new_gr_mem)
             # Call notification method for every Group Mem
-            # gr_user_uuid = crud.member
-            # notify
+            gr_user_uuid = crud.mr_member.get_by_member_id(db=db, member_id=new_gr_mem.member_id)
+            # notify(receiver_uuid=gr_user_uuid.user_uuid, ...)
 
         group_list.append(gr_mem_list)
 
