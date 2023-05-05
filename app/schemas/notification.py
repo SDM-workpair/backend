@@ -64,6 +64,8 @@ class NotificationTextWithMessage(BaseModel):
     data: Optional[List[NotificationViewModel]] = None
 
 
-class NotificationPollingMessage(BaseModel):
-    message: str
-    data: int
+class NotificationSendObjectModel(BaseModel):
+    receiver_uuid: UUID
+    sender_uuid: UUID
+    template_uuid: UUID
+    f_string: str

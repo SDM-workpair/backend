@@ -41,6 +41,8 @@ google-auth-oauthlib = "^1.0.0"
 black = "^23.3.0"
 autoflake = "^2.0.2"
 oauth2client = "^4.1.3"
+websockets = "^11.0.2"
+aio-pika = "^9.0.5"
 
 
 [build-system]

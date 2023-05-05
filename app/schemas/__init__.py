@@ -12,7 +12,7 @@ from .notification import (
     Notification,
     NotificationCreate,
     NotificationInDB,
-    NotificationPollingMessage,
+    NotificationSendObjectModel,
     NotificationTextWithMessage,
     NotificationViewModel,
 )

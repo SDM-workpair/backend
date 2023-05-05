@@ -6,18 +6,19 @@ Create Date: 2023-04-30 13:21:36.727755
 
 """
 import sqlalchemy as sa
-from alembic import op
-import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = 'e93d0123c41f'
-down_revision = '3e4e9958b6c2'
+revision = "e93d0123c41f"
+down_revision = "3e4e9958b6c2"
 branch_labels = None
 depends_on = None
 
 
 def upgrade() -> None:
+    op.drop_table("NotificationTemplate")
+    op.drop_table("Notification")
     op.create_table(
         "NotificationTemplate",
         sa.Column("template_uuid", sa.UUID(), nullable=False),
