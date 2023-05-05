@@ -57,8 +57,8 @@ async def trigger_matching_event(
         f_string="This Must Be My Dream",
     )
     notification_send_object_2 = schemas.NotificationSendObjectModel(
-        receiver_uuid="2be6b063-8914-42b6-9e8d-1bbe14317cc2",
-        sender_uuid="70528b75-1ebc-4117-b3dc-c6127264fcff",
+        receiver_uuid="70528b75-1ebc-4117-b3dc-c6127264fcff",
+        sender_uuid="2be6b063-8914-42b6-9e8d-1bbe14317cc2",
         template_uuid="9c1dc87f-e938-4fa1-9900-9b4ebd5701da",
         f_string="This Must Be My Dream",
     )
