@@ -81,8 +81,6 @@ async def notify(
 
 
 # 將通知push到rabbitmq裡
-
-
 async def send_notification_to_message_queue(db, notification_obj):
     # declare queue and send notification into queue
     # notification_text is composed of notification_template's text and notifications's f_string
@@ -91,8 +89,9 @@ async def send_notification_to_message_queue(db, notification_obj):
         db=db, template_id="matching_result"
     )
     if notification_template is None:
-        # TODO: error handling
-        pass
+        raise ValueError(
+            "Fail to retrieve notification_template with template_uuid = matching_result"
+        )
     else:
         notification_text = notification_template.text
         # loop to replace
@@ -108,10 +107,10 @@ async def send_notification_to_message_queue(db, notification_obj):
         if user is not None:
             user_email = user.email
         else:
-            # TODO: error handling or throw error?
-            pass
+            raise ValueError(
+                f"Fail to retrieve user with user_uuid={notification_obj.receiver_uuid}"
+            )
         print("user email >>> ", user_email)
-        print("print for testttttt")
         notifier = Notifier()
         await notifier.setup(queue_name=user_email, is_consumer=False)
         await notifier.push(f"{notification_text}")
