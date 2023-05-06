@@ -30,7 +30,7 @@ def initiate_matching_event(
             detail="Matching room with this room_id does not exist in this system.",
         )
     # result = matching_event(matching_room)
-
+    # query matching_room 然後隨便分組
     result = [[1, 2],[3, 4, 5],[6, 7]] #要是int
 
     # 可能要寫到一個method裡面(scheduler也會call)
@@ -58,7 +58,8 @@ def initiate_matching_event(
             # Call notification method for every Group Mem
             gr_user = crud.mr_member.get_by_member_id(db=db, member_id=new_gr_mem.member_id)
             gr_mem_list.append(gr_user.member_id)
-            # notify(receiver_uuid=gr_user_uuid.user_uuid, ...)
+            # Create notify send object -> (receiver_uuid=gr_user_uuid.user_uuid, ...)
+            # notify(db, notify_send_obj)
         group_list.append(gr_mem_list)
 
     return {'message': 'success', 'data':group_list}
