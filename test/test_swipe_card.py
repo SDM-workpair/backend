@@ -4,75 +4,95 @@ import string
 from datetime import timedelta
 
 import pytest
-import sqlalchemy as sa
 from fastapi.encoders import jsonable_encoder
-from fastapi.testclient import TestClient
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy_utils.functions import create_database, database_exists
 
 from app import crud, schemas
 from app.core import security
 from app.core.config import settings
-from app.database.base_class import Base
-from app.main import app  # Flask instance of the API
+from app.models.matching_room import MatchingRoom
 from app.models.mr_liked_hated_member import MR_Liked_Hated_Member
 from app.models.mr_member import MR_Member
-from app.routers.deps import get_db
+from app.models.user import User
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@\
-{settings.POSTGRES_HOST}:{settings.DATABASE_PORT}/test.db"
+from .contest import db_conn, test_client, test_session
 
-engine = sa.create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# pytest fixture
+db_conn = db_conn
+test_client = test_client
 
-if not database_exists(SQLALCHEMY_DATABASE_URL):
-    create_database(SQLALCHEMY_DATABASE_URL)
+# Fake data
+# user
+fake_user = []
+for i in range(4):
+    obj_in = schemas.UserCreate(
+        email="test_admin" + str(i + 1) + "@sdm-teamatch.com",
+        name="test_admin" + str(i + 1),
+        is_google_sso=True,
+    )
+    fake_user.append(obj_in)
+    crud.user.create(
+        test_session,
+        obj_in=obj_in,
+    )
+# matching room
+matching_room_in = schemas.MatchingRoomCreate(
+    name="swipe_test_matching_room",
+    room_id="swipe_test_matching_room001",
+    due_time=datetime.datetime.now(),
+    min_member_num=3,
+)
+crud.matching_room.create(test_session, obj_in=matching_room_in)
+# MR_member
+user_uuids = []
+for i in range(4):
+    user = crud.user.get_by_email(
+        test_session, email="test_admin" + str(i + 1) + "@sdm-teamatch.com"
+    )
+    user_uuids.append(user.user_uuid)
+matching_room = crud.matching_room.get_by_room_id(
+    test_session, room_id="swipe_test_matching_room001"
+)
+room_uuid = jsonable_encoder(matching_room)["room_uuid"]
+for uuid in user_uuids:
+    mr_member_in1 = MR_Member(
+        user_uuid=uuid,
+        room_uuid=room_uuid,
+    )
+    test_session.add(mr_member_in1)
+    test_session.commit()
 
-# Set up the database once
-Base.metadata.drop_all(bind=engine)
-Base.metadata.create_all(bind=engine)
 
-
-# This fixture creates a nested transaction,
-# recreates it when the application code calls session.commit
-# and rolls it back at the end.
-# Based on: https://docs.sqlalchemy.org/en/14/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
-@pytest.fixture()
-def session():
-    connection = engine.connect()
-    transaction = connection.begin()
-    session = TestingSessionLocal(bind=connection)
-
-    # Begin a nested transaction (using SAVEPOINT).
-    nested = connection.begin_nested()
-
-    # If the application code calls session.commit, it will end the nested
-    # transaction. Need to start a new one when that happens.
-    @sa.event.listens_for(session, "after_transaction_end")
-    def end_savepoint(session, transaction):
-        nonlocal nested
-        if not nested.is_active:
-            nested = connection.begin_nested()
-
-    yield session
-
-    # Rollback the overall transaction, restoring the state before the test ran.
-    session.close()
-    transaction.rollback()
-    connection.close()
-
-
-# A fixture for the fastapi test client which depends on the
-# previous session fixture. Instead of creating a new session in the
-# dependency override, it uses the one provided by the session fixture.
-@pytest.fixture()
-def test_client(session):
-    def override_get_db():
-        yield session
-
-    app.dependency_overrides[get_db] = override_get_db
-    yield TestClient(app)
-    del app.dependency_overrides[get_db]
+def delete_fake_data():
+    # delete MR_Liked_Hated_Member
+    obj = (
+        test_session.query(MR_Liked_Hated_Member)
+        .filter(MR_Liked_Hated_Member.room_uuid == room_uuid)
+        .first()
+    )
+    test_session.delete(obj)
+    test_session.commit()
+    # delete mr member
+    for user_uuid in user_uuids:
+        obj = (
+            test_session.query(MR_Member)
+            .filter(MR_Member.user_uuid == user_uuid)
+            .first()
+        )
+        test_session.delete(obj)
+        test_session.commit()
+    # delete matching room
+    obj = (
+        test_session.query(MatchingRoom)
+        .filter(MatchingRoom.room_id == "swipe_test_matching_room001")
+        .first()
+    )
+    test_session.delete(obj)
+    test_session.commit()
+    # delete user
+    for user_uuid in user_uuids:
+        obj = test_session.query(User).filter(User.user_uuid == user_uuid).first()
+        test_session.delete(obj)
+        test_session.commit()
 
 
 @pytest.fixture(scope="module")
@@ -99,59 +119,30 @@ def get_user_authentication_headers(session, email):
 
 
 # Test
-def test_save_preference_who_has_logged_in(get_server_api, session, test_client):
-    # generate fake data
-    email1 = "test_admin1@sdm-teamatch.com"
-    email2 = "test_admin2@sdm-teamatch.com"
-    crud.user.create(
-        session,
-        obj_in=schemas.UserCreate(email=email1, name="test_admin1", is_google_sso=True),
-    )
-    crud.user.create(
-        session,
-        obj_in=schemas.UserCreate(email=email2, name="test_admin2", is_google_sso=True),
-    )
-    user1 = crud.user.get_by_email(session, email=email1)
-    user2 = crud.user.get_by_email(session, email=email2)
-    user_uuid1 = user1.user_uuid
-    user_uuid2 = user2.user_uuid
-
-    matching_room_in = schemas.MatchingRoomCreate(
-        name="test_matching_room",
-        room_id="test_matching_room001",
-        due_time=datetime.datetime.now(),
-        min_member_num=3,
-    )
-    crud.matching_room.create(session, obj_in=matching_room_in)
-    matching_room = crud.matching_room.get_by_room_id(
-        session, room_id="test_matching_room001"
-    )
-    room_uuid = jsonable_encoder(matching_room)["room_uuid"]
-
-    mr_member_in1 = MR_Member(
-        user_uuid=user_uuid1,
-        room_uuid=room_uuid,
-    )
-    session.add(mr_member_in1)
-    session.commit()
-    mr_member_in2 = MR_Member(
-        user_uuid=user_uuid2,
-        room_uuid=room_uuid,
-    )
-    session.add(mr_member_in2)
-    session.commit()
+def test_save_preference_who_has_logged_in(get_server_api, db_conn, test_client):
+    member = []
+    for i in range(2):
+        member.append(
+            jsonable_encoder(
+                db_conn.query(MR_Member)
+                .filter(MR_Member.user_uuid == user_uuids[i])
+                .first()
+            )
+        )
 
     preference = {
-        "member_id": "1",
+        "member_id": member[0]["member_id"],
         "room_uuid": room_uuid,
-        "target_member_id": "2",
+        "target_member_id": member[1]["member_id"],
         "is_like": True,
         "is_hated": False,
     }
 
     response = test_client.post(
         f"{get_server_api}{settings.API_V1_STR}/swipe-card/swipe",
-        headers=get_user_authentication_headers(session=session, email=email1),
+        headers=get_user_authentication_headers(
+            session=db_conn, email="test_admin1@sdm-teamatch.com"
+        ),
         json=preference,
     )
 
@@ -176,99 +167,25 @@ def test_save_preference_who_has_not_logged_in(get_server_api, test_client):
     assert response.json()["detail"] == "Not authenticated"
 
 
-def test_get_recommendation(get_server_api, session, test_client):
-    # generate fake data
-    email1 = "test_admin1@sdm-teamatch.com"
-    email2 = "test_admin2@sdm-teamatch.com"
-    email3 = "test_admin3@sdm-teamatch.com"
-    email4 = "test_admin4@sdm-teamatch.com"
-    crud.user.create(
-        session,
-        obj_in=schemas.UserCreate(email=email1, name="test_admin1", is_google_sso=True),
-    )
-    crud.user.create(
-        session,
-        obj_in=schemas.UserCreate(email=email2, name="test_admin2", is_google_sso=True),
-    )
-    crud.user.create(
-        session,
-        obj_in=schemas.UserCreate(email=email3, name="test_admin3", is_google_sso=True),
-    )
-    crud.user.create(
-        session,
-        obj_in=schemas.UserCreate(email=email4, name="test_admin4", is_google_sso=True),
-    )
-    user1 = crud.user.get_by_email(session, email=email1)
-    user2 = crud.user.get_by_email(session, email=email2)
-    user3 = crud.user.get_by_email(session, email=email3)
-    user4 = crud.user.get_by_email(session, email=email4)
-    user_uuid1 = user1.user_uuid
-    user_uuid2 = user2.user_uuid
-    user_uuid3 = user3.user_uuid
-    user_uuid4 = user4.user_uuid
+def test_get_recommendation(get_server_api, db_conn, test_client):
+    member = jsonable_encoder(db_conn.query(MR_Member).first())
 
-    matching_room_in = schemas.MatchingRoomCreate(
-        name="test_matching_room",
-        room_id="test_matching_room001",
-        due_time=datetime.datetime.now(),
-        min_member_num=3,
-    )
-    crud.matching_room.create(session, obj_in=matching_room_in)
-    matching_room = crud.matching_room.get_by_room_id(
-        session, room_id="test_matching_room001"
-    )
-    room_uuid = jsonable_encoder(matching_room)["room_uuid"]
-
-    mr_member_in1 = MR_Member(
-        member_id=1,
-        user_uuid=user_uuid1,
-        room_uuid=room_uuid,
-    )
-    session.add(mr_member_in1)
-    session.commit()
-    mr_member_in2 = MR_Member(
-        member_id=2,
-        user_uuid=user_uuid2,
-        room_uuid=room_uuid,
-    )
-    session.add(mr_member_in2)
-    session.commit()
-    mr_member_in3 = MR_Member(
-        member_id=3,
-        user_uuid=user_uuid3,
-        room_uuid=room_uuid,
-    )
-    session.add(mr_member_in3)
-    session.commit()
-    mr_member_in4 = MR_Member(
-        member_id=4,
-        user_uuid=user_uuid4,
-        room_uuid=room_uuid,
-    )
-    session.add(mr_member_in4)
-    session.commit()
-
-    preference_in = MR_Liked_Hated_Member(
-        member_id=1,
-        room_uuid=room_uuid,
-        target_member_id=3,
-        is_liked=True,
-        is_hated=False,
-    )
-    session.add(preference_in)
-    session.commit()
-
-    recommend_in = {"member_id": "1", "room_uuid": room_uuid}
+    recommend_in = {"member_id": member["member_id"], "room_uuid": room_uuid}
 
     response = test_client.post(
         f"{get_server_api}{settings.API_V1_STR}/swipe-card/swipe-recommend",
-        headers=get_user_authentication_headers(session=session, email=email1),
+        headers=get_user_authentication_headers(
+            session=db_conn, email="test_admin1@sdm-teamatch.com"
+        ),
         json=recommend_in,
     )
     response_data = response.json()["data"]
     rcmd_member_list = []
     for d in response_data:
         rcmd_member_list.append(d["recommended_member_id"])
+
+    # delete fake data
+    delete_fake_data()
 
     assert response.status_code == 200
     assert response.json()["message"] == "success"
