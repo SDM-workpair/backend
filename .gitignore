@@ -164,6 +164,8 @@ cython_debug/
 */.Trashes
 
 # pre-commit files
+./pre-commit/
+./pre-commit/*
 ./.pre-commit/*
 .lock
 db.db

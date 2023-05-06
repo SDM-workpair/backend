@@ -1,78 +1,21 @@
+import random
+import string
 from datetime import timedelta
 
+import loguru
 import pytest
 import sqlalchemy as sa
 from fastapi.encoders import jsonable_encoder
-from fastapi.testclient import TestClient
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy_utils.functions import create_database, database_exists
 
 from app import crud, schemas
 from app.core import security
 from app.core.config import settings
-from app.database.base_class import Base
 
-# from app.database.session import db_session
-from app.main import app  # Flask instance of the API
-from app.routers.deps import get_db
+from .contest import db_conn, test_client
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@\
-{settings.POSTGRES_HOST}:{settings.DATABASE_PORT}/test.db"
-
-engine = sa.create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-if not database_exists(SQLALCHEMY_DATABASE_URL):
-    create_database(SQLALCHEMY_DATABASE_URL)
-
-# Set up the database once
-Base.metadata.drop_all(bind=engine)
-Base.metadata.create_all(bind=engine)
-
-
-# This fixture creates a nested transaction,
-# recreates it when the application code calls session.commit
-# and rolls it back at the end.
-# Based on: https://docs.sqlalchemy.org/en/14/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
-@pytest.fixture()
-def session():
-    connection = engine.connect()
-    transaction = connection.begin()
-    session = TestingSessionLocal(bind=connection)
-
-    # Begin a nested transaction (using SAVEPOINT).
-    nested = connection.begin_nested()
-
-    # If the application code calls session.commit, it will end the nested
-    # transaction. Need to start a new one when that happens.
-    @sa.event.listens_for(session, "after_transaction_end")
-    def end_savepoint(session, transaction):
-        nonlocal nested
-        if not nested.is_active:
-            nested = connection.begin_nested()
-
-    yield session
-
-    # Rollback the overall transaction, restoring the state before the test ran.
-    session.close()
-    transaction.rollback()
-    connection.close()
-
-
-# A fixture for the fastapi test client which depends on the
-# previous session fixture. Instead of creating a new session in the
-# dependency override, it uses the one provided by the session fixture.
-@pytest.fixture()
-def test_client(session):
-    def override_get_db():
-        yield session
-
-    app.dependency_overrides[get_db] = override_get_db
-    yield TestClient(app)
-    del app.dependency_overrides[get_db]
-
-
-# client = TestClient(app)
+# pytest fixture
+db_conn = db_conn
+test_client = test_client
 
 
 @pytest.fixture(scope="module")
@@ -81,10 +24,9 @@ def get_server_api():
     return server_name
 
 
-def get_user_authentication_headers(session):
-    email = "test_admin@sdm-teamatch.com"
-
+def get_user_authentication_headers(session, email):
     user = crud.user.get_by_email(db=session, email=email)
+    loguru.logger.info(jsonable_encoder(user))
     user = jsonable_encoder(user)
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = security.create_access_token(
@@ -94,20 +36,26 @@ def get_user_authentication_headers(session):
     return headers
 
 
+def random_lower_string():
+    return "".join(random.choices(string.ascii_lowercase, k=32))
+
+
 # Test
-def test_read_user_me_who_has_logged_in(get_server_api, session, test_client):
-    crud.user.create(
-        session,
-        obj_in=schemas.UserCreate(
-            email="test_admin@sdm-teamatch.com", name="test_admin", is_google_sso=True
-        ),
-    )
-    email = "test_admin@sdm-teamatch.com"
+def test_read_user_me_who_has_logged_in(get_server_api, db_conn, test_client):
+    # crud.user.create(
+    #     db_conn,
+    #     obj_in=schemas.UserCreate(
+    #         email="admin@sdm-teamatch.com", name="admin", is_google_sso=True
+    #     ),
+    # )
+    email = "admin@sdm-teamatch.com"
+    loguru.logger.info(jsonable_encoder(crud.user.get_by_email(db_conn, email=email)))
 
     response = test_client.get(
         f"{get_server_api}{settings.API_V1_STR}/users/profile/me/",
-        headers=get_user_authentication_headers(session),
+        headers=get_user_authentication_headers(db_conn, email),
     )
+    loguru.logger.info(response)
 
     assert response.status_code == 200
     assert email == response.json()["data"]["email"]
@@ -131,22 +79,22 @@ def test_read_user_me_who_has_wrong_credential(get_server_api, test_client):
     assert response.json()["detail"] == "Not enough segments"
 
 
-def test_update_logged_in_user_profile(get_server_api, session, test_client):
-    crud.user.create(
-        session,
-        obj_in=schemas.UserCreate(
-            email="test_admin@sdm-teamatch.com", name="test_admin", is_google_sso=True
-        ),
-    )
-    email = "test_admin@sdm-teamatch.com"
+def test_update_logged_in_user_profile(get_server_api, db_conn, test_client):
+    # crud.user.create(
+    #     db_conn,
+    #     obj_in=schemas.UserCreate(
+    #         email="admin@sdm-teamatch.com", name="admin", is_google_sso=True
+    #     ),
+    # )
+    email = "admin@sdm-teamatch.com"
 
-    line_id = "fake_line_id"
+    line_id = "fake_line_id" + random_lower_string()
     update_data = {"line_id": line_id}
 
     response = test_client.put(
         f"{get_server_api}{settings.API_V1_STR}/users/profile",
         json=update_data,
-        headers=get_user_authentication_headers(session),
+        headers=get_user_authentication_headers(db_conn, email),
     )
     assert response.status_code == 200
     assert email == response.json()["data"]["email"]
@@ -173,28 +121,34 @@ def test_update_user_profile_who_has_wrong_credential(get_server_api, test_clien
     assert response.json()["detail"] == "Not enough segments"
 
 
-def test_create_new_user(get_server_api, test_client):
-    email = "new_user@example.com"
-    name = "new user"
-    password = "newuser"
+def test_create_new_user(get_server_api, test_client, db_conn):
+    email = "create-test-user@example.com"
+    name = "test-user"
+    password = "testuser"
+    loguru.logger.info(jsonable_encoder(crud.user.get_by_email(db_conn, email=email)))
     data = {"email": email, "name": name, "password": password}
     response = test_client.post(
         f"{get_server_api}{settings.API_V1_STR}/users/", json=data
     )
-    assert 200 <= response.status_code < 300
+
+    obj = crud.user.get_by_email(db_conn, email=email)
+    db_conn.delete(obj)
+    db_conn.commit()
+
+    assert response.status_code == 200
     created_user = response.json()
     assert email == created_user["data"]["email"]
 
 
-def test_create_existing_user(get_server_api, session, test_client):
-    crud.user.create(
-        session,
-        obj_in=schemas.UserCreate(
-            email="test_admin@sdm-teamatch.com", name="test_admin", is_google_sso=True
-        ),
-    )
-    email = "test_admin@sdm-teamatch.com"
-    name = "test_admin"
+def test_create_existing_user(get_server_api, test_client):
+    # crud.user.create(
+    #     session,
+    #     obj_in=schemas.UserCreate(
+    #         email="admin@sdm-teamatch.com", name="admin", is_google_sso=True
+    #     ),
+    # )
+    email = "admin@sdm-teamatch.com"
+    name = "admin"
 
     data = {"email": email, "name": name}
     response = test_client.post(
