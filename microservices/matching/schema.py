@@ -1,20 +1,31 @@
-from typing import Union
+from enum import Enum
+from typing import List
 
 from pydantic import BaseModel
 
 
-class ItemBase(BaseModel):
-    title: str
-    description: Union[str, None] = None
+class GroupChoice(str, Enum):
+    random = "random"
+    similarity = "similarity"
+    tinder = "tinder"
 
 
-class ItemCreate(ItemBase):
-    pass
+class SlotChoice(str, Enum):
+    fixed_group = "fixed_group"
+    fixed_max = "fixed_max"
+    fixed_min = "fixed_min"
 
 
-class Item(ItemBase):
-    id: int
-    owner_id: int
+class MatchingEvent(BaseModel):
+    room_id: str
+    group_choice: GroupChoice = "random"
+    slot_choice: SlotChoice = "fixed_group"
+    params: dict = {}
 
-    class Config:
-        orm_mode = True
+
+class MatchingGroups(BaseModel):
+    groups: dict[str, List[int]] = {}
+
+
+class Message(BaseModel):
+    message: str

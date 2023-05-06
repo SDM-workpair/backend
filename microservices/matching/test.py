@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from .matching import app  # Flask instance of the API
+from .main import app  # Flask instance of the API
 
 client = TestClient(app)
 

@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List, Tuple
 
-from grouping_strategy import (
+from .grouping_strategy import (
     GroupingStrategy,
     RandomGrouping,
     SimilarityGrouping,
     TinderGrouping,
 )
-from slot_generator import FixedGroupSlot, FixedMaxMinSlot, SlotGenerator
+from .slot_generator import FixedGroupSlot, MaxUserSlot, MinUserSlot, SlotGenerator
 
 
 class MatchingEventBuilder(ABC):
@@ -70,10 +70,12 @@ class OneTimeMatchingEventBuilder(MatchingEventBuilder):
             self.grouping_strategy = self.default_grouping_strategy
 
         # set slot strategy
-        if slot_strategy == "fixed_group_amount":
+        if slot_strategy == "fixed_group":
             self.slot_generator = FixedGroupSlot()
-        elif slot_strategy == "fixed_max_min":
-            self.slot_generator = FixedMaxMinSlot()
+        elif slot_strategy == "fixed_max":
+            self.slot_generator = MaxUserSlot()
+        elif slot_strategy == "fixed_min":
+            self.slot_generator = MinUserSlot()
         else:
             self.slot_generator = FixedGroupSlot()
         return self
@@ -134,37 +136,37 @@ if __name__ == "__main__":
     test_config = [
         {
             "group_choice": "random",
-            "slot_choice": "fixed_group_amount",
+            "slot_choice": "fixed_group",
             "params": {"num_groups": 3},
             "users_pref": small_data,
         },
         {
             "group_choice": "tinder",
-            "slot_choice": "fixed_max_min",
-            "params": {"max_users": 4, "min_users": 0},
+            "slot_choice": "fixed_min",
+            "params": {"max_users": 5, "min_users": 4},
             "users_pref": small_data,
         },
         {
             "group_choice": "similarity",
-            "slot_choice": "fixed_max_min",
+            "slot_choice": "fixed_max",
             "params": {"max_users": 5, "min_users": 4},
             "users_pref": small_data,
         },
         {
             "group_choice": "random",
-            "slot_choice": "fixed_group_amount",
+            "slot_choice": "fixed_group",
             "params": {"num_groups": 3},
             "users_pref": large_data,
         },
         {
             "group_choice": "tinder",
-            "slot_choice": "fixed_max_min",
+            "slot_choice": "fixed_min",
             "params": {"max_users": 5, "min_users": 2},
             "users_pref": large_data,
         },
         {
             "group_choice": "similarity",
-            "slot_choice": "fixed_max_min",
+            "slot_choice": "fixed_max",
             "params": {"max_users": 5, "min_users": 2},
             "users_pref": large_data,
         },
