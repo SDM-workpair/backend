@@ -52,12 +52,11 @@ services:
         ports:
             - "8001:8001"
         volumes:
-            - ./backend/microservices/matching:/matching
+            - ./backend:/backend
         restart: always
         tty: true
         depends_on:
             - postgres
-            - backend
         networks:
             - teamatch-network
 

@@ -26,9 +26,9 @@ def get_db():
 
 
 @app.post(
-    "/matching/create/test", responses={**base_response, 202: {"model": MatchingGroups}}
+    "/matching/create/test", responses={**base_response, 200: {"model": MatchingGroups}}
 )
-async def create_matching_event_test(*, db: Session = Depends(get_db)):
+async def create_matching_event_test(config: MatchingEvent):
     """Create test matching event"""
 
     logger.info("invoke mathcing event create")
