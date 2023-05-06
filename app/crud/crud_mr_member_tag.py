@@ -16,6 +16,24 @@ import loguru
 
 class CRUDMR_Member_Tag(CRUDBase[MR_Member_Tag, MR_Member_Tag_Create, MR_Member_Tag_Update]):
 
+    def get_1st_self_tag_by_member_id(
+            self, 
+            db: Session, 
+            *, 
+            member_id: int) -> MR_Member_Tag:
+        return (
+            db.query(MR_Member_Tag).filter(MR_Member_Tag.member_id == member_id, MR_Member_Tag.is_self_tag == True).first()
+        )
+
+    def get_1st_find_tag_by_member_id(
+            self, 
+            db: Session, 
+            *, 
+            member_id: int) -> MR_Member_Tag:
+        return (
+            db.query(MR_Member_Tag).filter(MR_Member_Tag.member_id == member_id, MR_Member_Tag.is_find_tag == True).first()
+        )    
+
     def create_tag(
             self, 
             db: Session, 

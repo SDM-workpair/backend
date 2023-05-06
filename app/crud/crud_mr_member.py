@@ -21,7 +21,7 @@ class CRUDMR_Member(CRUDBase[MR_Member, MR_Member_Create, MR_Member_Update]):
         )
     
     def get_by_member_id(
-            self, db: Session, *, member_id: str
+            self, db: Session, *, member_id: int
     ) -> Optional[MR_Member]:
         return (
             db.query(MR_Member).filter(MR_Member.member_id == member_id).first()

@@ -19,98 +19,24 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils.functions import create_database, database_exists
 from app.database.base_class import Base
 import pytest
+from .contest import db_conn, test_client
+from .test_user import get_user_authentication_headers
+
+"""
+pytest fixture
+"""
+db_conn = db_conn
+test_client = test_client
+email = "admin@sdm-teamatch.com"
 
 
 """
-DB Testing
-
-SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@\
-{settings.POSTGRES_HOST}:{settings.DATABASE_PORT}/test.db"
-
-engine = sa.create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-if not database_exists(SQLALCHEMY_DATABASE_URL):
-    create_database(SQLALCHEMY_DATABASE_URL)
-
-# Set up the database once
-Base.metadata.drop_all(bind=engine)
-Base.metadata.create_all(bind=engine)
-
-
-# This fixture creates a nested transaction,
-# recreates it when the application code calls session.commit
-# and rolls it back at the end.
-# Based on: https://docs.sqlalchemy.org/en/14/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
-@pytest.fixture()
-def session():
-    connection = engine.connect()
-    transaction = connection.begin()
-    session = TestingSessionLocal(bind=connection)
-
-    # Begin a nested transaction (using SAVEPOINT).
-    nested = connection.begin_nested()
-
-    # If the application code calls session.commit, it will end the nested
-    # transaction. Need to start a new one when that happens.
-    @sa.event.listens_for(session, "after_transaction_end")
-    def end_savepoint(session, transaction):
-        nonlocal nested
-        if not nested.is_active:
-            nested = connection.begin_nested()
-
-    yield session
-
-    # Rollback the overall transaction, restoring the state before the test ran.
-    session.close()
-    transaction.rollback()
-    connection.close()
-
-
-# A fixture for the fastapi test client which depends on the
-# previous session fixture. Instead of creating a new session in the
-# dependency override, it uses the one provided by the session fixture.
-@pytest.fixture()
-def test_client(session):
-    def override_get_db():
-        yield session
-
-    app.dependency_overrides[get_db] = override_get_db
-    yield TestClient(app)
-    del app.dependency_overrides[get_db]
+Test data
 """
-
-"""
-Test MR Member
-"""
-
-test_client = TestClient(app)
-
 def random_lower_string():
     return "".join(random.choices(string.ascii_lowercase, k=32))
 
-def get_user_authentication_headers():
-    email = "admin@sdm-teamatch.com"
-
-    user = crud.user.get_by_email(db=db_session, email=email)
-    user = jsonable_encoder(user)
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = security.create_access_token(
-        user["user_uuid"], expires_delta=access_token_expires
-    )
-    headers = {"Authorization": f"Bearer {access_token}"}
-    return headers
-
-
 class Test_MR_Member:
-    # data
-    """  
-    email = str
-    name = str
-    password = str
-    created_user = dict
-    created_room = dict
-    """
     email = ''
     name = ''
     password = ''
@@ -118,21 +44,23 @@ class Test_MR_Member:
     created_room = {
         "room_id": 0
     }
-    member_id = ''
+    member_id = 0
 
     def __init__(self, email, name, password) -> None:
         self.email = email
         self.name = name
         self.password = password
      
-
-# data for testing
 test_mr_member = Test_MR_Member(
     email = random_lower_string() + "@example.com",
     name = random_lower_string(),
     password = random_lower_string())
 
-def test_create_mr_member():
+
+"""
+Test case
+"""
+def test_create_mr_member(db_conn, test_client):
     # create user
     data = {"email": test_mr_member.email, "name": test_mr_member.name, "password": test_mr_member.password}
     response = test_client.post(f"{settings.API_V1_STR}/users/", json=data)
@@ -143,10 +71,9 @@ def test_create_mr_member():
         f"{settings.API_V1_STR}/matching-room/create",
         json={"name": "test_mr", "due_time": "2023-04-06T01:27:50.024Z",
             "min_member_num": 3, "description": "desc", "is_forced_matching": False},
-        headers=get_user_authentication_headers(),
+        headers=get_user_authentication_headers(db_conn, email),
 
     )
-
     test_mr_member.created_room["room_id"] = response.json()["room_id"]
 
     # mr_member
@@ -162,7 +89,7 @@ def test_create_mr_member():
                     "room_id": test_mr_member.created_room["room_id"]
                 }
             },
-        headers=get_user_authentication_headers(),
+        headers=get_user_authentication_headers(db_conn, email),
     )
 
     test_mr_member.member_id = response.json()["data"]["member_id"]
@@ -171,6 +98,9 @@ def test_create_mr_member():
     assert response.json()["message"] == "success"
     assert response.json()["data"]["user"]["email"] == test_mr_member.created_user["email"]
     assert response.json()["data"]["matching_room"] == test_mr_member.created_room
+
+   
+
 
 """ #???不能delete
 def test_delete_mr_member(self) -> None:
@@ -192,11 +122,9 @@ def test_delete_mr_member(self) -> None:
     # loguru.logger.info(response)
     assert response.status_code == 200
     # assert response.json()["message"] == "success"
+"""
 
-
-    """
-
-def test_mr_member_self_tag():
+def test_mr_member_self_tag(db_conn, test_client):
     response = test_client.post(
         f"{settings.API_V1_STR}/mr-member-tag/create-self-tag",
         json={
@@ -206,13 +134,13 @@ def test_mr_member_self_tag():
                 "tag_text_list":[random_lower_string()],
                 "matching_room": test_mr_member.created_room
             },
-        headers=get_user_authentication_headers(),
+        headers=get_user_authentication_headers(db_conn, email),
     )
 
     assert response.status_code == 200
     assert response.json()["message"] == "success"
 
-def test_mr_member_find_tag():
+def test_mr_member_find_tag(db_conn, test_client):
     response = test_client.post(
         f"{settings.API_V1_STR}/mr-member-tag/create-find-tag",
         json={
@@ -222,8 +150,45 @@ def test_mr_member_find_tag():
                 "tag_text_list":[random_lower_string()],
                 "matching_room": test_mr_member.created_room
             },
-        headers=get_user_authentication_headers(),
+        headers=get_user_authentication_headers(db_conn, email),
     )
 
     assert response.status_code == 200
     assert response.json()["message"] == "success"
+
+    # delete test data
+    delete_test_data(db_conn, email)
+
+
+def delete_test_data(db_conn, test_client):
+    # find tag 
+    obj = crud.mr_member_tag.get_1st_find_tag_by_member_id(db=db_conn, member_id=test_mr_member.member_id)
+    db_conn.delete(obj)
+
+    # self tag 
+    obj = crud.mr_member_tag.get_1st_self_tag_by_member_id(db=db_conn, member_id=test_mr_member.member_id)
+    db_conn.delete(obj)
+    db_conn.commit()
+
+    # mr_member 
+    obj = crud.mr_member.get_by_member_id(db=db_conn, member_id=test_mr_member.member_id)
+    db_conn.delete(obj)
+    db_conn.commit()
+
+    # matching room 
+    obj = crud.matching_room.get_by_room_id(db_conn, room_id=test_mr_member.created_room['room_id'])
+    db_conn.delete(obj)
+    db_conn.commit()
+
+    # user
+    obj = crud.user.get_by_email(db_conn, email=test_mr_member.email)
+    db_conn.delete(obj)
+    db_conn.commit()
+
+    return
+
+
+
+
+   
+

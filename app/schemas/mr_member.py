@@ -12,7 +12,7 @@ from .matching_room import MatchingRoomBase
 
 # Shared properties
 class MR_Member_Base(BaseModel):
-    member_id: str
+    member_id: int
 
 # Properties to receive via API on creation
 class MR_Member_Req(BaseModel):
