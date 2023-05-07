@@ -126,8 +126,31 @@ def test_mr_member_find_tag(db_conn, test_client):
     assert response.status_code == 200
     assert response.json()["message"] == "success"
 
+    
+"""
+Delete API test
+"""
+def test_delete_mr_member(db_conn, test_client):
+    response = test_client.request(
+        "DELETE", 
+        f"{settings.API_V1_STR}/mr-member",
+        json={
+                "user": {
+                    "email": test_mr_member.email,
+                    "is_admin": False,
+                    "name": test_mr_member.name
+                },
+                "matching_room": {
+                    "room_id": test_mr_member.created_room["room_id"]
+                }
+            },
+        headers=get_user_authentication_headers(db_conn, email))
+
+    assert response.status_code == 200
+    assert response.json()["message"] == "success"
     # delete test data
     delete_test_data(db_conn)
+
 
 
 """
@@ -136,6 +159,7 @@ Delete testing data
 
 
 def delete_test_data(db_conn):
+    """
     # find tag
     obj = crud.mr_member_tag.get_1st_find_tag_by_member_id(
         db=db_conn, member_id=test_mr_member.member_id
@@ -155,7 +179,7 @@ def delete_test_data(db_conn):
     )
     db_conn.delete(obj)
     db_conn.commit()
-
+    """
     # matching room
     obj = crud.matching_room.get_by_room_id(
         db_conn, room_id=test_mr_member.created_room["room_id"]
@@ -169,28 +193,3 @@ def delete_test_data(db_conn):
     db_conn.commit()
 
     return
-
-
-""" #???不能delete
-Delete API test
-
-def test_delete_mr_member(self) -> None:
-
-    response = client.delete(
-        f"{settings.API_V1_STR}/mr-member",
-        json={
-                "user": {
-                    "email": test_mr_member.email,
-                    "is_admin": False,
-                    "name": test_mr_member.name
-                },
-                "matching_room": {
-                    "room_id": test_mr_member.created_room["room_id"]
-                }
-            },
-        headers=get_user_authentication_headers(),
-    )
-    # loguru.logger.info(response)
-    assert response.status_code == 200
-    # assert response.json()["message"] == "success"
-"""
