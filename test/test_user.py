@@ -1,16 +1,14 @@
 import random
 import string
-from datetime import timedelta
 
 import loguru
 import pytest
 from fastapi.encoders import jsonable_encoder
 
 from app import crud
-from app.core import security
 from app.core.config import settings
 
-from .contest import db_conn, test_client
+from .contest import db_conn, get_user_authentication_headers, test_client
 
 # pytest fixture
 db_conn = db_conn
@@ -23,16 +21,16 @@ def get_server_api():
     return server_name
 
 
-def get_user_authentication_headers(session, email):
-    user = crud.user.get_by_email(db=session, email=email)
-    loguru.logger.info(jsonable_encoder(user))
-    user = jsonable_encoder(user)
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = security.create_access_token(
-        user["user_uuid"], expires_delta=access_token_expires
-    )
-    headers = {"Authorization": f"Bearer {access_token}"}
-    return headers
+# def get_user_authentication_headers(session, email):
+#     user = crud.user.get_by_email(db=session, email=email)
+#     loguru.logger.info(jsonable_encoder(user))
+#     user = jsonable_encoder(user)
+#     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+#     access_token = security.create_access_token(
+#         user["user_uuid"], expires_delta=access_token_expires
+#     )
+#     headers = {"Authorization": f"Bearer {access_token}"}
+#     return headers
 
 
 def random_lower_string():
