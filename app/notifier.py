@@ -75,6 +75,7 @@ async def notify(
         send_time=datetime.now(),
         template_uuid=notification_obj.template_uuid,
         f_string=notification_obj.f_string,
+        is_read=False,
     )
     crud.notification.create(db=db, obj_in=insert_obj)
     await send_notification_to_message_queue(db, insert_obj)
