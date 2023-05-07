@@ -97,10 +97,10 @@ def run():
         "logger_class": StubbedGunicornLogger,
     }
 
-    if os.getenv("ENV") == "prod":
-        StandaloneApplication(app, options).run()
-    else:
+    if os.getenv("ENV") == "dev":
         uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    else:
+        StandaloneApplication(app, options).run()
 
 
 if __name__ == "__main__":
