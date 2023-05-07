@@ -23,28 +23,12 @@ class CRUDNotification(CRUDBase[Notification, NotificationCreate, NotificationUp
             db.query(Notification).filter(Notification.sender_uuid == sender_uuid).all()
         )
         for notification in notifications:
-            notification_text = ""
-            notification_obj = (
-                db.query(NotificationTemplate)
-                .filter(
-                    NotificationTemplate.template_uuid == notification.template_uuid
-                )
-                .first()
-            )
-            if notification_obj is None:
-                raise ValueError(
-                    f"Fail to retrieve notification_template with template_uuid={notification.template_uuid}"
-                )
-            else:
-                notification_text = notification_obj.text
-            # loop to replace
-            for idx, f in enumerate(notification.f_string.split(";")):
-                notification_text = notification_text.replace("{" + str(idx) + "}", f)
             # create a viewmodel and stored needed value
             notifiactionViewModel = NotificationViewModel(
                 receiver_uuid=notification.receiver_uuid,
                 send_time=notification.send_time,
-                content=notification_text,
+                content=notification.f_string,
+                is_read=notification.is_read,
             )
             notification_viewmodel_list.append(notifiactionViewModel)
         return notification_viewmodel_list
@@ -59,28 +43,12 @@ class CRUDNotification(CRUDBase[Notification, NotificationCreate, NotificationUp
             .all()
         )
         for notification in notifications:
-            notification_text = ""
-            notification_obj = (
-                db.query(NotificationTemplate)
-                .filter(
-                    NotificationTemplate.template_uuid == notification.template_uuid
-                )
-                .first()
-            )
-            if notification_obj is None:
-                raise ValueError(
-                    f"Fail to retrieve notification_template with template_uuid={notification.template_uuid}"
-                )
-            else:
-                notification_text = notification_obj.text
-            # loop to replace
-            for idx, f in enumerate(notification.f_string.split(";")):
-                notification_text = notification_text.replace("{" + str(idx) + "}", f)
             # create a viewmodel and stored needed value
             notifiactionViewModel = NotificationViewModel(
                 receiver_uuid=notification.receiver_uuid,
                 send_time=notification.send_time,
-                content=notification_text,
+                content=notification.f_string,
+                is_read=notification.is_read,
             )
             notification_viewmodel_list.append(notifiactionViewModel)
         return notification_viewmodel_list

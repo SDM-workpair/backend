@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
@@ -18,16 +18,12 @@ def read_my_notifications(
     """
     Retrieve user's notifications.
     """
-    try:
-        notifications = crud.notification.get_by_receiver_uuid(
-            db=db, receiver_uuid=current_user.user_uuid
-        )
-    except ValueError as e:
-        raise HTTPException(
-            status_code=400, detail=f"Fail to retrieve notification: {e}"
-        )
+    notifications = crud.notification.get_by_receiver_uuid(
+        db=db, receiver_uuid=current_user.user_uuid
+    )
+    unread_num = len([x for x in notifications if x.is_read is False])
 
-    return {"message": "success", "data": notifications}
+    return {"message": "success", "data": notifications, "unread_num": unread_num}
 
 
 @router.get("/set-read", response_model=schemas.NotificationTextWithMessage)

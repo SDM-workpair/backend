@@ -23,6 +23,7 @@ class NotificationCreate(NotificationBase):
     send_time: datetime
     template_uuid: UUID
     f_string: str
+    is_read: bool
 
 
 # Properties to receive via API on update
@@ -38,6 +39,7 @@ class NotificationInDBBase(NotificationBase):
     send_time: datetime
     template_uuid: UUID
     f_string: str
+    is_read: bool
 
     class Config:
         orm_mode = True
@@ -57,11 +59,13 @@ class NotificationViewModel(BaseModel):
     receiver_uuid: UUID
     send_time: datetime
     content: str
+    is_read: bool
 
 
 class NotificationTextWithMessage(BaseModel):
     message: str
     data: Optional[List[NotificationViewModel]] = None
+    unread_num: Optional[int]
 
 
 class NotificationSendObjectModel(BaseModel):
