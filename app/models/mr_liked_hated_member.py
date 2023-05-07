@@ -9,13 +9,13 @@ class MR_Liked_Hated_Member(Base):
     __tablename__ = "MR_Liked_Hated_Member"
     member_id = Column(
         Integer,
-        ForeignKey(MR_Member.member_id),
+        ForeignKey(MR_Member.member_id, ondelete="CASCADE"),
         primary_key=True,
         nullable=False,
     )
     target_member_id = Column(
         Integer,
-        ForeignKey(MR_Member.member_id),
+        ForeignKey(MR_Member.member_id, ondelete="CASCADE"),
         primary_key=True,
         nullable=False,
     )
@@ -23,9 +23,6 @@ class MR_Liked_Hated_Member(Base):
         UUID(as_uuid=True),
         ForeignKey("MatchingRoom.room_uuid"),
         nullable=False,
-    )
-    room_uuid = Column(
-        UUID(as_uuid=True), ForeignKey("MatchingRoom.room_uuid"), nullable=False
     )
     is_liked = Column(Boolean, nullable=False, default=False)
     is_hated = Column(Boolean, nullable=False, default=False)
