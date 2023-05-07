@@ -96,30 +96,6 @@ def test_create_mr_member(db_conn, test_client):
     )
     assert response.json()["data"]["matching_room"] == test_mr_member.created_room
 
-
-""" #???不能delete
-def test_delete_mr_member(self) -> None:
-
-    response = client.delete(
-        f"{settings.API_V1_STR}/mr-member",
-        json={
-                "user": {
-                    "email": test_mr_member.email,
-                    "is_admin": False,
-                    "name": test_mr_member.name
-                },
-                "matching_room": {
-                    "room_id": test_mr_member.created_room["room_id"]
-                }
-            },
-        headers=get_user_authentication_headers(),
-    )
-    # loguru.logger.info(response)
-    assert response.status_code == 200
-    # assert response.json()["message"] == "success"
-"""
-
-
 def test_mr_member_self_tag(db_conn, test_client):
     response = test_client.post(
         f"{settings.API_V1_STR}/mr-member-tag/create-self-tag",
@@ -152,6 +128,9 @@ def test_mr_member_find_tag(db_conn, test_client):
     # delete test data
     delete_test_data(db_conn)
 
+"""
+Delete testing data
+"""
 
 def delete_test_data(db_conn):
     # find tag
@@ -187,3 +166,28 @@ def delete_test_data(db_conn):
     db_conn.commit()
 
     return
+
+
+""" #???不能delete
+Delete API test
+
+def test_delete_mr_member(self) -> None:
+
+    response = client.delete(
+        f"{settings.API_V1_STR}/mr-member",
+        json={
+                "user": {
+                    "email": test_mr_member.email,
+                    "is_admin": False,
+                    "name": test_mr_member.name
+                },
+                "matching_room": {
+                    "room_id": test_mr_member.created_room["room_id"]
+                }
+            },
+        headers=get_user_authentication_headers(),
+    )
+    # loguru.logger.info(response)
+    assert response.status_code == 200
+    # assert response.json()["message"] == "success"
+"""
