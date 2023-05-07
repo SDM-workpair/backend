@@ -1,18 +1,4 @@
-import json
-import unittest
-import uuid
-from base64 import b64encode
-from datetime import datetime, timedelta
-from unittest import mock
-
-from fastapi.encoders import jsonable_encoder
-from itsdangerous import TimestampSigner
-
-from app import crud
-from app.core import security
 from app.core.config import settings
-from app.database.session import db_session
-from app.main import app  # Flask instance of the API
 
 from .contest import db_conn, get_user_authentication_headers, test_client
 
@@ -64,7 +50,6 @@ def test_search_groups_who_has_not_logged_in(db_conn, test_client):
 
 
 def test_search_groups_missing_param_who_has_logged_in(db_conn, test_client):
-
     response = test_client.post(
         f"{settings.API_V1_STR}/search/group/list",
         json={},
@@ -87,8 +72,7 @@ def test_read_group_members_who_has_logged_in(db_conn, test_client):
     )
     assert response.status_code == 200
     assert response.json()["message"] == "success"
-    assert response.json()[
-        "data"][0]["name"] == "admin"
+    assert response.json()["data"][0]["name"] == "admin"
 
 
 def test_read_group_members_who_has_not_logged_in(db_conn, test_client):

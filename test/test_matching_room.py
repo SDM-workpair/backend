@@ -1,10 +1,6 @@
-from datetime import datetime
-
-from itsdangerous import TimestampSigner
-
-from app import crud, schemas
+from app import crud
 from app.core.config import settings
-from app.main import app  # Flask instance of the API
+
 from .contest import db_conn, get_user_authentication_headers, test_client
 
 """
@@ -82,7 +78,9 @@ def test_search_matching_rooms_missing_param_who_has_logged_in(db_conn, test_cli
     assert response.status_code == 422
 
 
-def test_search_matching_rooms_missing_param_who_has_not_logged_in(db_conn, test_client):
+def test_search_matching_rooms_missing_param_who_has_not_logged_in(
+    db_conn, test_client
+):
     response = test_client.post(
         f"{settings.API_V1_STR}/search/matching-room/list",
         json={"prompt": ""},
