@@ -4,10 +4,9 @@ from datetime import timedelta
 
 import loguru
 import pytest
-import sqlalchemy as sa
 from fastapi.encoders import jsonable_encoder
 
-from app import crud, schemas
+from app import crud
 from app.core import security
 from app.core.config import settings
 

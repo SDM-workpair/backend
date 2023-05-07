@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.routers import deps
-import loguru
 
 router = APIRouter()
 
@@ -30,17 +29,13 @@ def create_matching_room(
     db: Session = Depends(deps.get_db),
     matching_room_in: schemas.MatchingRoomReq,
     current_user: models.User = Depends(deps.get_current_active_user),
-
 ) -> Any:
     """
     Create new matching room.
     """
     matching_room = crud.matching_room.create(db, obj_in=matching_room_in)
 
-    return {'message': 'success', 'room_id':matching_room.room_id}
-
-
-
+    return {"message": "success", "room_id": matching_room.room_id}
 
 
 # @router.delete("/", response_model=schemas.MatchingRoomWithMessage)

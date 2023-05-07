@@ -5,12 +5,11 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.routers import deps
-import loguru 
 
 router = APIRouter()
 
 
-@router.post("/create" , response_model=schemas.MR_Member_Create_Res)
+@router.post("/create", response_model=schemas.MR_Member_Create_Res)
 def join_matching_room(
     mr_member_in: schemas.MR_Member_Req,
     db: Session = Depends(deps.get_db),
@@ -28,7 +27,9 @@ def join_matching_room(
         )
 
     # Check if matching room exists
-    matching_room = crud.matching_room.get_by_room_id(db=db, room_id=mr_member_in.matching_room.room_id)
+    matching_room = crud.matching_room.get_by_room_id(
+        db=db, room_id=mr_member_in.matching_room.room_id
+    )
     if not matching_room:
         raise HTTPException(
             status_code=400,
@@ -37,10 +38,8 @@ def join_matching_room(
 
     # Check if user already in matching room
     mr_member = crud.mr_member.get_by_room_uuid_and_user_uuid(
-                                    db=db, 
-                                    room_uuid=matching_room.room_uuid, 
-                                    user_uuid=user.user_uuid
-                                )
+        db=db, room_uuid=matching_room.room_uuid, user_uuid=user.user_uuid
+    )
     if mr_member:
         raise HTTPException(
             status_code=400,
@@ -49,25 +48,17 @@ def join_matching_room(
 
     # Create MR_Member
     new_mr_member = crud.mr_member.create(
-                                    db=db,
-                                    user_uuid=user.user_uuid,
-                                    room_uuid=matching_room.room_uuid
-                                )
+        db=db, user_uuid=user.user_uuid, room_uuid=matching_room.room_uuid
+    )
 
     # Recreate response model
     data = {
         "member_id": new_mr_member.member_id,
-        "user":{
-            'email':user.email,
-            'is_admin':user.is_admin,
-            'name':user.name
-        },
-        "matching_room":{
-            'room_id':matching_room.room_id
-        } 
+        "user": {"email": user.email, "is_admin": user.is_admin, "name": user.name},
+        "matching_room": {"room_id": matching_room.room_id},
     }
 
-    return {'message': 'success', 'data': data}
+    return {"message": "success", "data": data}
 
 
 @router.delete("/", response_model=schemas.MR_Member_Del_Res)
@@ -88,7 +79,9 @@ def leave_matching_room(
         )
 
     # Check if matching room exists
-    matching_room = crud.matching_room.get_by_room_id(db=db, room_id=mr_member_in.matching_room.room_id)
+    matching_room = crud.matching_room.get_by_room_id(
+        db=db, room_id=mr_member_in.matching_room.room_id
+    )
     if not matching_room:
         raise HTTPException(
             status_code=400,
@@ -97,10 +90,8 @@ def leave_matching_room(
 
     # Check if user is in matching room
     mr_member = crud.mr_member.get_by_room_uuid_and_user_uuid(
-                                    db=db, 
-                                    room_uuid=matching_room.room_uuid, 
-                                    user_uuid=user.user_uuid
-                                )
+        db=db, room_uuid=matching_room.room_uuid, user_uuid=user.user_uuid
+    )
     if not mr_member:
         raise HTTPException(
             status_code=400,
@@ -111,6 +102,6 @@ def leave_matching_room(
     result = crud.mr_member.delete(db=db, db_obj=mr_member)
 
     if result:
-        return {'message': 'success'}
-    
+        return {"message": "success"}
+
     return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -1,19 +1,12 @@
-import json
-import unittest
-from base64 import b64encode
-from datetime import datetime, timedelta
-from unittest import mock
+from datetime import datetime
 
-from fastapi.encoders import jsonable_encoder
 from fastapi.testclient import TestClient
 from itsdangerous import TimestampSigner
 
-import sqlalchemy as sa
 from app import crud, schemas
-from app.core import security
 from app.core.config import settings
-from app.database.session import db_session
 from app.main import app  # Flask instance of the API
+
 from .contest import db_conn, test_client
 from .test_user import get_user_authentication_headers
 
@@ -41,7 +34,8 @@ fake_matching_room.created_time = None
 
 
 def create_session_cookie(data) -> str:
-    signer = TimestampSigner(str(settings.GOOGLE_SECRET_KEY))
+    TimestampSigner(str(settings.GOOGLE_SECRET_KEY))
+
 
 # TODO
 # def get_user_authentication_headers():
@@ -55,8 +49,6 @@ def create_session_cookie(data) -> str:
 #     )
 #     headers = {"Authorization": f"Bearer {access_token}"}
 #     return headers
-
-
 
 
 # class TestMatchingRoomAPI(unittest.TestCase):
@@ -140,15 +132,21 @@ def create_session_cookie(data) -> str:
 #         assert response.status_code == 401
 #         assert response.json()["detail"] == "Not authenticated"
 
+
 def test_create_matching_room(db_conn, test_client):
     response = test_client.post(
         f"{settings.API_V1_STR}/matching-room/create",
-        json={"name": "test_mr", "due_time": "2023-04-06T01:27:50.024Z",
-            "min_member_num": 3, "description": "desc", "is_forced_matching": False},
+        json={
+            "name": "test_mr",
+            "due_time": "2023-04-06T01:27:50.024Z",
+            "min_member_num": 3,
+            "description": "desc",
+            "is_forced_matching": False,
+        },
         headers=get_user_authentication_headers(db_conn, email),
     )
     assert response.status_code == 200
-    assert response.json()['message'] == 'success'
-    obj = crud.matching_room.get_by_room_id(db_conn, room_id=response.json()['room_id'])
+    assert response.json()["message"] == "success"
+    obj = crud.matching_room.get_by_room_id(db_conn, room_id=response.json()["room_id"])
     db_conn.delete(obj)
     db_conn.commit()
