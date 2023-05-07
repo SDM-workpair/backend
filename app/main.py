@@ -12,6 +12,8 @@ from fastapi import (
 from fastapi.middleware.cors import CORSMiddleware
 from jose import jwt
 from pydantic import ValidationError
+from sqlalchemy.orm import Session
+
 # from fastapi_profiler import PyInstrumentProfilerMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request

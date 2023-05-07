@@ -8,6 +8,16 @@ services:
     #         - "9200:9200"
     #     volumes:
     #         - elasticsearch
+    rabbitmq-container:
+        image: rabbitmq:3-management
+        hostname: rabbitmq-container
+        volumes:
+            - ./rabbitmq:/rabbitmq
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        networks:
+            - teamatch-network
 
     postgres:
         image: postgres:13.3
@@ -37,10 +47,12 @@ services:
             - JSON_LOGS=0
             - LOG_LEVEL=DEBUG
             - PRE_COMMIT_HOME=/backend/.pre-commit
+            - RABBITMQ_HOST=rabbitmq-container
             - ENV=dev
         tty: true
         depends_on:
             - postgres
+            - rabbitmq-container
         networks:
             - teamatch-network
 

@@ -46,20 +46,20 @@ async def trigger_matching_event(
     Trigger matching event and send notification into rabbitmq queue. (only for test)
     """
     # send_notification_to_rabbit_mq(db, group_members)
-    notification_send_object_1 = schemas.NotificationSendObjectModel(
-        receiver_uuid="5f1e19a8-70a9-44b9-b026-1584c5df4f5a",
-        sender_uuid="2be6b063-8914-42b6-9e8d-1bbe14317cc2",
-        template_uuid="9c1dc87f-e938-4fa1-9900-9b4ebd5701da",
-        f_string="配對結果111",
-    )
-    notification_send_object_2 = schemas.NotificationSendObjectModel(
-        receiver_uuid="57d02352-e057-4878-a05e-70713badca56",
-        sender_uuid="2be6b063-8914-42b6-9e8d-1bbe14317cc2",
-        template_uuid="9c1dc87f-e938-4fa1-9900-9b4ebd5701da",
-        f_string="配對結果111",
-    )
+    # notification_send_object_1 = schemas.NotificationSendObjectModel(
+    #     receiver_uuid="5f1e19a8-70a9-44b9-b026-1584c5df4f5a",
+    #     sender_uuid="2be6b063-8914-42b6-9e8d-1bbe14317cc2",
+    #     template_uuid="9c1dc87f-e938-4fa1-9900-9b4ebd5701da",
+    #     f_string="配對結果111",
+    # )
+    # notification_send_object_2 = schemas.NotificationSendObjectModel(
+    #     receiver_uuid="57d02352-e057-4878-a05e-70713badca56",
+    #     sender_uuid="2be6b063-8914-42b6-9e8d-1bbe14317cc2",
+    #     template_uuid="9c1dc87f-e938-4fa1-9900-9b4ebd5701da",
+    #     f_string="配對結果111",
+    # )
     notification_send_object_3 = schemas.NotificationSendObjectModel(
-        receiver_uuid="70528b75-1ebc-4117-b3dc-c6127264fcff",
+        receiver_uuid="7fcae3bb-8fab-44f7-98df-906147b34021",
         sender_uuid="2be6b063-8914-42b6-9e8d-1bbe14317cc2",
         template_uuid="9c1dc87f-e938-4fa1-9900-9b4ebd5701da",
         f_string="配對結果111",
@@ -70,7 +70,7 @@ async def trigger_matching_event(
         template_uuid="9c1dc87f-e938-4fa1-9900-9b4ebd5701da",
         f_string="配對結果111",
     )
-    await notify(db, notification_send_object_1)
-    await notify(db, notification_send_object_2)
+    # await notify(db, notification_send_object_1)
+    # await notify(db, notification_send_object_2)
     await notify(db, notification_send_object_3)
     await notify(db, notification_send_object_4)
