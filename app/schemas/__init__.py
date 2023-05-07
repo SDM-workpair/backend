@@ -1,14 +1,19 @@
-from .mr_member import MR_Member, MR_Member_Create, MR_Member_Create_Res, MR_Member_Update
-from .gr_member import GR_Member, GR_MemberWithSearch, GR_MemberCreate
+from .gr_member import GR_Member, GR_MemberCreate, GR_MemberWithSearch
 from .group import Group, GroupCreate, GroupInDB, GroupWithMessage, GroupWithSearch
 from .matching_room import (
     MatchingRoom,
+    MatchingRoomBase,
     MatchingRoomCreate,
     MatchingRoomInDB,
     MatchingRoomsWithMessage,
     MatchingRoomWithMessage,
     MatchingRoomWithSearch,
-    MatchingRoomBase
+)
+from .mr_member import (
+    MR_Member,
+    MR_Member_Create,
+    MR_Member_Create_Res,
+    MR_Member_Update,
 )
 from .notification import (
     Notification,

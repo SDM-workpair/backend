@@ -4,11 +4,11 @@ from app.routers.api_v1 import (
     auth,
     group,
     login,
+    matching_event,
     matching_room,
     notification,
     search,
     user,
-    matching_event,
 )
 
 api_router = APIRouter()
@@ -24,5 +24,6 @@ api_router.include_router(search.router, prefix="/search", tags=["search"])
 api_router.include_router(
     notification.router, prefix="/notification", tags=["notification"]
 )
-api_router.include_router(matching_event.router, prefix="/matching-event", tags=["matching-event"])
-
+api_router.include_router(
+    matching_event.router, prefix="/matching-event", tags=["matching-event"]
+)

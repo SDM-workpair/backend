@@ -5,11 +5,11 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.routers import deps
-import loguru
-import json
+
 # from app.core.scheduler import matching_event
 
 router = APIRouter()
+
 
 # TODO
 @router.post("/")
@@ -23,7 +23,9 @@ def initiate_matching_event(
     """
     Initiate matching event.
     """
-    matching_room = crud.matching_room.get_by_room_id(db=db, room_id=matching_room_in.room_id)
+    matching_room = crud.matching_room.get_by_room_id(
+        db=db, room_id=matching_room_in.room_id
+    )
     if not matching_room:
         raise HTTPException(
             status_code=400,
@@ -32,13 +34,7 @@ def initiate_matching_event(
     # result = matching_event(matching_room)
     # query matching_room 然後隨便分組
     # result = [[1, 2],[3, 4, 5],[6, 7]] #要是int
-    response = {
-        "groups": {
-            "0": [ 3, 4 ],
-            "1": [ 1 ],
-            "2": [ 2 ]
-        }
-    }
+    response = {"groups": {"0": [3, 4], "1": [1], "2": [2]}}
     result = response["groups"]
 
     # 可能要寫到一個method裡面(scheduler也會call)
@@ -50,7 +46,7 @@ def initiate_matching_event(
         new_group_schema = schemas.GroupCreate(
             name=matching_room.room_id + "_" + str(group_id),
             group_id=str(group_id),
-            room_uuid=matching_room.room_uuid
+            room_uuid=matching_room.room_uuid,
         )
         new_group = crud.group.create(db=db, obj_in=new_group_schema)
 
@@ -60,14 +56,16 @@ def initiate_matching_event(
             new_gr_mem_schema = schemas.GR_MemberCreate(
                 member_id=gr_member,
                 group_uuid=new_group.group_uuid,
-                join_time=new_group.create_time
+                join_time=new_group.create_time,
             )
             new_gr_mem = crud.gr_member.create(db=db, obj_in=new_gr_mem_schema)
             # Call notification method for every Group Mem
-            gr_user = crud.mr_member.get_by_member_id(db=db, member_id=new_gr_mem.member_id)
+            gr_user = crud.mr_member.get_by_member_id(
+                db=db, member_id=new_gr_mem.member_id
+            )
             gr_mem_list.append(gr_user.member_id)
             # Create notify send object -> (receiver_uuid=gr_user_uuid.user_uuid, ...)
             # notify(db, notify_send_obj)
         group_list.append(gr_mem_list)
 
-    return {'message': 'success', 'data':group_list}
+    return {"message": "success", "data": group_list}

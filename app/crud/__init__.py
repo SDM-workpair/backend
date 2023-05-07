@@ -1,9 +1,9 @@
 from .crud_gr_member import gr_member
 from .crud_group import group
 from .crud_matching_room import matching_room
+from .crud_mr_member import mr_member
 from .crud_notification import notification
 from .crud_user import user
-from .crud_mr_member import mr_member
 
 # For a new basic set of CRUD operations you could just do
 
