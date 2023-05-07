@@ -167,5 +167,13 @@ cython_debug/
 ./pre-commit/
 ./pre-commit/*
 ./.pre-commit/*
+.pre-commit/*
 .lock
 db.db
+
+# profile
+prof/
+*.html
+
+# txt
+*.txt
