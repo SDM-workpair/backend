@@ -61,8 +61,8 @@ jobs:
         docker-compose exec -T backend python3 -m app.database.test.initial_test_data
         echo "Start run pytest"
         docker-compose exec -T backend $ENTRYPOINT
-        docker-compose exec backend python -m pytest ./microservices/matching/test.py -rA
-        docker-compose exec backend python -m pytest ./microservices/swipecard/test_microservices_swipe_card.py -rA
+        docker-compose exec -T backend python -m pytest ./microservices/matching/test.py -rA
+        docker-compose exec -T backend python -m pytest ./microservices/swipecard/test_microservices_swipe_card.py -rA
     - name: log
       run: |
         docker-compose logs
