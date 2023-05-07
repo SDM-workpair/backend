@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List, Tuple
 
+from loguru import logger
+
 from .grouping_strategy import (
     GroupingStrategy,
     RandomGrouping,
@@ -55,8 +57,10 @@ class OneTimeMatchingEventBuilder(MatchingEventBuilder):
 
     def set_strategy(self, grouping_strategy: str, slot_strategy: str):
         if not isinstance(grouping_strategy, str):
+            logger.error("grouping_strategy must be a string")
             raise TypeError("grouping_strategy must be a string")
         if not isinstance(slot_strategy, str):
+            logger.error("slot_strategy must be a string")
             raise TypeError("slot_strategy must be a string")
 
         # set grouping strategy

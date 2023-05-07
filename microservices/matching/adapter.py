@@ -16,7 +16,7 @@ class MatchingRoomLikedHatedAdapter(MatchingEventAdapter):
         return self._total_users
 
     def get_member_id_list(self):
-        return sorted(self._member_id_list)
+        return sorted(list(set(self._member_id_list)))
 
     def get_users_pref(self):
         return self._users_pref
@@ -27,7 +27,7 @@ class MatchingRoomLikedHatedAdapter(MatchingEventAdapter):
     def add_member_id(self, member_id):
         self._member_id_list.append(member_id)
 
-    def transform_user_pref(self, mr_members_pref):
+    async def transform_user_pref(self, mr_members_pref):
         sorted_member_id_list = self.get_member_id_list()
 
         # turn member_id_list to dict
@@ -45,6 +45,13 @@ class MatchingRoomLikedHatedAdapter(MatchingEventAdapter):
         for member_pref in mr_members_pref:
             user_id = member_pref.member_id
             target_member_id = member_pref.target_member_id
+
+            # if member not in member list, skip
+            if (
+                user_id not in sorted_member_id_list
+                or target_member_id not in sorted_member_id_list
+            ):
+                continue
 
             user_index = user_list_dict[user_id]
             target_index = user_list_dict[target_member_id]

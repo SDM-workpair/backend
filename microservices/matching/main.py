@@ -1,3 +1,6 @@
+import sys
+import traceback
+
 from fastapi import Depends, FastAPI, HTTPException, Response, status
 from loguru import logger
 from sqlalchemy.orm import Session
@@ -26,9 +29,9 @@ def get_db():
 
 
 @app.post(
-    "/matching/create/test", responses={**base_response, 202: {"model": MatchingGroups}}
+    "/matching/create/test", responses={**base_response, 200: {"model": MatchingGroups}}
 )
-async def create_matching_event_test(*, db: Session = Depends(get_db)):
+async def create_matching_event_test(config: MatchingEvent):
     """Create test matching event"""
 
     logger.info("invoke mathcing event create")
@@ -74,11 +77,11 @@ async def create_matching_event(
 
     logger.info("invoke mathcing event create")
     try:
-        matching_room = CRUDLikedHatedMember.get_matching_room(
+        matching_room = await CRUDLikedHatedMember.get_matching_room(
             db=db, room_id=config.room_id
         )
     except Exception as e:
-        logger.error(e)
+        logger.error(getexception(e))
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"detail": "get_matching_room query error"}
 
@@ -89,14 +92,15 @@ async def create_matching_event(
         )
 
     try:
-        mr_members = CRUDLikedHatedMember.get_member_in_matching_room(
+        logger.info("get_member_in_matching_room")
+        mr_members = await CRUDLikedHatedMember.get_member_in_matching_room(
             db=db, room_uuid=matching_room.room_uuid
         )
         adapter.set_total_users(len(mr_members))
         for mr_member in mr_members:
             adapter.add_member_id(mr_member.member_id)
     except Exception as e:
-        logger.error(e)
+        logger.error(getexception(e))
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"detail": "get_matching_room_members query error"}
 
@@ -107,27 +111,29 @@ async def create_matching_event(
         )
 
     try:
-        mr_members_pref = CRUDLikedHatedMember.get_mr_user_pref_in_matching_room(
+        logger.info("get_mr_user_pref_in_matching_room")
+        mr_members_pref = await CRUDLikedHatedMember.get_mr_user_pref_in_matching_room(
             db=db, room_uuid=matching_room.room_uuid
         )
     except Exception as e:
-        logger.error(e)
+        logger.error(getexception(e))
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"detail": "get_mr_user_pref_in_matching_room query error"}
 
     try:
-        adapter.transform_user_pref(mr_members_pref)
+        await adapter.transform_user_pref(mr_members_pref)
     except Exception as e:
-        logger.error(e)
+        logger.error(getexception(e))
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"detail": "transform_user_pref query error"}
 
     try:
+        logger.info("start building matching event")
         # start building matching event
         config = {
             "group_choice": config.group_choice,
             "slot_choice": config.slot_choice,
-            "params": {"num_groups": 3},
+            "params": config.params,
             "users_pref": adapter.get_users_pref(),
         }
         matching_event_builder = OneTimeMatchingEventBuilder()
@@ -140,7 +146,7 @@ async def create_matching_event(
             .match(config["users_pref"])
         )
     except Exception as e:
-        logger.error(e)
+        logger.error(getexception(e))
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"detail": f"matching event builder error, {e}"}
 
@@ -161,3 +167,23 @@ async def get_all_matching_event(response: Response):
     """Get all matching event"""
     response.status_code = status.HTTP_501_NOT_IMPLEMENTED
     return {"detail": "Hello World"}
+
+
+@app.get("/healthchecker")
+async def healthchecker():
+    return {"msg": "Hello World"}
+
+
+def getexception(e):
+    error_class = e.__class__.__name__  # 取得錯誤類型
+    detail = e.args[0]  # 取得詳細內容
+    cl, exc, tb = sys.exc_info()  # 取得Call Stack
+    lastCallStack = traceback.extract_tb(tb)[-1]  # 取得Call Stack的最後一筆資料
+    fileName = lastCallStack[0]  # 取得發生的檔案名稱
+    lineNum = lastCallStack[1]  # 取得發生的行號
+    funcName = lastCallStack[2]  # 取得發生的函數名稱
+
+    errMsg = 'File "{}", line {}, in {}: [{}] {}'.format(
+        fileName, lineNum, funcName, error_class, detail
+    )
+    print(errMsg)

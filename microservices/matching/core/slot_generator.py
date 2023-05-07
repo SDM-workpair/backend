@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List
 
+from loguru import logger
+
 
 class SlotGenerator(ABC):
     def __init__(self):
@@ -40,6 +42,7 @@ class FixedGroupSlot(SlotGenerator):
                 num_groups <= self.num_users
             ), "num_groups must be less than or equal to the total number of users"
         except Exception:
+            logger.error("num_groups must be specified for fixed group amount strategy")
             raise ValueError(
                 "num_groups must be specified for fixed group amount strategy"
             )
@@ -55,11 +58,9 @@ class MaxUserSlot(SlotGenerator):
 
     def generate_slots(self, params: Dict[str, int]) -> List[int]:
         try:
-            max_users = params["max_users"]
-            assert (
-                max_users < self.num_users
-            ), "max_users must be less than total users"  # ??
-        except ValueError:
+            max_users = min(params["max_users"], self.num_users)
+        except ValueError as e:
+            logger.error(f"max_users must be specified for fixed max strategy, {e}")
             raise ValueError("max_users must be specified for fixed max strategy")
 
         num_groups = self.num_users // max_users
@@ -84,10 +85,12 @@ class MinUserSlot(SlotGenerator):
     def generate_slots(self, params: Dict[str, int]) -> List[int]:
         try:
             min_users = max(params["min_users"], 1)
+            min_users = min(min_users, int(self.num_users / 2))
             assert (
                 min_users <= self.num_users
             ), "min_users must be less than total users"
-        except ValueError:
+        except ValueError as e:
+            logger.error(f"min_users must be specified for fixed min strategy, {e}")
             raise ValueError("min_users must be specified for fixed min strategy")
 
         num_groups = self.num_users // min_users
