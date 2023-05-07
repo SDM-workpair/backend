@@ -126,31 +126,31 @@ def test_mr_member_find_tag(db_conn, test_client):
     assert response.status_code == 200
     assert response.json()["message"] == "success"
 
-    
+
 """
 Delete API test
 """
+
+
 def test_delete_mr_member(db_conn, test_client):
     response = test_client.request(
-        "DELETE", 
+        "DELETE",
         f"{settings.API_V1_STR}/mr-member",
         json={
-                "user": {
-                    "email": test_mr_member.email,
-                    "is_admin": False,
-                    "name": test_mr_member.name
-                },
-                "matching_room": {
-                    "room_id": test_mr_member.created_room["room_id"]
-                }
+            "user": {
+                "email": test_mr_member.email,
+                "is_admin": False,
+                "name": test_mr_member.name,
             },
-        headers=get_user_authentication_headers(db_conn, email))
+            "matching_room": {"room_id": test_mr_member.created_room["room_id"]},
+        },
+        headers=get_user_authentication_headers(db_conn, email),
+    )
 
     assert response.status_code == 200
     assert response.json()["message"] == "success"
     # delete test data
     delete_test_data(db_conn)
-
 
 
 """
