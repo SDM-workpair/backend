@@ -1,3 +1,4 @@
+import os
 from typing import Union
 
 from fastapi import (
@@ -11,7 +12,7 @@ from fastapi import (
 from fastapi.middleware.cors import CORSMiddleware
 from jose import jwt
 from pydantic import ValidationError
-from sqlalchemy.orm import Session
+# from fastapi_profiler import PyInstrumentProfilerMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
@@ -43,6 +44,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+if os.environ.get("ENV") == "dev":
+    pass
+    # app.add_middleware(
+    #     PyInstrumentProfilerMiddleware,
+    #     server_app=app,  # Required to output the profile on server shutdown
+    #     profiler_output_type="html",
+    #     is_print_each_request=False,  # Set to True to show request profile on
+    #     # stdout on each request
+    #     open_in_browser=False,  # Set to true to open your web-browser automatically
+    #     # when the server shuts down
+    #     html_file_name="./test/backend_profile.html",  # Filename for output
+    # )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 

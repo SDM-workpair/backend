@@ -9,13 +9,13 @@ class MR_Liked_Hated_Member(Base):
     __tablename__ = "MR_Liked_Hated_Member"
     member_id = Column(
         Integer,
-        ForeignKey(MR_Member.member_id),
+        ForeignKey(MR_Member.member_id, ondelete="CASCADE"),
         primary_key=True,
         nullable=False,
     )
     target_member_id = Column(
         Integer,
-        ForeignKey(MR_Member.member_id),
+        ForeignKey(MR_Member.member_id, ondelete="CASCADE"),
         primary_key=True,
         nullable=False,
     )

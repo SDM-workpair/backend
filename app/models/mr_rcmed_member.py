@@ -8,13 +8,13 @@ class MR_Rcmed_Member(Base):
     __tablename__ = "MR_Rcmed_Member"
     member_id = Column(
         Integer,
-        ForeignKey("MR_Member.member_id"),
+        ForeignKey("MR_Member.member_id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False,
     )
     rcmed_member_id = Column(
         Integer,
-        ForeignKey("MR_Member.member_id"),
+        ForeignKey("MR_Member.member_id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False,
     )

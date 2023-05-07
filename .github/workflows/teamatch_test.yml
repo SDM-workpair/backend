@@ -51,6 +51,8 @@ jobs:
         echo "migrate alembic"
         docker-compose exec -T backend alembic upgrade head
         docker-compose exec -T backend python3 -m app.initial_data
+        docker-compose exec -T backend python3 -m app.database.test.test_database
+        docker-compose exec -T backend python3 -m app.database.test.initial_test_data
         echo "Start run pytest"
         docker-compose exec -T backend $ENTRYPOINT
     - name: log

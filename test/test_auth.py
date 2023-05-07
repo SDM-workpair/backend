@@ -1,16 +1,20 @@
 import httpx
+import loguru
 import pytest
-from fastapi.testclient import TestClient
+from fastapi.encoders import jsonable_encoder
 from google.auth.transport import requests
 from google.oauth2 import id_token
 
 from app import crud
 from app.core.config import settings
-from app.database.session import db_session
-from app.main import app  # Flask instance of the API
 
-test_client = TestClient(app)
+from .contest import db_conn, test_client
+
 client = httpx.AsyncClient()
+
+# pytest fixture
+db_conn = db_conn
+test_client = test_client
 
 
 @pytest.fixture(scope="module")
@@ -41,12 +45,20 @@ def get_token_id():
 
 
 # test
-def test_google_auth_verify_id_token_successfully(get_server_api, get_token_id):
+def test_google_auth_verify_id_token_successfully(
+    get_server_api, get_token_id, test_client, db_conn
+):
     credential = get_token_id
     data = {"credential": credential}
     response = test_client.post(
         f"{get_server_api}{settings.API_V1_STR}/auth/sso-login", json=data
     )
+    # 因為這個google身分沒有名字之類的info
+    # assert response.status_code == 400
+    # assert (
+    #     response.json()["detail"]
+    #     == "Missing some user info from google authentication. Please use another way to create new account."
+    # )
     idinfo = id_token.verify_oauth2_token(
         credential,
         requests.Request(),
@@ -54,7 +66,9 @@ def test_google_auth_verify_id_token_successfully(get_server_api, get_token_id):
         clock_skew_in_seconds=5,
     )
     email = idinfo["email"]
-    user = crud.user.get_by_email(db=db_session, email=email)
+    user = crud.user.get_by_email(db=db_conn, email=email)
+    loguru.logger.info(jsonable_encoder(user))
+
     if user:
         assert response.status_code == 200
     else:
@@ -66,7 +80,7 @@ def test_google_auth_verify_id_token_successfully(get_server_api, get_token_id):
         )
 
 
-def test_google_auth_verify_id_token_failed(get_server_api):
+def test_google_auth_verify_id_token_failed(get_server_api, test_client):
     credential = "fake_token_id"
     data = {"credential": credential}
     response = test_client.post(
