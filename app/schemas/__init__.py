@@ -5,8 +5,10 @@ from .matching_room import (
     MatchingRoomBase,
     MatchingRoomCreate,
     MatchingRoomInDB,
+    MatchingRoomReq,
     MatchingRoomsWithMessage,
     MatchingRoomWithMessage,
+    MatchingRoomWithRoomId,
     MatchingRoomWithSearch,
 )
 from .mr_member import (
@@ -14,6 +16,17 @@ from .mr_member import (
     MR_Member_Create,
     MR_Member_Create_Res,
     MR_Member_Update,
+    MR_Member_Base,
+    MR_Member_Create,
+    MR_Member_Create_Res,
+    MR_Member_Del_Res,
+    MR_Member_Req,
+)
+from .mr_member_tag import (
+    MR_Member_Tag_Base,
+    MR_Member_Tag_Create,
+    MR_Member_Tag_Res,
+    MR_Member_Tag_Update,
 )
 from .notification import (
     Notification,

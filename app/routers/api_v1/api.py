@@ -6,6 +6,8 @@ from app.routers.api_v1 import (
     login,
     matching_event,
     matching_room,
+    mr_member,
+    mr_member_tag,
     notification,
     search,
     user,
@@ -25,5 +27,8 @@ api_router.include_router(
     notification.router, prefix="/notification", tags=["notification"]
 )
 api_router.include_router(
-    matching_event.router, prefix="/matching-event", tags=["matching-event"]
+    matching_event.router, prefix="/matching-event", tags=["matching-event"])
+api_router.include_router(mr_member.router, prefix="/mr-member", tags=["mr-member"])
+api_router.include_router(
+    mr_member_tag.router, prefix="/mr-member-tag", tags=["mr-member-tag"]
 )
