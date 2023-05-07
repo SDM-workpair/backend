@@ -96,6 +96,7 @@ def test_create_mr_member(db_conn, test_client):
     )
     assert response.json()["data"]["matching_room"] == test_mr_member.created_room
 
+
 def test_mr_member_self_tag(db_conn, test_client):
     response = test_client.post(
         f"{settings.API_V1_STR}/mr-member-tag/create-self-tag",
@@ -128,9 +129,11 @@ def test_mr_member_find_tag(db_conn, test_client):
     # delete test data
     delete_test_data(db_conn)
 
+
 """
 Delete testing data
 """
+
 
 def delete_test_data(db_conn):
     # find tag
