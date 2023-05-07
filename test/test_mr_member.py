@@ -4,8 +4,7 @@ import string
 from app import crud
 from app.core.config import settings
 
-from .contest import db_conn, test_client
-from .test_user import get_user_authentication_headers
+from .contest import db_conn, get_user_authentication_headers, test_client
 
 """
 pytest fixture
@@ -151,10 +150,10 @@ def test_mr_member_find_tag(db_conn, test_client):
     assert response.json()["message"] == "success"
 
     # delete test data
-    delete_test_data(db_conn, test_client)
+    delete_test_data(db_conn)
 
 
-def delete_test_data(db_conn, test_client):
+def delete_test_data(db_conn):
     # find tag
     obj = crud.mr_member_tag.get_1st_find_tag_by_member_id(
         db=db_conn, member_id=test_mr_member.member_id

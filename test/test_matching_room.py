@@ -7,8 +7,7 @@ from app import crud, schemas
 from app.core.config import settings
 from app.main import app  # Flask instance of the API
 
-from .contest import db_conn, test_client
-from .test_user import get_user_authentication_headers
+from .contest import db_conn, get_user_authentication_headers, test_client
 
 """
 pytest fixture
