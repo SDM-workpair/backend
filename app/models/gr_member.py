@@ -9,7 +9,7 @@ class GR_Member(Base):
     __tablename__ = "GR_Member"
     member_id = Column(
         Integer,
-        ForeignKey("MR_Member.member_id"),
+        ForeignKey("MR_Member.member_id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False,
     )
