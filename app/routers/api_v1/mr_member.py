@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.post("/create", response_model=schemas.MR_Member_Create_Res)
-async def join_matching_room(
+def join_matching_room(
     mr_member_in: schemas.MR_Member_Req,
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -19,7 +19,7 @@ async def join_matching_room(
     Create MR_Member
     """
     # Check if user exists
-    user = await crud.user.get_by_email(db=db, email=mr_member_in.user.email)
+    user =  crud.user.get_by_email(db=db, email=mr_member_in.user.email)
     if not user:
         raise HTTPException(
             status_code=400,
@@ -27,7 +27,7 @@ async def join_matching_room(
         )
 
     # Check if matching room exists
-    matching_room = await crud.matching_room.get_by_room_id(
+    matching_room =  crud.matching_room.get_by_room_id(
         db=db, room_id=mr_member_in.matching_room.room_id
     )
     if not matching_room:
@@ -37,7 +37,7 @@ async def join_matching_room(
         )
 
     # Check if user already in matching room
-    mr_member = await crud.mr_member.get_by_room_uuid_and_user_uuid(
+    mr_member =  crud.mr_member.get_by_room_uuid_and_user_uuid(
         db=db, room_uuid=matching_room.room_uuid, user_uuid=user.user_uuid
     )
     if mr_member:
@@ -47,7 +47,7 @@ async def join_matching_room(
         )
 
     # Create MR_Member
-    new_mr_member = await crud.mr_member.create(
+    new_mr_member =  crud.mr_member.create(
         db=db, user_uuid=user.user_uuid, room_uuid=matching_room.room_uuid
     )
 
@@ -62,7 +62,7 @@ async def join_matching_room(
 
 
 @router.delete("/", response_model=schemas.MR_Member_Del_Res)
-async def leave_matching_room(
+def leave_matching_room(
     mr_member_in: schemas.MR_Member_Req,
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -71,7 +71,7 @@ async def leave_matching_room(
     Leave matching room and delete MR_Member
     """
     # Check if user exists
-    user = await crud.user.get_by_email(db=db, email=mr_member_in.user.email)
+    user =  crud.user.get_by_email(db=db, email=mr_member_in.user.email)
     if not user:
         raise HTTPException(
             status_code=400,
@@ -79,7 +79,7 @@ async def leave_matching_room(
         )
 
     # Check if matching room exists
-    matching_room = await crud.matching_room.get_by_room_id(
+    matching_room =  crud.matching_room.get_by_room_id(
         db=db, room_id=mr_member_in.matching_room.room_id
     )
     if not matching_room:
@@ -89,7 +89,7 @@ async def leave_matching_room(
         )
 
     # Check if user is in matching room
-    mr_member = await crud.mr_member.get_by_room_uuid_and_user_uuid(
+    mr_member =  crud.mr_member.get_by_room_uuid_and_user_uuid(
         db=db, room_uuid=matching_room.room_uuid, user_uuid=user.user_uuid
     )
     if not mr_member:
@@ -99,7 +99,7 @@ async def leave_matching_room(
         )
 
     # Delete MR_Member
-    result = await crud.mr_member.delete(db=db, db_obj=mr_member)
+    result =  crud.mr_member.delete(db=db, db_obj=mr_member)
 
     if result:
         return {"message": "success"}
