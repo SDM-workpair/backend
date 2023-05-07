@@ -1,8 +1,8 @@
-"""Recreate all table
+"""Add cascade contraint into mr_member
 
-Revision ID: 3e4e9958b6c2
+Revision ID: f7e1d11cc1ed
 Revises:
-Create Date: 2023-04-19 10:17:39.070645
+Create Date: 2023-05-07 10:15:36.400879
 
 """
 import sqlalchemy as sa
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "3e4e9958b6c2"
+revision = "f7e1d11cc1ed"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -163,8 +163,7 @@ def upgrade() -> None:
             ["Group.group_uuid"],
         ),
         sa.ForeignKeyConstraint(
-            ["member_id"],
-            ["MR_Member.member_id"],
+            ["member_id"], ["MR_Member.member_id"], ondelete="CASCADE"
         ),
         sa.PrimaryKeyConstraint("member_id", "group_uuid"),
     )
@@ -176,16 +175,14 @@ def upgrade() -> None:
         sa.Column("is_liked", sa.Boolean(), nullable=False),
         sa.Column("is_hated", sa.Boolean(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["member_id"],
-            ["MR_Member.member_id"],
+            ["member_id"], ["MR_Member.member_id"], ondelete="CASCADE"
         ),
         sa.ForeignKeyConstraint(
             ["room_uuid"],
             ["MatchingRoom.room_uuid"],
         ),
         sa.ForeignKeyConstraint(
-            ["target_member_id"],
-            ["MR_Member.member_id"],
+            ["target_member_id"], ["MR_Member.member_id"], ondelete="CASCADE"
         ),
         sa.PrimaryKeyConstraint("member_id", "target_member_id"),
     )
@@ -197,8 +194,7 @@ def upgrade() -> None:
         sa.Column("is_self_tag", sa.Boolean(), nullable=False),
         sa.Column("is_find_tag", sa.Boolean(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["member_id"],
-            ["MR_Member.member_id"],
+            ["member_id"], ["MR_Member.member_id"], ondelete="CASCADE"
         ),
         sa.ForeignKeyConstraint(
             ["room_uuid"],
@@ -213,12 +209,10 @@ def upgrade() -> None:
         sa.Column("room_uuid", sa.UUID(), nullable=False),
         sa.Column("order", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["member_id"],
-            ["MR_Member.member_id"],
+            ["member_id"], ["MR_Member.member_id"], ondelete="CASCADE"
         ),
         sa.ForeignKeyConstraint(
-            ["rcmed_member_id"],
-            ["MR_Member.member_id"],
+            ["rcmed_member_id"], ["MR_Member.member_id"], ondelete="CASCADE"
         ),
         sa.ForeignKeyConstraint(
             ["room_uuid"],

@@ -11,15 +11,20 @@ from pydantic import BaseModel
 
 # Shared properties
 class MatchingRoomBase(BaseModel):
-    pass
+    room_id: str
 
 
 # Properties to receive via API on creation
+class MatchingRoomReq(BaseModel):
+    name: Optional[str] = None
+    due_time: datetime
+    min_member_num: int
+    description: Optional[str] = None
+    is_forced_matching: bool = False
 
 
 class MatchingRoomCreate(MatchingRoomBase):
     name: Optional[str] = None
-    room_id: str
     due_time: datetime
     min_member_num: int
     description: Optional[str] = None
@@ -67,6 +72,11 @@ class MatchingRoomsWithMessage(BaseModel):
 class MatchingRoomWithMessage(BaseModel):
     message: str
     data: Optional[MatchingRoom] = None
+
+
+class MatchingRoomWithRoomId(BaseModel):
+    message: str
+    room_id: str
 
 
 class MatchingRoomWithSearch(BaseModel):

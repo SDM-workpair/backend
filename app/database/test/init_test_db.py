@@ -212,28 +212,20 @@ def init_mr_member(db: Session):
             None,
             None,
         ],
-        "member_id": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
     }
     for i in range(len(init_mr_members["user_uuid"])):
-        member = (
-            db.query(MR_Member)
-            .filter(MR_Member.member_id == init_mr_members["member_id"][i])
-            .first()
+        db_obj = MR_Member(
+            user_uuid=init_mr_members["user_uuid"][i],
+            room_uuid=init_mr_members["room_uuid"][i],
+            join_time=init_mr_members["join_time"][i],
+            grouped_time=init_mr_members["grouped_time"][i],
+            is_grouped=init_mr_members["is_grouped"][i],
+            is_bound=init_mr_members["is_bound"][i],
+            bind_uuid=init_mr_members["bind_uuid"][i],
         )
-        if not member:
-            db_obj = MR_Member(
-                member_id=init_mr_members["member_id"][i],
-                user_uuid=init_mr_members["user_uuid"][i],
-                room_uuid=init_mr_members["room_uuid"][i],
-                join_time=init_mr_members["join_time"][i],
-                grouped_time=init_mr_members["grouped_time"][i],
-                is_grouped=init_mr_members["is_grouped"][i],
-                is_bound=init_mr_members["is_bound"][i],
-                bind_uuid=init_mr_members["bind_uuid"][i],
-            )
-            db.add(db_obj)
-            db.commit()
-            db.refresh(db_obj)
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
 
 
 # init group
