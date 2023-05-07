@@ -24,7 +24,7 @@ def read_my_matching_rooms(
 
 
 @router.post("/create", response_model=schemas.MatchingRoomWithRoomId)
-def create_matching_room(
+async def create_matching_room(
     *,
     db: Session = Depends(deps.get_db),
     matching_room_in: schemas.MatchingRoomReq,
@@ -33,7 +33,7 @@ def create_matching_room(
     """
     Create new matching room.
     """
-    matching_room = crud.matching_room.create(db, obj_in=matching_room_in)
+    matching_room = await crud.matching_room.create(db, obj_in=matching_room_in)
 
     return {"message": "success", "room_id": matching_room.room_id}
 
