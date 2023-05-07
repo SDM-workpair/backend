@@ -31,7 +31,15 @@ def initiate_matching_event(
         )
     # result = matching_event(matching_room)
     # query matching_room 然後隨便分組
-    result = [[1, 2],[3, 4, 5],[6, 7]] #要是int
+    # result = [[1, 2],[3, 4, 5],[6, 7]] #要是int
+    response = {
+        "groups": {
+            "0": [ 3, 4 ],
+            "1": [ 1 ],
+            "2": [ 2 ]
+        }
+    }
+    result = response["groups"]
 
     # 可能要寫到一個method裡面(scheduler也會call)
     group_list = []
@@ -47,7 +55,7 @@ def initiate_matching_event(
         new_group = crud.group.create(db=db, obj_in=new_group_schema)
 
         gr_mem_list = []
-        for gr_member in group:
+        for gr_member in group.values():
             # Create GR_member
             new_gr_mem_schema = schemas.GR_MemberCreate(
                 member_id=gr_member,
