@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import exc
 from sqlalchemy.orm import Session
 
@@ -106,12 +106,12 @@ def update_user_profile(
     }
 
 
-@router.get("/logout", response_model=schemas.user.UserMessage)
-async def logout(request: Request):
-    user = request.session.get("user")
-    if not user:
-        raise HTTPException(status_code=400, detail="User has not logged in.")
-    # Remove the user
-    request.session.pop("user", None)
+# @router.get("/logout", response_model=schemas.user.UserMessage)
+# async def logout(request: Request):
+#     user = request.session.get("user")
+#     if not user:
+#         raise HTTPException(status_code=400, detail="User has not logged in.")
+#     # Remove the user
+#     request.session.pop("user", None)
 
-    return {"message": "User log out", "data": ""}
+#     return {"message": "User log out", "data": ""}

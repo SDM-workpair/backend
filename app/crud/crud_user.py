@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional, Union
+from uuid import UUID
 
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash, verify_password
@@ -15,6 +15,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
     def get_by_user_uuid(self, db: Session, *, user_uuid: UUID) -> Optional[User]:
         return db.query(User).filter(User.user_uuid == user_uuid).first()
+
+    def get_by_uuid(self, db: Session, *, uuid: UUID) -> Optional[User]:
+        return db.query(User).filter(User.user_uuid == uuid).first()
 
     def create(self, db: Session, *, obj_in: UserCreate) -> User:
         if obj_in.password:
