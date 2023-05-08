@@ -70,4 +70,4 @@ jobs:
           git config --global --add safe.directory /home/freegcp0001//sdm-project/backend
           sudo git pull https://github.com/SDM-workpair/backend.git main
           cd /home/freegcp0001/sdm-project
-          docker-compose up --build -d
+          sudo docker-compose up --build -d
