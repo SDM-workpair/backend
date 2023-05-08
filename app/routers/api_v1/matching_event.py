@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.notifier import notify
 from app.routers import deps
-
+from loguru import logger
 # from app.core.scheduler import matching_event
 
 router = APIRouter()
@@ -52,6 +52,7 @@ async def initiate_matching_event(
     )
     headers = {"Content-Type": "application/json"}
     response = requests.request("POST", url, headers=headers, data=payload)
+    logger.info(response.text)
     result = json.loads(response.text)["groups"]
     """
     Create Group and GR_Member
