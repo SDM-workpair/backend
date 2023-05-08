@@ -71,7 +71,7 @@ async def notify(
     # insert notification data into db
     insert_obj = schemas.notification.NotificationCreate(
         receiver_uuid=notification_obj.receiver_uuid,
-        sender_uuid=notification_obj.sender_uuid,
+        # sender_uuid=notification_obj.sender_uuid,
         send_time=datetime.now(),
         template_uuid=notification_obj.template_uuid,
         f_string=notification_obj.f_string,

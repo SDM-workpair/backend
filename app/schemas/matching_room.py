@@ -82,3 +82,8 @@ class MatchingRoomWithRoomId(BaseModel):
 class MatchingRoomWithSearch(BaseModel):
     prompt: str
     query_all: bool
+
+
+# For Demo
+class MatchingRoomForEvent(MatchingRoomBase):
+    min_member_num: int

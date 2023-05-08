@@ -72,7 +72,7 @@ class CRUDNotification(CRUDBase[Notification, NotificationCreate, NotificationUp
         db_obj = Notification(
             notification_uuid=uuid.uuid4(),  # generate a uuid as notification_uuid
             receiver_uuid=obj_in.receiver_uuid,
-            sender_uuid=obj_in.sender_uuid,
+            # sender_uuid=obj_in.sender_uuid,
             send_time=obj_in.send_time,
             template_uuid=obj_in.template_uuid,  # ?
             f_string=notification_text,

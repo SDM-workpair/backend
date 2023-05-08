@@ -1,8 +1,10 @@
-from .gr_member import GR_Member, GR_MemberWithSearch
+from .gr_member import GR_Member, GR_MemberCreate, GR_MemberWithSearch
 from .group import Group, GroupCreate, GroupInDB, GroupWithMessage, GroupWithSearch
 from .matching_room import (
     MatchingRoom,
+    MatchingRoomBase,
     MatchingRoomCreate,
+    MatchingRoomForEvent,
     MatchingRoomInDB,
     MatchingRoomReq,
     MatchingRoomsWithMessage,
@@ -17,6 +19,7 @@ from .mr_member import (
     MR_Member_Create_Res,
     MR_Member_Del_Res,
     MR_Member_Req,
+    MR_Member_Update,
 )
 from .mr_member_tag import (
     MR_Member_Tag_Base,
@@ -24,7 +27,7 @@ from .mr_member_tag import (
     MR_Member_Tag_Res,
     MR_Member_Tag_Update,
 )
-from .notification import (
+from .notification import (  # NotificationFromMatchingEvent
     Notification,
     NotificationCreate,
     NotificationInDB,
