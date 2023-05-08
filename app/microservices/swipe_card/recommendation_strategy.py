@@ -17,7 +17,7 @@ class RecommendationStrategy(ABC):
     """
 
     @abstractmethod
-    def recommend(self, member_id, room_uuid, db: Session) -> List[str]:
+    def recommend(self, member_id, room_id, db: Session) -> List[str]:
         pass
 
 
@@ -26,7 +26,7 @@ class RandomRecommendation(RecommendationStrategy):
     Swipe card 随機推薦演算法策略 class
     """
 
-    def recommend(self, member_id, room_uuid, db: Session):
+    def recommend(self, member_id, room_id, db: Session):
         """
         implement random recommendation
         """
@@ -38,7 +38,7 @@ class RandomRecommendation(RecommendationStrategy):
         # candidate_member_id_list = random_feature_preparer.feature_order(member_id, room_uuid, db) #回傳一個 member_id list
 
         random_feature_prepare = RandomFeaturePreparer()
-        random_feature = random_feature_prepare.prepare(member_id, room_uuid, db)
+        random_feature = random_feature_prepare.prepare(member_id, room_id, db)
         candidate_member_id_list = random_feature.candidate_member_id_list
         # Recommend Algorithm: randomly get all candidate members
         if len(candidate_member_id_list) != 0:
@@ -61,7 +61,7 @@ class HotPersonRecommendation(RecommendationStrategy):
     Swipe card 優先推夯哥夯姊推薦演算法策略 class
     """
 
-    def recommend(self, member_id, room_uuid, db: Session) -> List[str]:
+    def recommend(self, member_id, room_id, db: Session) -> List[str]:
         # get candidate member_id list:
         # hot_guy_preparer = RecommendFeaturePreparer(HotPersonFeatureFactory())
         # recommend_feature = hot_guy_preparer.feature_order(member_id, room_uuid)

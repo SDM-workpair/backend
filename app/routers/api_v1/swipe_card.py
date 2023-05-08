@@ -46,7 +46,7 @@ def get_recommendation(
     """
     recommendation_context.set_strategy(random_recommendation_strategy)
     recommended_member_id_list = recommendation_context.recommend(
-        recommend_in.member_id, recommend_in.room_uuid, db
+        recommend_in.member_id, recommend_in.room_id, db
     )
 
     # generate recommen card for each to-be-recommended member
@@ -54,14 +54,14 @@ def get_recommendation(
     for rcmd_member_id in recommended_member_id_list:
         # get find tag, self tag by member_id and room_uuid
         self_tag = jsonable_encoder(
-            crud.swipe_card.get_self_tag_by_member_id_and_room_uuid(
-                db=db, member_id=str(rcmd_member_id), room_uuid=recommend_in.room_uuid
+            crud.swipe_card.get_self_tag_by_member_id_and_room_id(
+                db=db, member_id=str(rcmd_member_id), room_id=recommend_in.room_id
             )
         )
         self_tag_text = [t["tag_text"] for t in self_tag]
         find_tag = jsonable_encoder(
-            crud.swipe_card.get_find_tag_by_member_id_and_room_uuid(
-                db=db, member_id=str(rcmd_member_id), room_uuid=recommend_in.room_uuid
+            crud.swipe_card.get_find_tag_by_member_id_and_room_id(
+                db=db, member_id=str(rcmd_member_id), room_id=recommend_in.room_id
             )
         )
         find_tag_text = [t["tag_text"] for t in find_tag]
@@ -76,7 +76,7 @@ def get_recommendation(
         # make a recommendation list
         swipe_card = {
             "member_id": recommend_in.member_id,
-            "room_uuid": recommend_in.room_uuid,
+            "room_id": recommend_in.room_id,
             "recommended_member_id": rcmd_member_id,
             "self_tag_text": self_tag_text,
             "find_tag_text": find_tag_text,

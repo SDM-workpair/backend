@@ -19,6 +19,6 @@ class RecommendationContext:
     def set_strategy(self, strategy):
         self.strategy = strategy
 
-    def recommend(self, member_id, room_uuid, db: Session) -> List[str]:
+    def recommend(self, member_id, room_id, db: Session) -> List[str]:
         # 調用當前策略的推薦演算法，回傳5個要推薦的member_id 的 list
-        return self.strategy.recommend(member_id, room_uuid, db)
+        return self.strategy.recommend(member_id, room_id, db)
