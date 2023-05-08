@@ -16,7 +16,7 @@ class CRUDLikedHatedMember:
         return db.query(MatchingRoom).filter(MatchingRoom.room_id == room_id).first()
 
     def get_member_in_matching_room(db: Session, *, room_uuid: str):
-        return db.query(MR_Member).all()
+        return db.query(MR_Member).filter(MR_Member.room_uuid == room_uuid).all()
 
     def get_mr_user_pref_in_matching_room(db: Session, *, room_uuid: str):
         return (
