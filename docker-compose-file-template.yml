@@ -72,10 +72,24 @@ services:
         networks:
             - teamatch-network
 
+    swipecard:
+        container_name: swipecard
+        build:
+            context: ./backend/microservices/swipecard
+        ports:
+            - "8002:8002"
+        volumes:
+            - ./backend:/backend
+        restart: always
+        tty: true
+        depends_on:
+            - postgres
+        networks:
+            - teamatch-network
+
 
 volumes:
     postgres-db:
 networks:
     teamatch-network:
         driver: bridge
-
