@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.routers.api_v1 import (
     auth,
     group,
+    health_checker,
     login,
     matching_event,
     matching_room,
@@ -12,7 +13,6 @@ from app.routers.api_v1 import (
     search,
     swipe_card,
     user,
-    health_checker
 )
 
 api_router = APIRouter()

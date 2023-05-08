@@ -2,18 +2,14 @@ import json
 from typing import Any
 
 import requests
-from fastapi import APIRouter, Depends, HTTPException
-from loguru import logger
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app import crud, models, schemas
-from app.notifier import notify
 from app.routers import deps
 
 # from app.core.scheduler import matching_event
 
 router = APIRouter()
-
 
 
 @router.post("/matching")
@@ -25,8 +21,9 @@ def get_matching_event_health_checker(
     response = requests.request("POST", url)
     return json.loads(response.text)
 
+
 @router.post("/swipe-card")
-def get_matching_event_health_checker(
+def get_swipe_card_health_checker(
     *,
     db: Session = Depends(deps.get_db),
 ) -> Any:
