@@ -17,7 +17,7 @@ Test Initiate Matching Event
 def test_initiate_matching_event(db_conn, test_client):
     response = test_client.post(
         f"{settings.API_V1_STR}/matching-event",
-        json={"room_id": "IR001", "min_member_num": 2},
+        json={"room_id": "sdm001", "min_member_num": 2},
         headers=get_user_authentication_headers(db_conn, email),
     )
     assert response.status_code == 200
