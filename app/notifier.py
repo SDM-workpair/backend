@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from starlette.websockets import WebSocket
 
 from app import crud, schemas
-import loguru
+
 
 class Notifier:
     def __init__(self):

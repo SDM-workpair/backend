@@ -13,6 +13,7 @@ from pydantic import BaseModel
 class MatchingRoomBase(BaseModel):
     room_id: str
 
+
 # Properties to receive via API on creation
 class MatchingRoomReq(BaseModel):
     name: Optional[str] = None

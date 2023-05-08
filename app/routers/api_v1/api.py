@@ -28,7 +28,8 @@ api_router.include_router(
     notification.router, prefix="/notification", tags=["notification"]
 )
 api_router.include_router(
-    matching_event.router, prefix="/matching-event", tags=["matching-event"])
+    matching_event.router, prefix="/matching-event", tags=["matching-event"]
+)
 api_router.include_router(swipe_card.router, prefix="/swipe-card", tags=["swipe-card"])
 api_router.include_router(mr_member.router, prefix="/mr-member", tags=["mr-member"])
 api_router.include_router(
