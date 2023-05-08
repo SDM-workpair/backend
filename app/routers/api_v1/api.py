@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.routers.api_v1 import (
     auth,
     group,
+    health_checker,
     login,
     matching_event,
     matching_room,
@@ -34,4 +35,7 @@ api_router.include_router(swipe_card.router, prefix="/swipe-card", tags=["swipe-
 api_router.include_router(mr_member.router, prefix="/mr-member", tags=["mr-member"])
 api_router.include_router(
     mr_member_tag.router, prefix="/mr-member-tag", tags=["mr-member-tag"]
+)
+api_router.include_router(
+    health_checker.router, prefix="/health-checker", tags=["health-checker"]
 )
