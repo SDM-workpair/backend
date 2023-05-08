@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Session
@@ -28,7 +28,7 @@ class CRUDGR_Member(CRUDBase[GR_Member, GR_MemberCreate, GR_MemberUpdate]):
 
     def get_all_members_by_group_id(
         self, db: Session, *, group_id: str
-    ) -> Optional[User]:
+    ) -> Optional[List[User]]:
         gr_members = self.get_by_group_id(db, group_id=group_id)
         member_list = []
         for gr_member in gr_members:

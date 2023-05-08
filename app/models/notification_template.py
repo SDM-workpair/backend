@@ -11,4 +11,5 @@ class NotificationTemplate(Base):
     template_uuid = Column(
         UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4
     )
+    template_id = Column(String, nullable=False)
     text = Column(String, nullable=False)

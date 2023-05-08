@@ -8,6 +8,16 @@ services:
     #         - "9200:9200"
     #     volumes:
     #         - elasticsearch
+    rabbitmq-container:
+        image: rabbitmq:3-management
+        hostname: rabbitmq-container
+        volumes:
+            - ./rabbitmq:/rabbitmq
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        networks:
+            - teamatch-network
 
     postgres:
         image: postgres:13.3

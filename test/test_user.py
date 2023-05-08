@@ -156,3 +156,12 @@ def test_create_existing_user(get_server_api, test_client):
         response.json()["detail"]
         == "The user with this username already exists in the system."
     )
+
+
+def test_read_user_by_user_uuid(db_conn, test_client):
+    user = crud.user.get_by_email(db=db_conn, email=settings.ADMIN_EMAIL)
+    user_with_user_uuid = crud.user.get_by_user_uuid(
+        db=db_conn, user_uuid=user.user_uuid
+    )
+
+    assert user_with_user_uuid.email == settings.ADMIN_EMAIL

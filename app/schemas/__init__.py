@@ -28,6 +28,7 @@ from .notification import (
     Notification,
     NotificationCreate,
     NotificationInDB,
+    NotificationSendObjectModel,
     NotificationTextWithMessage,
     NotificationViewModel,
 )

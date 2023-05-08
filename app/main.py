@@ -1,15 +1,29 @@
 import os
 from typing import Union
 
-from fastapi import FastAPI
+from fastapi import (
+    Depends,
+    FastAPI,
+    HTTPException,
+    WebSocket,
+    WebSocketDisconnect,
+    status,
+)
 from fastapi.middleware.cors import CORSMiddleware
+from jose import jwt
+from pydantic import ValidationError
+from sqlalchemy.orm import Session
 
 # from fastapi_profiler import PyInstrumentProfilerMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
 
+from app import crud, schemas
+from app.core import security
 from app.core.config import settings
+from app.notifier import Notifier
+from app.routers import deps
 from app.routers.api_v1.api import api_router
 from app.utils import get_tw_time
 
@@ -109,3 +123,44 @@ async def test_google_sso(request: Request):
     )
     return HTMLResponse(html)
     # return HTMLResponse('<a href="/login">login</a>')
+
+
+@app.websocket("/ws/{token}")
+async def websocket_endpoint(
+    websocket: WebSocket,
+    token: str,
+    db: Session = Depends(deps.get_db),
+):
+    print("token >>> ", token)
+    # decode token to get user email (email for notifier.setup())
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
+        )
+        token_data = schemas.TokenPayload(**payload)
+    except (jwt.JWTError, ValidationError) as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"{e}",
+        )
+    print("payload >>> ", payload)
+    user = crud.user.get(db, id=token_data.sub)
+    if not user:
+        raise HTTPException(status_code=204, detail="User not found")
+    print("user email >>> ", user.email)
+    print("user name >>> ", user.name)
+
+    # connect notifier with websocket
+    notifier = Notifier()
+    await notifier.connect(websocket)
+    print("notifier >>> ", notifier)
+    if not notifier.is_ready:
+        print("notifier is not ready. ready to set up notifier with user email.")
+        await notifier.setup(queue_name=user.email, is_consumer=True)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            print(f"text from client >>>: {data} ^_^")
+            await websocket.send_text(f"Message text from client was: {data}")
+    except WebSocketDisconnect:
+        notifier.remove(websocket)

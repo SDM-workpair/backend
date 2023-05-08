@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, DateTime, ForeignKey, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
@@ -19,3 +19,4 @@ class Notification(Base):
     send_time = Column(DateTime(timezone=True), nullable=False, default=func.now())
     template_uuid = Column(String, nullable=False)
     f_string = Column(String)
+    is_read = Column(Boolean, nullable=False, default=False)

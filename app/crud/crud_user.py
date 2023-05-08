@@ -13,6 +13,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def get_by_email(self, db: Session, *, email: str) -> Optional[User]:
         return db.query(User).filter(User.email == email).first()
 
+    def get_by_user_uuid(self, db: Session, *, user_uuid: UUID) -> Optional[User]:
+        return db.query(User).filter(User.user_uuid == user_uuid).first()
+
     def get_by_uuid(self, db: Session, *, uuid: UUID) -> Optional[User]:
         return db.query(User).filter(User.user_uuid == uuid).first()
 

@@ -372,6 +372,7 @@ def init_notification(db: Session):
 def init_notification_template(db: Session):
     init_notification_templates = {
         "template_uuid": ["9c1dc87f-e938-4fa1-9900-9b4ebd5701da"],
+        "template_id": ["matching_result"],
         "text": ["{0}的配對結果已完成，可於我的群組內查看配對結果"],
     }
     for i in range(len(init_notification_templates["template_uuid"])):
@@ -386,6 +387,7 @@ def init_notification_template(db: Session):
         if not notification_template:
             db_obj = NotificationTemplate(
                 template_uuid=init_notification_templates["template_uuid"][i],
+                template_id=init_notification_templates["template_id"][i],
                 text=init_notification_templates["text"][i],
             )
             db.add(db_obj)
