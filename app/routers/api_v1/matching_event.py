@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.notifier import notify
 from app.routers import deps
-from loguru import logger
+
 # from app.core.scheduler import matching_event
 
 router = APIRouter()
