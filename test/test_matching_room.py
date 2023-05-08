@@ -2,7 +2,7 @@ from app import crud
 from app.core.config import settings
 
 from .contest import db_conn, get_user_authentication_headers, test_client
-
+import loguru
 """
 pytest fixture
 """
@@ -22,6 +22,8 @@ def test_read_my_matching_rooms_who_has_logged_in(db_conn, test_client):
     )
     assert response.status_code == 200
     assert response.json()["message"] == "success"
+    loguru.logger.info(response.json())
+
     assert response.json()["data"][0]["name"] == "IR"
 
 

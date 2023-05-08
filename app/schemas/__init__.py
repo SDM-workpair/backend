@@ -36,6 +36,7 @@ from .notification import (
     NotificationSendObjectModel,
     NotificationTextWithMessage,
     NotificationViewModel,
+    # NotificationFromMatchingEvent
 )
 from .sso_login import SSOLogin, SSOLoginMessage
 from .swipe_card import (

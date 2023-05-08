@@ -19,7 +19,7 @@ class NotificationBase(BaseModel):
 
 class NotificationCreate(NotificationBase):
     receiver_uuid: UUID
-    sender_uuid: UUID
+    sender_uuid: Optional[UUID]
     send_time: datetime
     template_uuid: UUID
     f_string: str
@@ -70,7 +70,14 @@ class NotificationTextWithMessage(BaseModel):
 
 class NotificationSendObjectModel(BaseModel):
     receiver_uuid: UUID
-    sender_uuid: UUID
+    sender_uuid: Optional[UUID]
     template_uuid: UUID
     f_string: str
     is_read: Optional[bool] = False
+
+
+# class NotificationFromMatchingEvent(BaseModel):
+#     receiver_uuid: UUID
+#     template_uuid: UUID
+#     f_string: str
+#     is_read: Optional[bool] = False

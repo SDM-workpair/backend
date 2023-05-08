@@ -8,6 +8,8 @@ from app.routers import deps
 import loguru
 import requests
 import json
+from app.notifier import notify
+
 
 # from app.core.scheduler import matching_event
 
@@ -17,7 +19,7 @@ router = APIRouter()
 # TODO
 @router.post("/")
 # , response_model=schemas.Group
-def initiate_matching_event(
+async def initiate_matching_event(
     *,
     db: Session = Depends(deps.get_db),
     matching_room_in: schemas.MatchingRoomForEvent,
@@ -36,7 +38,7 @@ def initiate_matching_event(
         )
     
     """
-    Call Micro-service
+    Call matching event micro-service
     """
     url = "http://matching:8001/matching/create/test"
 
@@ -59,6 +61,9 @@ def initiate_matching_event(
     """
     Create Group and GR_Member
     """
+    # Get notify template_uuid
+    notification_template = crud.notification_template.get_by_template_id(db=db, template_id='matching_result')
+
     group_list = []
     group_id = 0
     for group in result:
@@ -81,14 +86,21 @@ def initiate_matching_event(
             )
             new_gr_mem = crud.gr_member.create(db=db, obj_in=new_gr_mem_schema)
 
-            # Call notification method for every Group Mem
+            """
+            Call notification method for every Group Member
+            """
             gr_user = crud.mr_member.get_by_member_id(
                 db=db, member_id=new_gr_mem.member_id
             )
             gr_mem_list.append(gr_user.member_id)
-
-            # Create notify send object -> (receiver_uuid=gr_user_uuid.user_uuid, ...)
-            # notify(db, notify_send_obj)
+            
+            # Create notify send object
+            notification_send_object = schemas.NotificationSendObjectModel(
+                receiver_uuid=gr_user.user_uuid,
+                template_uuid=notification_template.template_uuid,
+                f_string=matching_room.name,
+            )
+            await notify(db, notification_send_object)
         group_list.append(gr_mem_list)
 
     return {"message": "success", "data": group_list}
