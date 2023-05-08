@@ -15,8 +15,7 @@ router = APIRouter()
 
 
 # TODO
-@router.post("/")
-# , response_model=schemas.Group
+@router.post("/", response_model=schemas.GroupAfterMatchingEvent)
 async def initiate_matching_event(
     *,
     db: Session = Depends(deps.get_db),
@@ -39,7 +38,6 @@ async def initiate_matching_event(
     Call matching event micro-service
     """
     url = "http://matching:8001/matching/create/test"
-
     payload = json.dumps(
         {
             "room_id": matching_room.room_id,
@@ -70,8 +68,8 @@ async def initiate_matching_event(
         # Create Group
         group_id += 1
         new_group_schema = schemas.GroupCreate(
-            name=matching_room.room_id + "_" + str(group_id),
-            group_id=str(group_id),
+            name=matching_room.name + "_" + str(group_id),
+            group_id=matching_room.room_id + "_" + str(group_id),
             room_uuid=matching_room.room_uuid,
         )
         new_group = crud.group.create(db=db, obj_in=new_group_schema)

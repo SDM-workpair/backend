@@ -58,3 +58,8 @@ class GroupWithMessage(BaseModel):
 
 class GroupWithSearch(BaseModel):
     prompt: str
+
+
+class GroupAfterMatchingEvent(BaseModel):
+    message: str
+    data: Optional[List[List[str]]] = None
