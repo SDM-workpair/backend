@@ -49,13 +49,11 @@ def search_my_groups(
 
 
 @router.post("/matching-room/test", response_model=schemas.MatchingRoomsWithMessage)
-def search_matching_rooms(
+def search_matching_rooms_test(
     db: Session = Depends(deps.get_db),
 ) -> Any:
     """
     Retrieve matching rooms test.
     """
-    matching_rooms = crud.matching_room.search_with_user_and_name(
-        db=db, name=""
-    )
+    matching_rooms = crud.matching_room.search_with_user_and_name(db=db, name="")
     return {"message": "success", "data": matching_rooms}
