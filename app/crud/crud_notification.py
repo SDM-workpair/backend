@@ -61,7 +61,7 @@ class CRUDNotification(CRUDBase[Notification, NotificationCreate, NotificationUp
         )
         if notification_obj is None:
             raise ValueError(
-                f"Fail to retrieve notification_template with template_uuid={notification.template_uuid}"
+                f"Fail to retrieve notification_template with template_uuid={obj_in.template_uuid}"
             )
         else:
             notification_text = notification_obj.text
