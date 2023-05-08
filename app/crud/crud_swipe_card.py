@@ -1,6 +1,8 @@
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
+from app.models.matching_room import MatchingRoom
 from app.models.mr_liked_hated_member import MR_Liked_Hated_Member
 from app.models.mr_member import MR_Member
 from app.models.mr_member_tag import MR_Member_Tag
@@ -17,10 +19,15 @@ class CRUDSwipeCard(CRUDBase[SwipeCard, SwipeCardCreate, SwipeCardUpdate]):
     def save_preference(
         self, db: Session, *, obj_in: SwipeCardPreference
     ) -> MR_Liked_Hated_Member:
+        room_uuid = jsonable_encoder(
+            db.query(MatchingRoom)
+            .filter(MatchingRoom.room_id == obj_in.room_id)
+            .first()
+        )["room_uuid"]
         db_obj = MR_Liked_Hated_Member(
             member_id=obj_in.member_id,
             target_member_id=obj_in.target_member_id,
-            room_uuid=obj_in.room_uuid,
+            room_uuid=room_uuid,
             is_liked=obj_in.is_liked,
             is_hated=obj_in.is_hated,
         )
@@ -29,9 +36,12 @@ class CRUDSwipeCard(CRUDBase[SwipeCard, SwipeCardCreate, SwipeCardUpdate]):
         db.refresh(db_obj)
         return db_obj
 
-    def get_preference_by_member_id_and_room_uuid(
-        self, db: Session, *, member_id: str, room_uuid: str
+    def get_preference_by_member_id_and_room_id(
+        self, db: Session, *, member_id: str, room_id: str
     ) -> MR_Liked_Hated_Member:
+        room_uuid = jsonable_encoder(
+            db.query(MatchingRoom).filter(MatchingRoom.room_id == room_id).first()
+        )["room_uuid"]
         return (
             db.query(MR_Liked_Hated_Member)
             .filter(
@@ -41,12 +51,18 @@ class CRUDSwipeCard(CRUDBase[SwipeCard, SwipeCardCreate, SwipeCardUpdate]):
             .all()
         )
 
-    def get_mr_member_by_room_uuid(self, db: Session, *, room_uuid: str) -> MR_Member:
+    def get_mr_member_by_room_id(self, db: Session, *, room_id: str) -> MR_Member:
+        room_uuid = jsonable_encoder(
+            db.query(MatchingRoom).filter(MatchingRoom.room_id == room_id).first()
+        )["room_uuid"]
         return db.query(MR_Member).filter(MR_Member.room_uuid == room_uuid).all()
 
-    def get_self_tag_by_member_id_and_room_uuid(
-        self, db: Session, *, member_id: str, room_uuid: str
+    def get_self_tag_by_member_id_and_room_id(
+        self, db: Session, *, member_id: str, room_id: str
     ) -> MR_Member_Tag:
+        room_uuid = jsonable_encoder(
+            db.query(MatchingRoom).filter(MatchingRoom.room_id == room_id).first()
+        )["room_uuid"]
         return (
             db.query(MR_Member_Tag)
             .filter(
@@ -58,9 +74,12 @@ class CRUDSwipeCard(CRUDBase[SwipeCard, SwipeCardCreate, SwipeCardUpdate]):
             .all()
         )
 
-    def get_find_tag_by_member_id_and_room_uuid(
-        self, db: Session, *, member_id: str, room_uuid: str
+    def get_find_tag_by_member_id_and_room_id(
+        self, db: Session, *, member_id: str, room_id: str
     ) -> MR_Member_Tag:
+        room_uuid = jsonable_encoder(
+            db.query(MatchingRoom).filter(MatchingRoom.room_id == room_id).first()
+        )["room_uuid"]
         return (
             db.query(MR_Member_Tag)
             .filter(

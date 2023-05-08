@@ -4,7 +4,6 @@ while BaseModel.schema_json will return a JSON string representation of that dic
 """
 
 from typing import List, Optional
-from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -12,7 +11,7 @@ from pydantic import BaseModel
 # Shared properties
 class SwipeCardBase(BaseModel):
     member_id: str = None
-    room_uuid: UUID
+    room_id: str = None
 
 
 class SwipeCardCreate(SwipeCardBase):

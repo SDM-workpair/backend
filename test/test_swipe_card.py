@@ -130,9 +130,9 @@ def test_save_preference_who_has_logged_in(get_server_api, db_conn, test_client)
     #     "is_hated": False,
     # }
     preference = {
-        "member_id": 2,
-        "room_uuid": "15b14b78-7b33-4274-868f-e3aca152bd80",
-        "target_member_id": 11,
+        "member_id": 3,
+        "room_id": "sdm001",
+        "target_member_id": 9,
         "is_like": True,
         "is_hated": False,
     }
@@ -149,8 +149,8 @@ def test_save_preference_who_has_logged_in(get_server_api, db_conn, test_client)
     mr_liked_hated_member = (
         db_conn.query(MR_Liked_Hated_Member)
         .filter(
-            MR_Liked_Hated_Member.member_id == 2,
-            MR_Liked_Hated_Member.target_member_id == 11,
+            MR_Liked_Hated_Member.member_id == 3,
+            MR_Liked_Hated_Member.target_member_id == 9,
         )
         .first()
     )
@@ -163,9 +163,9 @@ def test_save_preference_who_has_logged_in(get_server_api, db_conn, test_client)
 
 def test_save_preference_who_has_not_logged_in(get_server_api, test_client):
     preference = {
-        "member_id": "1",
-        "room_uuid": "6891704b-a2e8-4fce-b971-b3fe3928dfd6",
-        "target_member_id": "2",
+        "member_id": "3",
+        "room_id": "sdm001",
+        "target_member_id": "9",
         "is_like": True,
         "is_hated": False,
     }
@@ -182,7 +182,7 @@ def test_get_recommendation(get_server_api, db_conn, test_client):
     # member = jsonable_encoder(db_conn.query(MR_Member).first())
 
     # recommend_in = {"member_id": member["member_id"], "room_uuid": room_uuid}
-    recommend_in = {"member_id": 3, "room_uuid": "58102867-1773-4c68-a78f-d6da7124bb2d"}
+    recommend_in = {"member_id": 3, "room_id": "sdm001"}
 
     response = test_client.post(
         f"{get_server_api}{settings.API_V1_STR}/swipe-card/swipe-recommend",
