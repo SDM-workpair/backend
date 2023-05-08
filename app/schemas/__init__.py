@@ -1,5 +1,12 @@
 from .gr_member import GR_Member, GR_MemberCreate, GR_MemberWithSearch
-from .group import Group, GroupCreate, GroupInDB, GroupWithMessage, GroupWithSearch
+from .group import (
+    Group,
+    GroupAfterMatchingEvent,
+    GroupCreate,
+    GroupInDB,
+    GroupWithMessage,
+    GroupWithSearch,
+)
 from .matching_room import (
     MatchingRoom,
     MatchingRoomBase,
