@@ -10,6 +10,7 @@ from .matching_room import (
     MatchingRoomWithMessage,
     MatchingRoomWithRoomId,
     MatchingRoomWithSearch,
+    MatchingRoomForEvent
 )
 from .mr_member import (
     MR_Member,
