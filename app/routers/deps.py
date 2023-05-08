@@ -1,7 +1,7 @@
-from typing import Generator, Optional
+from typing import Generator
 
 import loguru
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import ValidationError
@@ -29,6 +29,7 @@ def get_current_user(
     db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
 ) -> models.user:
     try:
+        print("in get_current_user")
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
@@ -70,9 +71,9 @@ def get_current_active_superuser(
     return current_user
 
 
-async def get_login_user(request: Request) -> Optional[dict]:
-    user = request.session.get("user")
-    if user is not None:
-        return user
-    else:
-        raise HTTPException(status_code=401, detail="Could not validate credentials.")
+# async def get_login_user(request: Request) -> Optional[dict]:
+#     user = request.session.get("user")
+#     if user is not None:
+#         return user
+#     else:
+#         raise HTTPException(status_code=401, detail="Could not validate credentials.")

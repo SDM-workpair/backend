@@ -8,6 +8,16 @@ services:
     #         - "9200:9200"
     #     volumes:
     #         - elasticsearch
+    rabbitmq-container:
+        image: rabbitmq:3-management
+        hostname: rabbitmq-container
+        volumes:
+            - ./rabbitmq:/rabbitmq
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        networks:
+            - teamatch-network
 
     postgres:
         image: postgres:13.3
@@ -48,6 +58,21 @@ services:
             context: ./microservices/matching
         ports:
             - "8001:8001"
+        volumes:
+            - ./:/backend
+        restart: always
+        tty: true
+        depends_on:
+            - postgres
+        networks:
+            - teamatch-network
+
+    swipecard:
+        container_name: swipecard
+        build:
+            context: ./microservices/swipecard
+        ports:
+            - "8002:8002"
         volumes:
             - ./:/backend
         restart: always
