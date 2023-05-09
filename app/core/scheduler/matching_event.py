@@ -1,5 +1,5 @@
 from sqlalchemy import event
-import loguru
+from loguru import logger
 from app.models.matching_room import MatchingRoom
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -12,7 +12,7 @@ import json
 import requests
 from sqlalchemy.orm import Session
 from fastapi import Depends
-
+from tzlocal import get_localzone
 
 """
 Matching event scheduler
@@ -21,7 +21,7 @@ scheduler = BackgroundScheduler()
 scheduler.start()
 
 async def matching_event(matching_room: MatchingRoom, db: Session = Depends(deps.get_db)):
-    loguru.logger.info("run matching_event function")
+    logger.info("run matching_event function")
     """
     Call matching event micro-service
     """
@@ -40,7 +40,7 @@ async def matching_event(matching_room: MatchingRoom, db: Session = Depends(deps
     )
     headers = {"Content-Type": "application/json"}
     response = requests.request("POST", url, headers=headers, data=payload)
-    loguru.logger.info(response.text)
+    logger.info(response.text)
     result = json.loads(response.text)["groups"]
     """
     Create Group and GR_Member
@@ -91,13 +91,14 @@ async def matching_event(matching_room: MatchingRoom, db: Session = Depends(deps
     return
 
 def schedule_matching_event(matching_room: MatchingRoom):
-    loguru.logger.info(matching_room)
+    logger.info('schedule matching event')
+    logger.info(matching_room.due_time)
+    # Parse the due_time string into a datetime object
     # call matching_event function
-    due_time = matching_room.due_time
     scheduler.add_job(
         matching_event,
         'date',
-        run_date=due_time,
+        run_date=matching_room.due_time,
         args=[matching_room]
     )
     return
@@ -106,6 +107,7 @@ def schedule_matching_event(matching_room: MatchingRoom):
 @event.listens_for(MatchingRoom, 'after_insert')
 def schedule_matching_room(mapper, connection, matching_room):
     "listen for the 'after_insert' event"
+    logger.info('after insert')
     schedule_matching_event(matching_room=matching_room)
     
 
