@@ -11,6 +11,7 @@ from fastapi import (
 )
 from fastapi.middleware.cors import CORSMiddleware
 from jose import jwt
+from loguru import logger
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
@@ -39,6 +40,7 @@ if GOOGLE_SECRET_KEY is None:
     raise "Missing SECRET_KEY"
 app.add_middleware(SessionMiddleware, secret_key=GOOGLE_SECRET_KEY)
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -46,7 +48,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+logger.info(f"Current env: {settings.ENV}")
 if os.environ.get("ENV") == "dev":
     pass
     # app.add_middleware(
