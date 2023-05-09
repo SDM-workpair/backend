@@ -20,7 +20,7 @@ Matching event scheduler
 scheduler = BackgroundScheduler()
 scheduler.start()
 
-async def matching_event(matching_room: MatchingRoom, db: Session = Depends(deps.get_db)):
+async def matching_event(matching_room: MatchingRoom, db: Session):
     logger.info("run matching_event function")
     """
     Call matching event micro-service
@@ -92,14 +92,14 @@ async def matching_event(matching_room: MatchingRoom, db: Session = Depends(deps
 
 def schedule_matching_event(matching_room: MatchingRoom):
     logger.info('schedule matching event')
-    logger.info(matching_room.due_time)
-    # Parse the due_time string into a datetime object
+    db: Session = Depends(deps.get_db)
     # call matching_event function
     scheduler.add_job(
         matching_event,
+        # lambda: matching_event(matching_room, db),
         'date',
         run_date=matching_room.due_time,
-        args=[matching_room]
+        args=[matching_room, db]
     )
     return
 
