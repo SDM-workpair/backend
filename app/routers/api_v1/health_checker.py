@@ -18,7 +18,7 @@ def get_matching_event_health_checker(
     db: Session = Depends(deps.get_db),
 ) -> Any:
     url = "http://matching:8001/healthchecker"
-    response = requests.request("POST", url)
+    response = requests.request("GET", url)
     return json.loads(response.text)
 
 
