@@ -1,5 +1,7 @@
 from typing import List, Tuple
 
+from loguru import logger
+
 
 class MatchingEventAdapter:
     def __init__(self) -> None:
@@ -27,7 +29,7 @@ class MatchingRoomLikedHatedAdapter(MatchingEventAdapter):
     def add_member_id(self, member_id):
         self._member_id_list.append(member_id)
 
-    async def transform_user_pref(self, mr_members_pref):
+    def transform_user_pref(self, mr_members_pref):
         sorted_member_id_list = self.get_member_id_list()
 
         # turn member_id_list to dict
@@ -61,10 +63,12 @@ class MatchingRoomLikedHatedAdapter(MatchingEventAdapter):
             elif member_pref.is_hated:
                 user_pref_list[user_index][target_index] = -1
 
+        logger.info(f"user_pref_list: {user_pref_list}")
         user_pref = []
         # turn 2d array to list of tuple
         for user_id in sorted_member_id_list:
             user_index = user_list_dict[user_id]
             user_pref.append(tuple((user_id, user_pref_list[user_index])))
 
+        logger.info(f"user_pref: {user_pref}")
         self._users_pref = user_pref

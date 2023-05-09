@@ -3,6 +3,7 @@ from typing import Any
 
 import requests
 from fastapi import APIRouter, Depends, HTTPException
+from loguru import logger
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
@@ -37,7 +38,7 @@ async def initiate_matching_event(
     """
     Call matching event micro-service
     """
-    url = "http://matching:8001/matching/create/test"
+    url = "http://matching:8001/matching/create"
     payload = json.dumps(
         {
             "room_id": matching_room.room_id,
@@ -52,8 +53,8 @@ async def initiate_matching_event(
     )
     headers = {"Content-Type": "application/json"}
     response = requests.request("POST", url, headers=headers, data=payload)
+    logger.info(response.text)
     result = json.loads(response.text)["groups"]
-
     """
     Create Group and GR_Member
     """

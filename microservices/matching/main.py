@@ -31,7 +31,7 @@ def get_db():
 @app.post(
     "/matching/create/test", responses={**base_response, 200: {"model": MatchingGroups}}
 )
-async def create_matching_event_test(config: MatchingEvent):
+def create_matching_event_test(config: MatchingEvent):
     """Create test matching event"""
 
     logger.info("invoke mathcing event create")
@@ -67,7 +67,7 @@ async def create_matching_event_test(config: MatchingEvent):
 @app.post(
     "/matching/create", responses={**base_response, 200: {"model": MatchingGroups}}
 )
-async def create_matching_event(
+def create_matching_event(
     config: MatchingEvent, *, db: Session = Depends(get_db), response: Response
 ):
     """Create matching event"""
@@ -77,7 +77,7 @@ async def create_matching_event(
 
     logger.info("invoke mathcing event create")
     try:
-        matching_room = await CRUDLikedHatedMember.get_matching_room(
+        matching_room = CRUDLikedHatedMember.get_matching_room(
             db=db, room_id=config.room_id
         )
     except Exception as e:
@@ -85,6 +85,7 @@ async def create_matching_event(
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"detail": "get_matching_room query error"}
 
+    logger.info(f"matching_room: {matching_room}")
     if not matching_room:
         raise HTTPException(
             status_code=404,
@@ -93,7 +94,7 @@ async def create_matching_event(
 
     try:
         logger.info("get_member_in_matching_room")
-        mr_members = await CRUDLikedHatedMember.get_member_in_matching_room(
+        mr_members = CRUDLikedHatedMember.get_member_in_matching_room(
             db=db, room_uuid=matching_room.room_uuid
         )
         adapter.set_total_users(len(mr_members))
@@ -104,6 +105,7 @@ async def create_matching_event(
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"detail": "get_matching_room_members query error"}
 
+    logger.info(f"total users: {adapter.get_total_users()}")
     if adapter.get_total_users() < 1:
         raise HTTPException(
             status_code=404,
@@ -112,7 +114,7 @@ async def create_matching_event(
 
     try:
         logger.info("get_mr_user_pref_in_matching_room")
-        mr_members_pref = await CRUDLikedHatedMember.get_mr_user_pref_in_matching_room(
+        mr_members_pref = CRUDLikedHatedMember.get_mr_user_pref_in_matching_room(
             db=db, room_uuid=matching_room.room_uuid
         )
     except Exception as e:
@@ -121,7 +123,7 @@ async def create_matching_event(
         return {"detail": "get_mr_user_pref_in_matching_room query error"}
 
     try:
-        await adapter.transform_user_pref(mr_members_pref)
+        adapter.transform_user_pref(mr_members_pref)
     except Exception as e:
         logger.error(getexception(e))
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -136,15 +138,18 @@ async def create_matching_event(
             "params": config.params,
             "users_pref": adapter.get_users_pref(),
         }
+        logger.info(f"config: {config}")
         matching_event_builder = OneTimeMatchingEventBuilder()
 
         # Group the users using the chosen strategy
         groups = (
-            matching_event_builder.set_total_users(len(config["users_pref"]))
+            matching_event_builder.set_total_users(adapter.get_total_users())
             .set_strategy(config["group_choice"], config["slot_choice"])
             .set_slot_params(config["params"])
             .match(config["users_pref"])
         )
+        logger.info(f"groups: {groups}")
+
     except Exception as e:
         logger.error(getexception(e))
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -154,7 +159,7 @@ async def create_matching_event(
 
 
 @app.get("/matching/{matching_id}")
-async def get_by_matching_id(matching_id: int, response: Response):
+def get_by_matching_id(matching_id: int, response: Response):
     """
     Get matching event by matching id
     """
@@ -163,14 +168,14 @@ async def get_by_matching_id(matching_id: int, response: Response):
 
 
 @app.get("/matching/all/")
-async def get_all_matching_event(response: Response):
+def get_all_matching_event(response: Response):
     """Get all matching event"""
     response.status_code = status.HTTP_501_NOT_IMPLEMENTED
     return {"detail": "Hello World"}
 
 
 @app.get("/healthchecker")
-async def healthchecker():
+def healthchecker():
     return {"msg": "Hello World"}
 
 

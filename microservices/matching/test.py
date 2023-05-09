@@ -1,9 +1,4 @@
-import warnings
-
-import pytest
 from fastapi.testclient import TestClient
-from httpx import AsyncClient
-from trio import TrioDeprecationWarning
 
 from microservices.matching.core.matching_event import OneTimeMatchingEventBuilder
 from microservices.matching.core.slot_generator import (
@@ -14,8 +9,6 @@ from microservices.matching.core.slot_generator import (
 
 from .main import app  # Flask instance of the API
 
-warnings.filterwarnings(action="ignore", category=TrioDeprecationWarning)
-
 client = TestClient(app)
 
 
@@ -24,20 +17,19 @@ def test_matching_healthchecker():
     assert response.status_code == 200
 
 
-@pytest.mark.anyio
-async def test_create_matching_event_test():
+def test_create_matching_event_test():
     data = {
         "room_id": "test",
         "group_choice": "random",
         "slot_choice": "fixed_group",
         "params": {"num_groups": 3},
     }
-    async with AsyncClient(app=app, base_url="http:/") as ac:
-        response = await ac.post("/matching/create/test", json=data)
-        assert response.status_code == 200
 
-        response = await ac.post("/matching/create/test")
-        assert response.status_code == 422
+    response = client.post("/matching/create/test", json=data)
+    assert response.status_code == 200
+
+    response = client.post("/matching/create/test")
+    assert response.status_code == 422
 
 
 def test_slot_generator():

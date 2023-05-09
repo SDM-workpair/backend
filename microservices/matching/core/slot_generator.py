@@ -85,7 +85,7 @@ class MinUserSlot(SlotGenerator):
     def generate_slots(self, params: Dict[str, int]) -> List[int]:
         try:
             min_users = max(params["min_users"], 1)
-            min_users = min(min_users, int(self.num_users / 2))
+            min_users = min(min_users, self.num_users)
             assert (
                 min_users <= self.num_users
             ), "min_users must be less than total users"
