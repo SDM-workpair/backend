@@ -48,7 +48,6 @@ services:
             - LOG_LEVEL=DEBUG
             - PRE_COMMIT_HOME=/backend/.pre-commit
             - RABBITMQ_HOST=rabbitmq-container
-            - ENV=dev
         tty: true
         depends_on:
             - postgres

@@ -10,9 +10,48 @@ from loguru import logger
 from app.main import app
 from app.utils import number_of_workers
 
-LOG_LEVEL = logging.getLevelName(os.environ.get("LOG_LEVEL", "DEBUG"))
-JSON_LOGS = True if os.environ.get("JSON_LOGS", "0") == "1" else False
-WORKERS = int(os.environ.get("GUNICORN_WORKERS", number_of_workers()))
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
+JSON_LOGS = os.environ.get("JSON_LOGS", "0") == 1 if os.getenv("ENV", "dev") else True
+WORKERS = (
+    os.environ.get("GUNICORN_WORKERS", 1)
+    if os.getenv("ENV", "dev") == "dev"
+    else number_of_workers()
+)
+
+logger.add(sink=sys.stdout, serialize=JSON_LOGS)
+logger.add(
+    sink="/backend/logs/concise/concise.log",
+    enqueue=True,
+    serialize=0,
+    level="INFO",
+    rotation="23:59",
+)
+logger.add(
+    sink="/backend/logs/extend/extend.log",
+    enqueue=True,
+    serialize=0,
+    backtrace=True,
+    level="DEBUG",
+    rotation="23:59",
+)
+logger.add(
+    sink="/backend/logs/extend/extend-json.json",
+    enqueue=True,
+    serialize=1,
+    level="DEBUG",
+    rotation="23:59",
+)
+logger.add(
+    sink="/backend/logs/error/error.log",
+    enqueue=True,
+    serialize=0,
+    backtrace=True,
+    level="ERROR",
+    rotation="23:59",
+)
+
+
+logger.info("Current Environment: {}".format(os.getenv("ENV", "dev")))
 
 
 class InterceptHandler(logging.Handler):
@@ -86,8 +125,16 @@ def run():
             seen.add(name.split(".")[0])
             logging.getLogger(name).handlers = [intercept_handler]
 
-    logger.configure(handlers=[{"sink": sys.stdout, "serialize": JSON_LOGS}])
+    from pathlib import Path
 
+    concise_path = os.path.join(*[os.getcwd(), "logs/concise"])
+    extend_path = os.path.join(*[os.getcwd(), "logs/extend"])
+    error_path = os.path.join(*[os.getcwd(), "logs/error"])
+    Path(concise_path).mkdir(parents=True, exist_ok=True)
+    Path(extend_path).mkdir(parents=True, exist_ok=True)
+    Path(error_path).mkdir(parents=True, exist_ok=True)
+
+    logger.info(f"log path: {concise_path}, {extend_path}, {error_path}")
     options = {
         "bind": "0.0.0.0:8000",
         "workers": WORKERS,

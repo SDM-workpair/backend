@@ -177,3 +177,6 @@ prof/
 
 # txt
 *.txt
+
+# log folder
+logs/
