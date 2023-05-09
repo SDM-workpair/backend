@@ -46,7 +46,7 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, GroupUpdate]):
             name=obj_in.name,
             group_id=obj_in.group_id,
             room_uuid=obj_in.room_uuid,
-            created_time=datetime.now(),
+            create_time=datetime.now(),
         )
         db.add(db_obj)
         db.commit()

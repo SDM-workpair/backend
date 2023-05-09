@@ -38,6 +38,12 @@ jobs:
         echo "Start creating .env file"
         echo "${{ secrets.ENV_FILE }}" > .env
         echo $PWD
+    - name: Create swipecard microservice env file
+      working-directory: ./microservices/swipecard
+      run: |
+        echo "Start creating swipecard microservice .env file"
+        echo "${{ secrets.ENV_FILE }}" > .env
+        echo $PWD
     - name: Run test
       working-directory: ./
       run: |
@@ -51,8 +57,12 @@ jobs:
         echo "migrate alembic"
         docker-compose exec -T backend alembic upgrade head
         docker-compose exec -T backend python3 -m app.initial_data
+        docker-compose exec -T backend python3 -m app.database.test.test_database
+        docker-compose exec -T backend python3 -m app.database.test.initial_test_data
         echo "Start run pytest"
         docker-compose exec -T backend $ENTRYPOINT
+        docker-compose exec -T backend python -m pytest ./microservices/matching/test.py -rA
+        docker-compose exec -T backend python -m pytest ./microservices/swipecard/test_microservices_swipe_card.py -rA
     - name: log
       run: |
         docker-compose logs

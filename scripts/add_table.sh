@@ -1,3 +1,6 @@
 docker-compose build
-docker-compose run backend alembic revision --autogenerate -m "Recreate all table"
-docker-compose run backend alembic upgrade head
+docker-compose up -d
+
+docker-compose exec backend alembic revision --autogenerate -m "Recreate all table"
+docker-compose exec backend alembic upgrade head
+docker-compose down

@@ -8,7 +8,7 @@ class MR_Member_Tag(Base):
     __tablename__ = "MR_Member_Tag"
     member_id = Column(
         Integer,
-        ForeignKey("MR_Member.member_id"),
+        ForeignKey("MR_Member.member_id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False,
     )

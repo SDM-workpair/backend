@@ -1,6 +1,7 @@
 from datetime import timedelta
 from typing import Any
 
+import loguru
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.encoders import jsonable_encoder
 from google.auth.transport import requests
@@ -50,6 +51,7 @@ def google_auth(
     try:
         # # 檢查此google帳號是否已建立帳號
         user = crud.user.get_by_email(db, email=idinfo["email"])
+        loguru.logger.info(f"user:{user}")
 
         # 帳號尚未建立，create user
         if not user:
@@ -65,6 +67,8 @@ def google_auth(
 
         # 帳號已建立，取得access token
         user = crud.user.get_by_email(db, email=idinfo["email"])
+        loguru.logger.info(f"created_user:{jsonable_encoder(user)}")
+
         access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = security.create_access_token(
             user.user_uuid, expires_delta=access_token_expires

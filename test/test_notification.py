@@ -1,67 +1,59 @@
-import json
-import unittest
-import uuid
-from base64 import b64encode
-from datetime import datetime, timedelta
-from unittest import mock
-
-from fastapi.encoders import jsonable_encoder
-from fastapi.testclient import TestClient
-from itsdangerous import TimestampSigner
+from datetime import datetime
 
 from app import crud, schemas
-from app.core import security
 from app.core.config import settings
-from app.database.session import db_session
-from app.main import app  # Flask instance of the API
 
-client = TestClient(app)
+from .contest import db_conn, get_user_authentication_headers, test_client
 
-# fake data for test
-fake_notification = schemas.NotificationViewModel(
-    receiver_uuid=uuid.uuid4(), send_time=datetime.now(), content=""
-)
+"""
+pytest fixture
+"""
+db_conn = db_conn
+test_client = test_client
+email = "admin@sdm-teamatch.com"
 
-
-def create_session_cookie(data) -> str:
-    signer = TimestampSigner(str(settings.GOOGLE_SECRET_KEY))
-
-    return signer.sign(
-        b64encode(json.dumps(data).encode("utf-8")),
-    ).decode("utf-8")
+"""
+Test Notification
+"""
 
 
-def get_user_authentication_headers():
-    email = "admin@sdm-teamatch.com"
-
-    user = crud.user.get_by_email(db=db_session, email=email)
-    user = jsonable_encoder(user)
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = security.create_access_token(
-        user["user_uuid"], expires_delta=access_token_expires
+def test_read_my_notifications_who_has_logged_in(db_conn, test_client):
+    response = test_client.get(
+        f"{settings.API_V1_STR}/notification/my-list",
+        headers=get_user_authentication_headers(db_conn, email),
     )
-    headers = {"Authorization": f"Bearer {access_token}"}
-    return headers
-
-
-class TestNotificationAPI(unittest.TestCase):
-    @mock.patch(
-        "app.routers.api_v1.notification.crud.notification.get_by_receiver_uuid"
+    assert response.status_code == 200
+    assert (
+        response.json()["data"][0]["receiver_uuid"]
+        == "397d0336-3df4-4325-a1b3-cc4ef8e8e0ab"
     )
-    def test_read_my_notifications_who_has_logged_in(self, mock_my_notifications):
-        mock_my_notifications.return_value = [fake_notification]
 
-        response = client.get(
-            f"{settings.API_V1_STR}/notification/my-list",
-            headers=get_user_authentication_headers(),
-        )
 
-        assert response.status_code == 200
-        assert response.json()["data"][0]["receiver_uuid"] == str(
-            fake_notification.receiver_uuid
-        )
+def test_read_my_notifications_who_has_not_logged_in(db_conn, test_client):
+    response = test_client.get(f"{settings.API_V1_STR}/notification/my-list")
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Not authenticated"
 
-    def test_read_my_notifications_who_has_not_logged_in(self):
-        response = client.get(f"{settings.API_V1_STR}/notification/my-list")
-        assert response.status_code == 401
-        assert response.json()["detail"] == "Not authenticated"
+
+# test create notification function directly with CRUD (not through API)
+
+
+def test_create_notification(db_conn):
+    notification_obj = schemas.NotificationSendObjectModel(
+        receiver_uuid="397d0336-3df4-4325-a1b3-cc4ef8e8e0ab",
+        sender_uuid="2be6b063-8914-42b6-9e8d-1bbe14317cc2",
+        template_uuid="9c1dc87f-e938-4fa1-9900-9b4ebd5701da",
+        f_string="測試配對結果",
+    )
+    insert_obj = schemas.notification.NotificationCreate(
+        receiver_uuid=notification_obj.receiver_uuid,
+        sender_uuid=notification_obj.sender_uuid,
+        send_time=datetime.now(),
+        template_uuid=notification_obj.template_uuid,
+        f_string=notification_obj.f_string,
+    )
+    crud.notification.create(db=db_conn, obj_in=insert_obj)
+    query_result = crud.notification.get_by_receiver_uuid(
+        db=db_conn, receiver_uuid="397d0336-3df4-4325-a1b3-cc4ef8e8e0ab"
+    )[0]
+    assert str(query_result.receiver_uuid) == "397d0336-3df4-4325-a1b3-cc4ef8e8e0ab"
