@@ -64,9 +64,13 @@ class MatchingRoomInDB(MatchingRoomInDBBase):
     finish_time: datetime
 
 
+class MatchingRoomWithMemberID(MatchingRoom):
+    member_id: Optional[int]
+
+
 class MatchingRoomsWithMessage(BaseModel):
     message: str
-    data: Optional[List[MatchingRoom]] = None
+    data: Optional[List[MatchingRoomWithMemberID]] = None
 
 
 class MatchingRoomWithMessage(BaseModel):
@@ -85,5 +89,7 @@ class MatchingRoomWithSearch(BaseModel):
 
 
 # For Demo
+
+
 class MatchingRoomForEvent(MatchingRoomBase):
     min_member_num: int

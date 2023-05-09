@@ -12,6 +12,7 @@ from app.schemas.matching_room import (
     MatchingRoomCreate,
     MatchingRoomReq,
     MatchingRoomUpdate,
+    MatchingRoomWithMemberID,
 )
 
 
@@ -29,8 +30,13 @@ class CRUDMatchingRoom(CRUDBase[MatchingRoom, MatchingRoomCreate, MatchingRoomUp
 
     def search_with_user_and_name(
         self, db: Session, *, user_uuid: UUID = None, name: str = ""
-    ) -> Optional[List[MatchingRoom]]:
+    ) -> Optional[List[MatchingRoomWithMemberID]]:
         matching_rooms = db.query(MatchingRoom)
+        result = []
+        if name != "":
+            matching_rooms = matching_rooms.filter(
+                MatchingRoom.name.ilike("%{}%".format(name))
+            )
         # filter out matching rooms for user first
         if user_uuid:
             mr_members = db.query(MR_Member).filter(MR_Member.user_uuid == user_uuid)
@@ -38,12 +44,28 @@ class CRUDMatchingRoom(CRUDBase[MatchingRoom, MatchingRoomCreate, MatchingRoomUp
             matching_rooms = matching_rooms.filter(
                 MatchingRoom.room_uuid.in_([x.room_uuid for x in mr_members])
             )
-            print("matching_rooms >>> ", matching_rooms)
-        if name != "":
-            matching_rooms = matching_rooms.filter(
-                MatchingRoom.name.ilike("%{}%".format(name))
+        for matching_room in matching_rooms:
+            if user_uuid:
+                var_member_id = (
+                    mr_members.filter(MR_Member.room_uuid == matching_room.room_uuid)
+                    .first()
+                    .member_id
+                )
+            else:
+                var_member_id = None
+            matching_room_with_member_id = MatchingRoomWithMemberID(
+                room_id=matching_room.room_id,
+                name=matching_room.name,
+                due_time=matching_room.due_time,
+                min_member_num=matching_room.min_member_num,
+                description=matching_room.description,
+                is_forced_matching=matching_room.is_forced_matching,
+                created_time=matching_room.created_time,
+                member_id=var_member_id,
             )
-        return matching_rooms.all()
+            result.append(matching_room_with_member_id)
+            print("matching_rooms >>> ", result)
+        return result  # matching_rooms.all()
 
     # def get_participated_in_matching_room(self, db: Session, *, user_email: str) -> Optional[List[MatchingRoom]]:
     #     user = db.query(User).filter(User.email == user_email).first()
