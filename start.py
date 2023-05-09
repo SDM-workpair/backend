@@ -7,14 +7,15 @@ from gunicorn.app.base import BaseApplication
 from gunicorn.glogging import Logger
 from loguru import logger
 
+from app.core.config import settings
 from app.main import app
 from app.utils import number_of_workers
 
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
-JSON_LOGS = os.environ.get("JSON_LOGS", "0") == 1 if os.getenv("ENV", "dev") else True
+JSON_LOGS = os.environ.get("JSON_LOGS", "0") == 1 if settings.ENV else True
 WORKERS = (
     os.environ.get("GUNICORN_WORKERS", 1)
-    if os.getenv("ENV", "dev") == "dev"
+    if settings.ENV == "dev"
     else number_of_workers()
 )
 
@@ -51,7 +52,7 @@ logger.add(
 )
 
 
-logger.info("Current Environment: {}".format(os.getenv("ENV", "dev")))
+logger.info("Current Environment: {}".format(settings.ENV))
 
 
 class InterceptHandler(logging.Handler):
@@ -144,7 +145,7 @@ def run():
         "logger_class": StubbedGunicornLogger,
     }
 
-    if os.getenv("ENV") == "dev":
+    if settings.ENV == "dev":
         uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
     else:
         StandaloneApplication(app, options).run()
