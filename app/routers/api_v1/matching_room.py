@@ -15,7 +15,7 @@ def read_my_matching_rooms(
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Retrieve user's matching rooms.
+    Retrieve user's matching rooms with their member_id in each matching room.
     """
     matching_rooms = crud.matching_room.search_with_user_and_name(
         db=db, user_uuid=current_user.user_uuid

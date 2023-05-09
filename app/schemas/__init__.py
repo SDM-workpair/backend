@@ -15,6 +15,7 @@ from .matching_room import (
     MatchingRoomInDB,
     MatchingRoomReq,
     MatchingRoomsWithMessage,
+    MatchingRoomWithMemberID,
     MatchingRoomWithMessage,
     MatchingRoomWithRoomId,
     MatchingRoomWithSearch,
