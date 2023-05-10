@@ -34,7 +34,7 @@ def create_matching_room(
     Create new matching room.
     """
     matching_room = crud.matching_room.create(db, obj_in=matching_room_in)
-    
+
     return {"message": "success", "room_id": matching_room.room_id}
 
 

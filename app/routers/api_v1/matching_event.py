@@ -55,7 +55,7 @@ async def initiate_matching_event(
     response = requests.request("POST", url, headers=headers, data=payload)
     logger.info(response.status_code)
     logger.info(response.text)
-    if response.status_code==200:
+    if response.status_code == 200:
         result = json.loads(response.text)["groups"]
         """
         Create Group and GR_Member
@@ -105,7 +105,7 @@ async def initiate_matching_event(
             group_list.append(gr_mem_list)
 
         return {"message": "success", "data": group_list}
-    
+
     else:
         raise HTTPException(
             status_code=500,
