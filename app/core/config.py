@@ -7,7 +7,9 @@ class Settings(BaseSettings):
     # app
     APP_NAME: str = "teamatch-backend"
     API_V1_STR: str = "/api/v1"
+    ENV: str
     test_int: int = 50
+    POOL_SIZE: int
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
         "http://localhost/",
         "http://localhost:4200/",

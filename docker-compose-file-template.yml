@@ -42,13 +42,7 @@ services:
             - ./backend:/backend
         restart: always
         environment:
-            - WATCHFILES_FORCE_POLLING=true
-            - GUNICORN_WORKERS=1
-            - JSON_LOGS=0
-            - LOG_LEVEL=DEBUG
-            - PRE_COMMIT_HOME=/backend/.pre-commit
-            - RABBITMQ_HOST=rabbitmq-container
-            - ENV=dev
+           - pass
         tty: true
         depends_on:
             - postgres
