@@ -31,7 +31,8 @@ class CRUDMatchingRoom(CRUDBase[MatchingRoom, MatchingRoomCreate, MatchingRoomUp
     def search_with_user_and_name(
         self, db: Session, *, user_uuid: UUID = None, name: str = ""
     ) -> Optional[List[MatchingRoomWithMemberID]]:
-        matching_rooms = db.query(MatchingRoom)
+        # only filter out not grouped matching rooms
+        matching_rooms = db.query(MatchingRoom).filter(MatchingRoom.is_closed == False)
         result = []
         if name != "":
             matching_rooms = matching_rooms.filter(
