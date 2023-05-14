@@ -53,53 +53,61 @@ async def initiate_matching_event(
     )
     headers = {"Content-Type": "application/json"}
     response = requests.request("POST", url, headers=headers, data=payload)
+    logger.info(response.status_code)
     logger.info(response.text)
-    result = json.loads(response.text)["groups"]
-    """
-    Create Group and GR_Member
-    """
-    # Get notify template_uuid
-    notification_template = crud.notification_template.get_by_template_id(
-        db=db, template_id="matching_result"
-    )
-
-    group_list = []
-    group_id = 0
-    for group in result:
-        # Create Group
-        group_id += 1
-        new_group_schema = schemas.GroupCreate(
-            name=matching_room.name + "_" + str(group_id),
-            group_id=matching_room.room_id + "_" + str(group_id),
-            room_uuid=matching_room.room_uuid,
+    if response.status_code == 200:
+        result = json.loads(response.text)["groups"]
+        """
+        Create Group and GR_Member
+        """
+        # Get notify template_uuid
+        notification_template = crud.notification_template.get_by_template_id(
+            db=db, template_id="matching_result"
         )
-        new_group = crud.group.create(db=db, obj_in=new_group_schema)
 
-        gr_mem_list = []
-        for gr_member in result[group]:
-            # Create GR_member
-            new_gr_mem_schema = schemas.GR_MemberCreate(
-                member_id=gr_member,
-                group_uuid=new_group.group_uuid,
-                join_time=new_group.create_time,
+        group_list = []
+        group_id = 0
+        for group in result:
+            # Create Group
+            group_id += 1
+            new_group_schema = schemas.GroupCreate(
+                name=matching_room.name + "_" + str(group_id),
+                group_id=matching_room.room_id + "_" + str(group_id),
+                room_uuid=matching_room.room_uuid,
             )
-            new_gr_mem = crud.gr_member.create(db=db, obj_in=new_gr_mem_schema)
+            new_group = crud.group.create(db=db, obj_in=new_group_schema)
 
-            """
-            Call notification method for every Group Member
-            """
-            gr_user = crud.mr_member.get_by_member_id(
-                db=db, member_id=new_gr_mem.member_id
-            )
-            gr_mem_list.append(gr_user.member_id)
+            gr_mem_list = []
+            for gr_member in result[group]:
+                # Create GR_member
+                new_gr_mem_schema = schemas.GR_MemberCreate(
+                    member_id=gr_member,
+                    group_uuid=new_group.group_uuid,
+                    join_time=new_group.create_time,
+                )
+                new_gr_mem = crud.gr_member.create(db=db, obj_in=new_gr_mem_schema)
 
-            # Create notify send object
-            notification_send_object = schemas.NotificationSendObjectModel(
-                receiver_uuid=gr_user.user_uuid,
-                template_uuid=notification_template.template_uuid,
-                f_string=matching_room.name,
-            )
-            await notify(db, notification_send_object)
-        group_list.append(gr_mem_list)
+                """
+                Call notification method for every Group Member
+                """
+                gr_user = crud.mr_member.get_by_member_id(
+                    db=db, member_id=new_gr_mem.member_id
+                )
+                gr_mem_list.append(gr_user.member_id)
 
-    return {"message": "success", "data": group_list}
+                # Create notify send object
+                notification_send_object = schemas.NotificationSendObjectModel(
+                    receiver_uuid=gr_user.user_uuid,
+                    template_uuid=notification_template.template_uuid,
+                    f_string=matching_room.name,
+                )
+                await notify(db, notification_send_object)
+            group_list.append(gr_mem_list)
+
+        return {"message": "success", "data": group_list}
+
+    else:
+        raise HTTPException(
+            status_code=500,
+            detail=json.loads(response.text)["detail"],
+        )
