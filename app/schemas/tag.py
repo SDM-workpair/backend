@@ -9,7 +9,6 @@ from pydantic import BaseModel
 from .matching_room import MatchingRoomBase
 
 
-
 # Shared properties
 class Tag_Base(BaseModel):
     tag_text: str
@@ -32,3 +31,6 @@ class Tag_InDBBase(Tag_Base):
         orm_mode = True
 
 
+class Tag_Res(BaseModel):
+    message: str
+    data: List[str]
