@@ -27,7 +27,6 @@ from app.notifier import Notifier
 from app.routers import deps
 from app.routers.api_v1.api import api_router
 from app.utils import get_tw_time
-import app.core.scheduler.matching_event
 
 app = FastAPI(
     title=settings.APP_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json)"

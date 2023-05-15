@@ -56,10 +56,15 @@ async def initiate_matching_event(
     logger.info(response.status_code)
     logger.info(response.text)
     if response.status_code == 200:
-        result = json.loads(response.text)["groups"]
+        # Close matching room
+        matching_room = crud.matching_room.close_by_room_id(
+            db=db, room_id=matching_room.room_id
+        )
+
         """
         Create Group and GR_Member
         """
+        result = json.loads(response.text)["groups"]
         # Get notify template_uuid
         notification_template = crud.notification_template.get_by_template_id(
             db=db, template_id="matching_result"

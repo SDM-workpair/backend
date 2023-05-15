@@ -22,6 +22,7 @@ class MatchingRoomReq(BaseModel):
     description: Optional[str] = None
     is_forced_matching: bool = False
 
+
 class MatchingRoomCreate(MatchingRoomBase):
     name: Optional[str] = None
     due_time: datetime
@@ -77,18 +78,15 @@ class MatchingRoomWithMessage(BaseModel):
     data: Optional[MatchingRoom] = None
 
 
-class MatchingRoomWithRoomId(BaseModel):
-    message: str
-    room_id: str
-
-
 class MatchingRoomWithSearch(BaseModel):
     prompt: str
     query_all: bool
 
+
 class MatchingRoomWithRoomId(BaseModel):
     message: str
     room_id: str
+
 
 # For Demo
 

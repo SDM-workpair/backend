@@ -1,25 +1,23 @@
-from sqlalchemy import event
-from loguru import logger
-from app.models.matching_room import MatchingRoom
-from datetime import datetime
-from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
-from tzlocal import get_localzone
-from app import crud, models, schemas
-from app.notifier import notify
-from app.routers import deps
 import json
-import requests
-from sqlalchemy.orm import Session
-from fastapi import Depends
-import pytz
 
+import pytz
+import requests
+from apscheduler.schedulers.background import BackgroundScheduler
+from fastapi import Depends
+from loguru import logger
+from sqlalchemy import event
+from sqlalchemy.orm import Session
+
+from app.models.matching_room import MatchingRoom
+from app.routers import deps
 
 """
 Matching event scheduler
 """
 scheduler = BackgroundScheduler()
 scheduler.start()
+
 
 def matching_event(matching_room: MatchingRoom, db: Session):
     logger.info("run matching_event function")
@@ -43,7 +41,7 @@ def matching_event(matching_room: MatchingRoom, db: Session):
     headers = {"Content-Type": "application/json"}
     response = requests.request("POST", url, headers=headers, data=payload)
     logger.info(response.text)
-    result = json.loads(response.text)["groups"]
+    json.loads(response.text)["groups"]
     """
     Create Group and GR_Member
     """
@@ -92,41 +90,42 @@ def matching_event(matching_room: MatchingRoom, db: Session):
     #     group_list.append(gr_mem_list)
     return
 
+
 def schedule_matching_event(matching_room: MatchingRoom):
-    logger.info('schedule matching event')
+    logger.info("schedule matching event")
     logger.info(matching_room)
     db: Session = Depends(deps.get_db)
 
     if scheduler.running:
-        logger.info('scheduler running')
+        logger.info("scheduler running")
 
     # Time zone
     utc_time = matching_room.due_time.astimezone(pytz.utc)
     logger.info(utc_time)
     # Convert UTC timezone to local timezone
-    local_tz = pytz.timezone('Asia/Taipei')
-    local_time = utc_time.astimezone(local_tz)
+    local_tz = pytz.timezone("Asia/Taipei")
+    utc_time.astimezone(local_tz)
 
     # call matching_event function
     scheduler.add_job(
         matching_event,
         # lambda: matching_event(matching_room, db),
-        'date',
+        "date",
         run_date=matching_room.due_time,
-        args=[matching_room, db]
+        args=[matching_room, db],
     )
 
     return
 
 
-@event.listens_for(MatchingRoom, 'after_insert')
+@event.listens_for(MatchingRoom, "after_insert")
 def schedule_matching_room(mapper, connection, matching_room):
     "listen for the 'after_insert' event"
-    logger.info('after insert')
+    logger.info("after insert")
     schedule_matching_event(matching_room=matching_room)
-    
+
 
 @atexit.register
 def shutdown_scheduler():
-    logger.info('scheduler shutdown')
+    logger.info("scheduler shutdown")
     scheduler.shutdown()

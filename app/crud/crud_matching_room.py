@@ -28,6 +28,15 @@ class CRUDMatchingRoom(CRUDBase[MatchingRoom, MatchingRoomCreate, MatchingRoomUp
     def get_by_room_id(self, db: Session, *, room_id: str) -> Optional[MatchingRoom]:
         return db.query(MatchingRoom).filter(MatchingRoom.room_id == room_id).first()
 
+    def close_by_room_id(self, db: Session, *, room_id: str) -> Optional[MatchingRoom]:
+        matching_room_in = (
+            db.query(MatchingRoom).filter(MatchingRoom.room_id == room_id).first()
+        )
+        if matching_room_in:
+            matching_room_in.is_closed = True
+            db.commit()
+        return matching_room_in
+
     def search_with_user_and_name(
         self, db: Session, *, user_uuid: UUID = None, name: str = ""
     ) -> Optional[List[MatchingRoomWithMemberID]]:
@@ -100,7 +109,6 @@ class CRUDMatchingRoom(CRUDBase[MatchingRoom, MatchingRoomCreate, MatchingRoomUp
         db.commit()
         db.refresh(db_obj)
         return db_obj
-
 
     def delete(self, db: Session, *, db_obj: MatchingRoom, room_id: str):
         if room_id is not None or room_id != "":

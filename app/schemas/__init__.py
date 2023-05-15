@@ -19,8 +19,6 @@ from .matching_room import (
     MatchingRoomWithMessage,
     MatchingRoomWithRoomId,
     MatchingRoomWithSearch,
-    MatchingRoomReq,
-    MatchingRoomWithRoomId
 )
 from .mr_member import (
     MR_Member,
