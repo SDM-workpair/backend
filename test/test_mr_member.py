@@ -71,7 +71,7 @@ def test_create_mr_member(db_conn, test_client):
         },
         headers=get_user_authentication_headers(db_conn, email),
     )
-    test_mr_member.created_room["room_id"] = response.json()["room_id"]
+    test_mr_member.created_room["room_id"] = response.json()["data"]["room_id"]
 
     # mr_member
     response = test_client.post(
