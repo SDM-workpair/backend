@@ -107,6 +107,8 @@ def test_create_matching_room(db_conn, test_client):
     )
     assert response.status_code == 200
     assert response.json()["message"] == "success"
-    obj = crud.matching_room.get_by_room_id(db_conn, room_id=response.json()["data"]["room_id"])
+    obj = crud.matching_room.get_by_room_id(
+        db_conn, room_id=response.json()["data"]["room_id"]
+    )
     db_conn.delete(obj)
     db_conn.commit()
