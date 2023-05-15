@@ -10,7 +10,7 @@ from app import crud, models, schemas
 from app.notifier import notify
 from app.routers import deps
 
-# from app.core.scheduler import matching_event
+from app.core.scheduler.matching_event import matching_event
 
 router = APIRouter()
 
@@ -38,6 +38,9 @@ async def initiate_matching_event(
     """
     Call matching event micro-service
     """
+    # return matching_event(db=db, matching_room=matching_room)
+
+
     url = "http://matching:8001/matching/create"
     payload = json.dumps(
         {
