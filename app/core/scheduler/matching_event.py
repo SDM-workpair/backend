@@ -102,6 +102,7 @@ def schedule_matching_event(matching_room: MatchingRoom):
 
     # Time zone
     utc_time = matching_room.due_time.astimezone(pytz.utc)
+    logger.info(utc_time)
     # Convert UTC timezone to local timezone
     local_tz = pytz.timezone('Asia/Taipei')
     local_time = utc_time.astimezone(local_tz)
