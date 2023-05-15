@@ -55,6 +55,7 @@ from .swipe_card import (
     SwipeCardRecommend,
     SwipeCardUpdate,
 )
+from .tag import Tag_Create
 from .token import Token, TokenPayload
 from .user import (
     User,

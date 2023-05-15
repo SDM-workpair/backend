@@ -6,6 +6,7 @@ from .crud_mr_member_tag import mr_member_tag
 from .crud_notification import notification
 from .crud_notification_template import notification_template
 from .crud_swipe_card import swipe_card
+from .crud_tag import tag
 from .crud_user import user
 
 # For a new basic set of CRUD operations you could just do
