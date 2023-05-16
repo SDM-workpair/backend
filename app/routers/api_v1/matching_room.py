@@ -23,7 +23,7 @@ def read_my_matching_rooms(
     return {"message": "success", "data": matching_rooms}
 
 
-@router.post("/create", response_model=schemas.MatchingRoomWithRoomId)
+@router.post("/create", response_model=schemas.MatchingRoomWithMessage)
 def create_matching_room(
     *,
     db: Session = Depends(deps.get_db),
@@ -35,7 +35,7 @@ def create_matching_room(
     """
     matching_room = crud.matching_room.create(db, obj_in=matching_room_in)
 
-    return {"message": "success", "room_id": matching_room.room_id}
+    return {"message": "success", "data": matching_room}
 
 
 # @router.delete("/", response_model=schemas.MatchingRoomWithMessage)
