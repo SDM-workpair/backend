@@ -18,7 +18,7 @@ def read_my_matching_rooms(
     Retrieve user's matching rooms with their member_id in each matching room.
     """
     matching_rooms = crud.matching_room.search_with_user_and_name(
-        db=db, user_uuid=current_user.user_uuid
+        db=db, user_uuid=current_user.user_uuid, is_query_with_user=True
     )
     return {"message": "success", "data": matching_rooms}
 

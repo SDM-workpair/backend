@@ -29,7 +29,12 @@ class CRUDMatchingRoom(CRUDBase[MatchingRoom, MatchingRoomCreate, MatchingRoomUp
         return db.query(MatchingRoom).filter(MatchingRoom.room_id == room_id).first()
 
     def search_with_user_and_name(
-        self, db: Session, *, user_uuid: UUID = None, name: str = ""
+        self,
+        db: Session,
+        *,
+        user_uuid: UUID = None,
+        name: str = "",
+        is_query_with_user: bool = True
     ) -> Optional[List[MatchingRoomWithMemberID]]:
         # only filter out not grouped matching rooms
         matching_rooms = db.query(MatchingRoom).filter(MatchingRoom.is_closed == False)
@@ -38,15 +43,20 @@ class CRUDMatchingRoom(CRUDBase[MatchingRoom, MatchingRoomCreate, MatchingRoomUp
             matching_rooms = matching_rooms.filter(
                 MatchingRoom.name.ilike("%{}%".format(name))
             )
-        # filter out matching rooms for user first
-        if user_uuid:
-            mr_members = db.query(MR_Member).filter(MR_Member.user_uuid == user_uuid)
-            print("mr_members >>> ", mr_members)
+        mr_members = db.query(MR_Member).filter(MR_Member.user_uuid == user_uuid)
+        # return only matching rooms user already joined
+        if is_query_with_user:
             matching_rooms = matching_rooms.filter(
                 MatchingRoom.room_uuid.in_([x.room_uuid for x in mr_members])
             )
+        # exclude matching rooms user already joined
+        else:
+            matching_rooms = matching_rooms.filter(
+                MatchingRoom.room_uuid.notin_([x.room_uuid for x in mr_members])
+            )
+
         for matching_room in matching_rooms:
-            if user_uuid:
+            if is_query_with_user:
                 var_member_id = (
                     mr_members.filter(MR_Member.room_uuid == matching_room.room_uuid)
                     .first()
@@ -54,6 +64,7 @@ class CRUDMatchingRoom(CRUDBase[MatchingRoom, MatchingRoomCreate, MatchingRoomUp
                 )
             else:
                 var_member_id = None
+
             matching_room_with_member_id = MatchingRoomWithMemberID(
                 room_id=matching_room.room_id,
                 name=matching_room.name,
@@ -65,8 +76,7 @@ class CRUDMatchingRoom(CRUDBase[MatchingRoom, MatchingRoomCreate, MatchingRoomUp
                 member_id=var_member_id,
             )
             result.append(matching_room_with_member_id)
-            print("matching_rooms >>> ", result)
-        return result  # matching_rooms.all()
+        return result
 
     # def get_participated_in_matching_room(self, db: Session, *, user_email: str) -> Optional[List[MatchingRoom]]:
     #     user = db.query(User).filter(User.email == user_email).first()
