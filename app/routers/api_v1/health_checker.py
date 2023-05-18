@@ -27,6 +27,6 @@ def get_swipe_card_health_checker(
     *,
     db: Session = Depends(deps.get_db),
 ) -> Any:
-    url = ""
-    response = requests.request("POST", url)
+    url = "http://swipecard:8002/healthchecker"
+    response = requests.request("GET", url)
     return json.loads(response.text)
