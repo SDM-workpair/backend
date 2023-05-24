@@ -55,11 +55,9 @@ class Notifier:
         living_connections = []
         while len(self.connections) > 0:
             websocket = self.connections.pop()
-            message_json = json.loads(message.body)
-            # encode byte string into bytes then decode it
-            message_json["message"] = message_json["message"].encode().decode("utf-8")
-            message_json_str = json.dumps(message_json)
-            await websocket.send_text(message_json_str)
+            new_message = message.body.decode("utf-8")
+            print("incomingMessage >>> ", new_message)
+            await websocket.send_text(f"{new_message}")
             living_connections.append(websocket)
         self.connections = living_connections
 
@@ -114,19 +112,7 @@ async def send_notification_to_message_queue(db, notification_obj):
             raise ValueError(
                 f"Fail to retrieve user with user_uuid={notification_obj.receiver_uuid}"
             )
-        message_json = {"message": notification_text}
-        # check if need to send with group_id
-        if isinstance(
-            notification_obj,
-            schemas.notification.NotificationSendObjectModelWithGroupID,
-        ):
-            message_json = {
-                "message": notification_text,
-                "group_id": notification_obj.group_id,
-            }
-        message_json_str = json.dumps(message_json)
-        print("messageJsonStr >>> ", message_json_str)
         notifier = Notifier()
         await notifier.setup(queue_name=user_email, is_consumer=False)
-        await notifier.push(message_json_str)
+        await notifier.push(f"{notification_text}")
         print(f"sucessfuly push notification into queue-{user_email}")
