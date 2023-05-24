@@ -14,7 +14,7 @@ class Tag(Base):
     tag_text = Column(String, unique=True, nullable=False)
     room_uuid = Column(
         UUID(as_uuid=True),
-        ForeignKey("MatchingRoom.room_uuid"),
+        ForeignKey("MatchingRoom.room_uuid", ondelete="CASCADE"),
         primary_key=True,
         nullable=False,
     )
