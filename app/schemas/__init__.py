@@ -19,6 +19,7 @@ from .matching_room import (
     MatchingRoomWithMessage,
     MatchingRoomWithRoomId,
     MatchingRoomWithSearch,
+    MatchingRoomWithTagNum,
 )
 from .mr_member import (
     MR_Member,
@@ -55,6 +56,7 @@ from .swipe_card import (
     SwipeCardRecommend,
     SwipeCardUpdate,
 )
+from .tag import Tag_Create, Tag_Res
 from .token import Token, TokenPayload
 from .user import (
     User,

@@ -112,3 +112,20 @@ def test_create_matching_room(db_conn, test_client):
     )
     db_conn.delete(obj)
     db_conn.commit()
+
+
+def test_get_rcmed_tag(db_conn, test_client):
+    response = test_client.post(
+        f"{settings.API_V1_STR}/matching-room/rcmed-tag",
+        json={"room_id": "IR001"},
+        headers=get_user_authentication_headers(db_conn, email),
+    )
+    assert response.status_code == 200
+    assert response.json()["message"] == "success"
+    assert response.json()["data"] == [
+        "TAG1",
+        "TAG2",
+        "TAG3",
+        "TAG4",
+        "TAG5",
+    ]

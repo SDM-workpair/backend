@@ -2,7 +2,7 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from app import crud
+from app import crud, schemas
 from app.crud.base import CRUDBase
 from app.models.mr_member_tag import MR_Member_Tag
 from app.schemas.mr_member_tag import MR_Member_Tag_Create, MR_Member_Tag_Update
@@ -94,6 +94,12 @@ class CRUDMR_Member_Tag(
                 db.commit()
                 db_obj_list.append(db_obj)
                 db.refresh(db_obj)
+
+            # Update tag mentioned num
+            tag_in = schemas.Tag_Create(
+                tag_text=tag, matching_room=mr_member_tag_in.matching_room
+            )
+            crud.tag.create(db=db, tag_in=tag_in)
 
         return [tag.tag_text for tag in db_obj_list]
 
