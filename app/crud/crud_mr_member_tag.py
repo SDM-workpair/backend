@@ -33,7 +33,7 @@ class CRUDMR_Member_Tag(
             .first()
         )
 
-    def create_tag(
+    def create(
         self,
         db: Session,
         *,
@@ -51,6 +51,7 @@ class CRUDMR_Member_Tag(
         seen = set()
         tag_text_list = []
         for tag in original_tag_text_list:
+            tag = tag.upper()
             if tag not in seen:
                 tag_text_list.append(tag)
                 seen.add(tag)
@@ -58,6 +59,7 @@ class CRUDMR_Member_Tag(
         db_obj_list = []
 
         for tag in tag_text_list:
+            tag = tag.upper()
             # Check if tag already existed
             tag_existed = (
                 db.query(MR_Member_Tag)
