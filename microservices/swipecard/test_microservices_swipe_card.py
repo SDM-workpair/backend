@@ -152,6 +152,11 @@ def get_server_api():
 
 
 # Test
+def test_swipecard_healthchecker(get_server_api, client):
+    response = client.get(f"{get_server_api}/healthchecker")
+    assert response.status_code == 200
+
+
 def test_microservice_save_preference(get_server_api, db_conn, client):
     member = []
     for i in range(2):
@@ -165,7 +170,7 @@ def test_microservice_save_preference(get_server_api, db_conn, client):
 
     preference = {
         "member_id": member[0]["member_id"],
-        "room_uuid": room_uuid,
+        "room_id": "swipe_test_matching_room001",
         "target_member_id": member[1]["member_id"],
         "is_like": True,
         "is_hated": False,
@@ -183,7 +188,10 @@ def test_microservice_save_preference(get_server_api, db_conn, client):
 def test_microservice_get_recommendation(get_server_api, db_conn, client):
     member = jsonable_encoder(db_conn.query(MR_Member).first())
 
-    recommend_in = {"member_id": member["member_id"], "room_uuid": room_uuid}
+    recommend_in = {
+        "member_id": member["member_id"],
+        "room_id": "swipe_test_matching_room001",
+    }
 
     response = client.post(
         f"{get_server_api}/swipe-card/swipe-recommend",

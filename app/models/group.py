@@ -13,7 +13,9 @@ class Group(Base):
         UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4
     )
     room_uuid = Column(
-        UUID(as_uuid=True), ForeignKey("MatchingRoom.room_uuid"), nullable=False
+        UUID(as_uuid=True),
+        ForeignKey("MatchingRoom.room_uuid", ondelete="SET NULL"),
+        nullable=True,
     )
     create_time = Column(DateTime(timezone=True), default=func.now())
     group_id = Column(String, nullable=False)  # mr_id+數字

@@ -15,7 +15,7 @@ class MR_Member_Tag(Base):
     tag_text = Column(String, primary_key=True, nullable=False)
     room_uuid = Column(
         UUID(as_uuid=True),
-        ForeignKey("MatchingRoom.room_uuid"),
+        ForeignKey("MatchingRoom.room_uuid", ondelete="CASCADE"),
         nullable=False,
     )
     is_self_tag = Column(Boolean, nullable=False, default=False)

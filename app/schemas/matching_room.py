@@ -88,6 +88,10 @@ class MatchingRoomWithSearch(BaseModel):
     query_all: bool
 
 
+class MatchingRoomWithTagNum(MatchingRoomBase):
+    tag_num = int
+
+
 # For Demo
 
 
