@@ -76,6 +76,10 @@ class NotificationSendObjectModel(BaseModel):
     is_read: Optional[bool] = False
 
 
+class NotificationSendObjectModelWithGroupID(NotificationSendObjectModel):
+    group_id: str
+
+
 # class NotificationFromMatchingEvent(BaseModel):
 #     receiver_uuid: UUID
 #     template_uuid: UUID
