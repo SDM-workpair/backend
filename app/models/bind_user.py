@@ -14,5 +14,7 @@ class BindUser(Base):
     )
     bind_time = Column(DateTime(timezone=True), default=func.now())
     room_uuid = Column(
-        UUID(as_uuid=True), ForeignKey("MatchingRoom.room_uuid", ondelete="CASCADE"), nullable=False
+        UUID(as_uuid=True),
+        ForeignKey("MatchingRoom.room_uuid", ondelete="CASCADE"),
+        nullable=False,
     )
