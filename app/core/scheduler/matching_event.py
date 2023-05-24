@@ -4,15 +4,13 @@ import json
 import pytz
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from loguru import logger
 from sqlalchemy import event
 from sqlalchemy.orm import Session
 
 from app.models.matching_room import MatchingRoom
 from app.routers import deps
-from app import crud, schemas
-from app.notifier import notify
 
 """
 Matching event scheduler
@@ -42,9 +40,9 @@ def matching_event(db: Session, matching_room: MatchingRoom):
     )
     headers = {"Content-Type": "application/json"}
     response = requests.request("POST", url, headers=headers, data=payload)
-    logger.info(response.text) #?接不到東西
+    logger.info(response.text)  # ?接不到東西
 
-    logger.info('response.status_code')
+    logger.info("response.status_code")
     logger.info(response.status_code)
     return
     # if response.status_code == 200:
@@ -107,7 +105,7 @@ def matching_event(db: Session, matching_room: MatchingRoom):
     #             notify(db, notification_send_object)
     #         group_list.append(gr_mem_list)
     #     return {"message": "success", "data": group_list}
-    
+
     # else:
     #     raise HTTPException(
     #         status_code=500,
