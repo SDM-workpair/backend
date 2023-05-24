@@ -25,7 +25,7 @@ def matching_event(db: Session, matching_room: MatchingRoom):
     """
     Call matching event micro-service
     """
-    url = "http://matching:8001/matching/create"
+    url = "http://matching:8001/matching/create/test"
     payload = json.dumps(
         {
             "room_id": matching_room.room_id,
