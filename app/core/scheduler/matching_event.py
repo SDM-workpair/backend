@@ -4,7 +4,7 @@ import json
 import pytz
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from loguru import logger
 from sqlalchemy import event
 from sqlalchemy.orm import Session
@@ -22,6 +22,11 @@ scheduler.start()
 def matching_event(db: Session, matching_room: MatchingRoom):
     logger.info("run matching_event function")
     logger.info(matching_room.room_id)
+    if matching_room.is_closed:
+        raise HTTPException(
+            status_code=400,
+            detail="Matching room is already closed.",
+        )
     """
     Call matching event micro-service
     """
@@ -40,9 +45,7 @@ def matching_event(db: Session, matching_room: MatchingRoom):
     )
     headers = {"Content-Type": "application/json"}
     response = requests.request("POST", url, headers=headers, data=payload)
-    logger.info(response.text)  # ?接不到東西
-
-    logger.info("response.status_code")
+    logger.info(response.text)  
     logger.info(response.status_code)
     return
     # if response.status_code == 200:

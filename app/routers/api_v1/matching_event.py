@@ -122,3 +122,37 @@ async def initiate_matching_event(
             status_code=response.status_code,
             detail=json.loads(response.text)["detail"],
         )
+
+
+@router.post("/test")
+def test_matching_event_scheduler(
+    *,
+    db: Session = Depends(deps.get_db),
+    matching_room_in: schemas.MatchingRoomReq,
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Create new matching room.
+    """
+    # Create new matching room
+    matching_room = crud.matching_room.create(db, obj_in=matching_room_in)
+
+    # Create mr_member for the matching room
+    new_mr_member_1 = crud.mr_member.create(
+        db=db, user_uuid='2be6b063-8914-42b6-9e8d-1bbe14317cc2', room_uuid=matching_room.room_uuid
+    )
+
+    new_mr_member_2 = crud.mr_member.create(
+        db=db, user_uuid='2a3c5a50-a70c-42d2-9689-af8a67423153', room_uuid=matching_room.room_uuid
+    )
+
+    new_mr_member_3 = crud.mr_member.create(
+        db=db, user_uuid='70528b75-1ebc-4117-b3dc-c6127264fcff', room_uuid=matching_room.room_uuid
+    )
+
+    # new_mr_member_4 = crud.mr_member.create(
+    #     db=db, user_uuid='397d0336-3df4-4325-a1b3-cc4ef8e8e0ab', room_uuid=matching_room.room_uuid
+    # )
+
+    return {"message": "success"}
+
