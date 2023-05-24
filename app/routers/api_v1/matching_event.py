@@ -35,6 +35,12 @@ async def initiate_matching_event(
             detail="Matching room with this room_id does not exist in this system.",
         )
 
+    if matching_room.is_closed:
+        raise HTTPException(
+            status_code=400,
+            detail="Matching room is already closed.",
+        )
+    
     """
     Call matching event micro-service
     """
@@ -116,6 +122,6 @@ async def initiate_matching_event(
 
     else:
         raise HTTPException(
-            status_code=500,
+            status_code=response.status_code,
             detail=json.loads(response.text)["detail"],
         )
