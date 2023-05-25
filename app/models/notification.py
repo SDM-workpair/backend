@@ -20,3 +20,4 @@ class Notification(Base):
     template_uuid = Column(String, nullable=False)
     f_string = Column(String)
     is_read = Column(Boolean, nullable=False, default=False)
+    group_id = Column(String, nullable=True)

@@ -1,5 +1,4 @@
 import asyncio
-import json
 from datetime import datetime
 from typing import List
 
@@ -69,6 +68,14 @@ async def notify(
     """
     Send notification. Insert notification data into DB first and publish notification into message queue.
     """
+    input_group_id = ""
+    if isinstance(
+        notification_obj, schemas.notification.NotificationSendObjectModelWithGroupID
+    ):
+        print("is called with NotificationSendObjectModel!!!!!!!")
+        input_group_id = notification_obj.group_id
+        print("notification_obj.group_id >>> ", notification_obj.group_id)
+        print("input_group_id >>> ", input_group_id)
     # insert notification data into db
     insert_obj = schemas.notification.NotificationCreate(
         receiver_uuid=notification_obj.receiver_uuid,
@@ -77,6 +84,7 @@ async def notify(
         template_uuid=notification_obj.template_uuid,
         f_string=notification_obj.f_string,
         is_read=False,
+        group_id=input_group_id,
     )
     crud.notification.create(db=db, obj_in=insert_obj)
     await send_notification_to_message_queue(db, notification_obj)
