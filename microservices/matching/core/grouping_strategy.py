@@ -59,13 +59,16 @@ class RandomGrouping(GroupingStrategy):
         num_groups = len(slots)
         groups = {i: [] for i in range(num_groups)}
         users_left = users[:]
+        slot_left = sum(slots)
 
         # Randomly assign users to groups
-        while users_left:
-            group_index = random.randint(0, num_groups - 1)
+        while users_left and slot_left > 0:
+            group_index = random.randint(0, num_groups)
+            print("group_index: ", group_index)
             if len(groups[group_index]) < slots[group_index]:
                 user = users_left.pop(0)
                 groups[group_index].append(user[0])
+                slot_left -= 1
         return groups
 
 
@@ -112,30 +115,44 @@ if __name__ == "__main__":
         (2, [-1, 0, 1, -1]),
         (3, [1, -1, -1, 1]),
         (4, [-1, 1, 0, 1]),
-        (5, [1, -1, -1, 1]),
+        # (5, [1, -1, -1, 1]),
     ]
 
     # algorithm testing
     print("test")
     slots = [3, 2, 1]
 
-    print("Tinder")
+    print("\nTinder")
     tg = TinderGrouping()
     groups_tinder = tg.group_users(users_pref, slots)
 
     for i, group in groups_tinder.items():
         print(f"Group {i+1}: {group}")
 
-    print("Random")
+    print("\nRandom")
     rg = RandomGrouping()
     groups_random = rg.group_users(users_pref, slots)
 
     for i, group in groups_random.items():
         print(f"Group {i+1}: {group}")
 
-    print("Similarity")
+    print("\nRandom")
+    rg = RandomGrouping()
+    groups_random = rg.group_users(users_pref, slots=[3])
+
+    for i, group in groups_random.items():
+        print(f"Group {i+1}: {group}")
+
+    print("\nSimilarity")
     sg = SimilarityGrouping()
     groups = sg.group_users(users_pref, slots)
+
+    for i, group in groups.items():
+        print(f"Group {i+1}: {group}")
+
+    print("\nSimilarity")
+    sg = SimilarityGrouping()
+    groups = sg.group_users(users_pref, slots=[3])
 
     for i, group in groups.items():
         print(f"Group {i+1}: {group}")

@@ -88,7 +88,8 @@ class MatchingRoomWithRoomId(BaseModel):
     room_id: str
 
 
-# For Demo
+class MatchingRoomWithTagNum(MatchingRoomBase):
+    tag_num = int
 
 
 class MatchingRoomForEvent(MatchingRoomBase):

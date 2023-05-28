@@ -9,12 +9,12 @@ class MR_Member(Base):
     __tablename__ = "MR_Member"
     user_uuid = Column(
         UUID(as_uuid=True),
-        ForeignKey("User.user_uuid"),
+        ForeignKey("User.user_uuid", ondelete="CASCADE"),
         nullable=False,
     )
     room_uuid = Column(
         UUID(as_uuid=True),
-        ForeignKey("MatchingRoom.room_uuid"),
+        ForeignKey("MatchingRoom.room_uuid", ondelete="CASCADE"),
         nullable=False,
     )
     member_id = Column(

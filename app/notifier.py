@@ -3,7 +3,6 @@ from datetime import datetime
 from typing import List
 
 from aio_pika import DeliveryMode, IncomingMessage, Message, connect
-from loguru import logger
 from sqlalchemy.orm import Session
 from starlette.websockets import WebSocket
 
@@ -69,7 +68,14 @@ async def notify(
     """
     Send notification. Insert notification data into DB first and publish notification into message queue.
     """
-    logger.info(notification_obj)
+    input_group_id = ""
+    if isinstance(
+        notification_obj, schemas.notification.NotificationSendObjectModelWithGroupID
+    ):
+        print("is called with NotificationSendObjectModel!!!!!!!")
+        input_group_id = notification_obj.group_id
+        print("notification_obj.group_id >>> ", notification_obj.group_id)
+        print("input_group_id >>> ", input_group_id)
     # insert notification data into db
     insert_obj = schemas.notification.NotificationCreate(
         receiver_uuid=notification_obj.receiver_uuid,
@@ -78,9 +84,10 @@ async def notify(
         template_uuid=notification_obj.template_uuid,
         f_string=notification_obj.f_string,
         is_read=False,
+        group_id=input_group_id,
     )
     crud.notification.create(db=db, obj_in=insert_obj)
-    await send_notification_to_message_queue(db, insert_obj)
+    await send_notification_to_message_queue(db, notification_obj)
 
 
 # 將通知push到rabbitmq裡
@@ -113,7 +120,6 @@ async def send_notification_to_message_queue(db, notification_obj):
             raise ValueError(
                 f"Fail to retrieve user with user_uuid={notification_obj.receiver_uuid}"
             )
-        print("user email >>> ", user_email)
         notifier = Notifier()
         await notifier.setup(queue_name=user_email, is_consumer=False)
         await notifier.push(f"{notification_text}")

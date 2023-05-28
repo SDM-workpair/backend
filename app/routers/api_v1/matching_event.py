@@ -3,7 +3,6 @@ from typing import Any
 
 import requests
 from fastapi import APIRouter, Depends, HTTPException
-from loguru import logger
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
@@ -58,8 +57,7 @@ async def initiate_matching_event(
     )
     headers = {"Content-Type": "application/json"}
     response = requests.request("POST", url, headers=headers, data=payload)
-    logger.info(response.status_code)
-    logger.info(response.text)
+
     if response.status_code == 200:
         # Close matching room
         matching_room = crud.matching_room.close_by_room_id(

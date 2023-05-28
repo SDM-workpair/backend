@@ -15,7 +15,7 @@ class GR_Member(Base):
     )
     group_uuid = Column(
         UUID(as_uuid=True),
-        ForeignKey("Group.group_uuid"),
+        ForeignKey("Group.group_uuid", ondelete="CASCADE"),
         primary_key=True,
         nullable=False,
     )

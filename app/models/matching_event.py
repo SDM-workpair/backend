@@ -13,5 +13,7 @@ class MatchingEvent(Base):
     )
     maching_algo = Column(String, nullable=False, default="random")
     room_uuid = Column(
-        UUID(as_uuid=True), ForeignKey("MatchingRoom.room_uuid"), nullable=False
+        UUID(as_uuid=True),
+        ForeignKey("MatchingRoom.room_uuid", ondelete="CASCADE"),
+        nullable=False,
     )
