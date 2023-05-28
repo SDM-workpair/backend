@@ -4,7 +4,7 @@ from app import crud, schemas
 from app.core.config import settings
 
 from .contest import db_conn, get_user_authentication_headers, test_client
-
+import loguru
 """
 pytest fixture
 """
