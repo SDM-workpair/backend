@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.28.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: swipecard
+  name: swipecard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: swipecard
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.28.0 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/sdm-project-teamatch-network: "true"
+        io.kompose.service: swipecard
+    spec:
+      containers:
+        - image: swipecard
+          name: swipecard
+          ports:
+            - containerPort: 8002
+          resources: {}
+          tty: true
+          volumeMounts:
+            - mountPath: /backend
+              name: swipecard-claim0
+      restartPolicy: Always
+      volumes:
+        - name: swipecard-claim0
+          persistentVolumeClaim:
+            claimName: swipecard-claim0
+status: {}
