@@ -107,7 +107,7 @@ async def matching_event(db: Session, matching_room: MatchingRoom):
 
     else:
         raise HTTPException(
-            status_code=500,
+            status_code=response.status_code,
             detail=json.loads(response.text)["detail"],
         )
 
