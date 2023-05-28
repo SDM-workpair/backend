@@ -34,6 +34,7 @@ class CRUDMatchingRoom(CRUDBase[MatchingRoom, MatchingRoomCreate, MatchingRoomUp
         )
         if matching_room_in:
             matching_room_in.is_closed = True
+            matching_room_in.finish_time = datetime.now()
             db.commit()
         return matching_room_in
 

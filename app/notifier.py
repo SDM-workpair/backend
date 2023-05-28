@@ -7,6 +7,8 @@ from sqlalchemy.orm import Session
 from starlette.websockets import WebSocket
 
 from app import crud, schemas
+from loguru import logger
+
 
 
 class Notifier:
@@ -68,6 +70,7 @@ async def notify(
     """
     Send notification. Insert notification data into DB first and publish notification into message queue.
     """
+    logger.info(notification_obj)
     # insert notification data into db
     insert_obj = schemas.notification.NotificationCreate(
         receiver_uuid=notification_obj.receiver_uuid,
