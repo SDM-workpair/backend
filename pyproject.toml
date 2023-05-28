@@ -49,7 +49,7 @@ anyio = "^3.6.2"
 websockets = "^11.0.2"
 
 aio-pika = "^9.0.5"
-
+google-cloud-secret-manager = "^2.16.1"
 
 [build-system]
 requires = ["poetry-core"]
