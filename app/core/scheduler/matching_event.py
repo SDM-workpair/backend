@@ -133,5 +133,4 @@ def schedule_matching_room(mapper, connection, matching_room):
 
 @atexit.register
 def shutdown_scheduler():
-    logger.info("scheduler shutdown")
     scheduler.shutdown()
