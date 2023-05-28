@@ -29,6 +29,7 @@ class CRUDNotification(CRUDBase[Notification, NotificationCreate, NotificationUp
                 send_time=notification.send_time,
                 content=notification.f_string,
                 is_read=notification.is_read,
+                group_id=notification.group_id,
             )
             notification_viewmodel_list.append(notifiactionViewModel)
         return notification_viewmodel_list
@@ -49,6 +50,7 @@ class CRUDNotification(CRUDBase[Notification, NotificationCreate, NotificationUp
                 send_time=notification.send_time,
                 content=notification.f_string,
                 is_read=notification.is_read,
+                group_id=notification.group_id,
             )
             notification_viewmodel_list.append(notifiactionViewModel)
         return notification_viewmodel_list
@@ -74,8 +76,9 @@ class CRUDNotification(CRUDBase[Notification, NotificationCreate, NotificationUp
             receiver_uuid=obj_in.receiver_uuid,
             # sender_uuid=obj_in.sender_uuid,
             send_time=obj_in.send_time,
-            template_uuid=obj_in.template_uuid,  # ?
+            template_uuid=obj_in.template_uuid,
             f_string=notification_text,
+            group_id=obj_in.group_id,
         )
 
         db.add(db_obj)

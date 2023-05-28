@@ -41,6 +41,7 @@ from .notification import (  # NotificationFromMatchingEvent
     NotificationCreate,
     NotificationInDB,
     NotificationSendObjectModel,
+    NotificationSendObjectModelWithGroupID,
     NotificationTextWithMessage,
     NotificationViewModel,
 )
