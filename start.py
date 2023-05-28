@@ -50,6 +50,14 @@ logger.add(
     level="ERROR",
     rotation="23:59",
 )
+logger.add(
+    sink="/backend/logs/error/error-concise.log",
+    enqueue=True,
+    serialize=0,
+    backtrace=False,
+    level="ERROR",
+    rotation="23:59",
+)
 
 
 logger.info("Current Environment: {}".format(settings.ENV))

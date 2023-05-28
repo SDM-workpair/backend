@@ -124,7 +124,7 @@ if __name__ == "__main__":
     print(f"Fixed max: {slot_params['max_users']} -> {slots}")
 
     # Generate slots with fixed max/min users
-    generator = MinUserSlot().set_num_users(10)
-    slot_params = {"min_users": 2}
+    generator = MinUserSlot().set_num_users(4).set_proximity(False)
+    slot_params = {"min_users": 3}
     slots = generator.generate_slots(params=slot_params)
     print(f"Fixed min: {slot_params['min_users']} -> {slots}")
