@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.28.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: rabbitmq-container
+  name: rabbitmq-container
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: rabbitmq-container
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.28.0 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/sdm-project-teamatch-network: "true"
+        io.kompose.service: rabbitmq-container
+    spec:
+      containers:
+        - image: rabbitmq:3-management
+          name: rabbitmq-container
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+          resources: {}
+          volumeMounts:
+            - mountPath: /rabbitmq
+              name: rabbitmq-container-claim0
+      hostname: rabbitmq-container
+      restartPolicy: Always
+      volumes:
+        - name: rabbitmq-container-claim0
+          persistentVolumeClaim:
+            claimName: rabbitmq-container-claim0
+status: {}
