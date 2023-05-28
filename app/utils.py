@@ -11,4 +11,4 @@ def get_tw_time() -> str:
 
 
 def number_of_workers():
-    return (multiprocessing.cpu_count() * 2) + 1
+    return max(multiprocessing.cpu_count() + 1, 1)
