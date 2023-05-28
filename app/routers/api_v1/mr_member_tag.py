@@ -29,7 +29,7 @@ def create_mr_member_self_tag(
         )
 
     # Create MR_Member Self-Tag
-    mr_member_tag_list = crud.mr_member_tag.create_tag(
+    mr_member_tag_list = crud.mr_member_tag.create(
         db=db, is_self_tag=True, is_find_tag=False, mr_member_tag_in=mr_member_tag_in
     )
 
@@ -56,7 +56,7 @@ def create_mr_member_find_tag(
         )
 
     # Create MR_Member Find-Tag
-    mr_member_tag_list = crud.mr_member_tag.create_tag(
+    mr_member_tag_list = crud.mr_member_tag.create(
         db=db, is_self_tag=False, is_find_tag=True, mr_member_tag_in=mr_member_tag_in
     )
 

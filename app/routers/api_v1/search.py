@@ -20,13 +20,17 @@ def search_matching_rooms(
     """
     if mr_search_in.query_all:
         matching_rooms = crud.matching_room.search_with_user_and_name(
-            db=db, name=mr_search_in.prompt
+            db=db,
+            user_uuid=current_user.user_uuid,
+            name=mr_search_in.prompt,
+            is_query_with_user=False,
         )
     else:  # query with user authentication
         matching_rooms = crud.matching_room.search_with_user_and_name(
             db=db,
             user_uuid=current_user.user_uuid,
             name=mr_search_in.prompt,
+            is_query_with_user=True,
         )
     return {"message": "success", "data": matching_rooms}
 

@@ -73,7 +73,7 @@ def google_auth(
         access_token = security.create_access_token(
             user.user_uuid, expires_delta=access_token_expires
         )
-        request.session["user"] = jsonable_encoder(user)
+        # request.session["user"] = jsonable_encoder(user)
         request.session["authorization"] = access_token
         response.set_cookie(
             "access_token",
