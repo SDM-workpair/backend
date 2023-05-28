@@ -10,12 +10,9 @@ from app import crud, models, schemas
 from app.notifier import notify
 from app.routers import deps
 
-# from app.core.scheduler import matching_event
-
 router = APIRouter()
 
 
-# TODO
 @router.post("/", response_model=schemas.GroupAfterMatchingEvent)
 async def initiate_matching_event(
     *,
@@ -35,9 +32,17 @@ async def initiate_matching_event(
             detail="Matching room with this room_id does not exist in this system.",
         )
 
+    if matching_room.is_closed:
+        raise HTTPException(
+            status_code=400,
+            detail="Matching room is already closed.",
+        )
+
     """
     Call matching event micro-service
     """
+    # return matching_event(db=db, matching_room=matching_room)
+
     url = "http://matching:8001/matching/create"
     payload = json.dumps(
         {
@@ -53,13 +58,18 @@ async def initiate_matching_event(
     )
     headers = {"Content-Type": "application/json"}
     response = requests.request("POST", url, headers=headers, data=payload)
-    logger.info(response.status_code)
-    logger.info(response.text)
+
+
     if response.status_code == 200:
-        result = json.loads(response.text)["groups"]
+        # Close matching room
+        matching_room = crud.matching_room.close_by_room_id(
+            db=db, room_id=matching_room.room_id
+        )
+
         """
         Create Group and GR_Member
         """
+        result = json.loads(response.text)["groups"]
         # Get notify template_uuid
         notification_template = crud.notification_template.get_by_template_id(
             db=db, template_id="matching_result"
@@ -108,6 +118,8 @@ async def initiate_matching_event(
 
     else:
         raise HTTPException(
-            status_code=500,
+            status_code=response.status_code,
             detail=json.loads(response.text)["detail"],
         )
+
+
