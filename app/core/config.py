@@ -1,10 +1,12 @@
 import json
+import os
 from typing import Any, Dict, List, Optional, Union
 
 from google.cloud import secretmanager
+from google.oauth2 import service_account
 from pydantic import AnyHttpUrl, BaseSettings, validator
 
-# GCS_APP_KEY = "./app/core/k8s-codelab-381104-86fe71c3464f.json"
+GCS_APP_KEY = "./app/core/k8s-codelab-381104-86fe71c3464f.json"
 
 
 def get_google_cloud_secret(key) -> Optional[str]:
@@ -13,9 +15,15 @@ def get_google_cloud_secret(key) -> Optional[str]:
     #     LOGGER.debug("Not fetching secret from GCS: %s not present", GCS_APP_KEY)
     #     return
     try:
-        # credentials = service_account.Credentials.from_service_account_file(GCS_APP_KEY)
-        # client = secretmanager.SecretManagerServiceClient(credentials=credentials)
-        client = secretmanager.SecretManagerServiceClient()
+        # only for dev test
+        if os.path.exists(GCS_APP_KEY):
+            credentials = service_account.Credentials.from_service_account_file(
+                GCS_APP_KEY
+            )
+            client = secretmanager.SecretManagerServiceClient(credentials=credentials)
+        # no need using credentials when deployed to GCP
+        else:
+            client = secretmanager.SecretManagerServiceClient()
         response = client.access_secret_version(name=key)
         return response.payload.data.decode()
     except KeyError as e:
@@ -34,7 +42,7 @@ def json_config_settings_source(settings: BaseSettings) -> Dict[str, Any]:
         "projects/993698511015/secrets/teamatch-secret/versions/latest"
     )
     env_json = json.loads(env_json_str)
-    print("secret from google cloud secret manager >>> ", env_json)
+    # print("secret from google cloud secret manager >>> ", env_json)
     return env_json
 
 
