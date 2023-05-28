@@ -1,34 +1,29 @@
+import asyncio
 import atexit
 import json
 
-import pytz
 import requests
-# from apscheduler.schedulers.background import BackgroundScheduler
-# from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.schedulers.background import BlockingScheduler
-
-from fastapi import Depends, HTTPException
+from apscheduler.schedulers.background import BackgroundScheduler
+from fastapi import HTTPException
 from loguru import logger
 from sqlalchemy import event
 from sqlalchemy.orm import Session
 
-from app.models.matching_room import MatchingRoom
-from app.database.session import SessionLocal
 from app import crud, schemas
+from app.database.session import SessionLocal
+from app.models.matching_room import MatchingRoom
 from app.notifier import notify
-import asyncio
 
 """
 Matching event scheduler
 """
-# scheduler = BackgroundScheduler()
-scheduler = BlockingScheduler()
+scheduler = BackgroundScheduler()
 scheduler.start()
 
 
 async def matching_event(db: Session, matching_room: MatchingRoom):
-    logger.info("run matching_event function")
-    logger.info(matching_room.room_id)
+    logger.info("call matching_event service in scheduler")
+
     if matching_room.is_closed:
         raise HTTPException(
             status_code=400,
@@ -37,7 +32,7 @@ async def matching_event(db: Session, matching_room: MatchingRoom):
     """
     Call matching event micro-service
     """
-    url = "http://matching:8001/matching/create/test"
+    url = "http://matching:8001/matching/create"
     payload = json.dumps(
         {
             "room_id": matching_room.room_id,
@@ -52,8 +47,7 @@ async def matching_event(db: Session, matching_room: MatchingRoom):
     )
     headers = {"Content-Type": "application/json"}
     response = requests.request("POST", url, headers=headers, data=payload)
-    # logger.info(response.text)  
-    logger.info(response.status_code)
+
     # return
     if response.status_code == 200:
         # Close matching room
@@ -65,7 +59,6 @@ async def matching_event(db: Session, matching_room: MatchingRoom):
         Create Group and GR_Member
         """
         result = json.loads(response.text)["groups"]
-        logger.info(result)
 
         # Get notify template_uuid
         notification_template = crud.notification_template.get_by_template_id(
@@ -76,7 +69,6 @@ async def matching_event(db: Session, matching_room: MatchingRoom):
         group_id = 0
         for group in result:
             # Create Group
-            logger.info('Create Group')
             group_id += 1
             new_group_schema = schemas.GroupCreate(
                 name=matching_room.name + "_" + str(group_id),
@@ -87,8 +79,6 @@ async def matching_event(db: Session, matching_room: MatchingRoom):
 
             gr_mem_list = []
             for gr_member in result[group]:
-                logger.info('Create Group Member')
-
                 # Create GR_member
                 new_gr_mem_schema = schemas.GR_MemberCreate(
                     member_id=gr_member,
@@ -111,7 +101,6 @@ async def matching_event(db: Session, matching_room: MatchingRoom):
                     template_uuid=notification_template.template_uuid,
                     f_string=matching_room.name,
                 )
-                logger.info('Notify')
                 await notify(db, notification_send_object)
             group_list.append(gr_mem_list)
         return {"message": "success", "data": group_list}
@@ -124,32 +113,21 @@ async def matching_event(db: Session, matching_room: MatchingRoom):
 
 
 def schedule_matching_event(matching_room: MatchingRoom, db: Session = SessionLocal()):
-    logger.info("schedule matching event")
-    logger.info(matching_room)
-
     if scheduler.running:
         logger.info("scheduler running")
-
-    # scheduler.add_job(
-    #     matching_event,
-    #     "date",
-    #     run_date=matching_room.due_time,
-    #     args=[db, matching_room],
-    # )
 
     scheduler.add_job(
         lambda: asyncio.run(matching_event(db, matching_room)),
         "date",
         run_date=matching_room.due_time,
     )
-    
+
     return
 
 
 @event.listens_for(MatchingRoom, "after_insert")
 def schedule_matching_room(mapper, connection, matching_room):
     "listen for the 'after_insert' event"
-    logger.info("after insert")
     schedule_matching_event(matching_room=matching_room)
 
 
@@ -157,16 +135,3 @@ def schedule_matching_room(mapper, connection, matching_room):
 def shutdown_scheduler():
     logger.info("scheduler shutdown")
     scheduler.shutdown()
-
-# Create and run the event loop
-# loop = asyncio.get_event_loop()
-# try:
-#     loop.run_forever()
-# except KeyboardInterrupt:
-#     pass
-# finally:
-#     scheduler.shutdown()
-#     loop.close()
-
-
-

@@ -3,12 +3,11 @@ from datetime import datetime
 from typing import List
 
 from aio_pika import DeliveryMode, IncomingMessage, Message, connect
+from loguru import logger
 from sqlalchemy.orm import Session
 from starlette.websockets import WebSocket
 
 from app import crud, schemas
-from loguru import logger
-
 
 
 class Notifier:

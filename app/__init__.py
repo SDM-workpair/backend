@@ -1,1 +1,1 @@
-from app.core.scheduler import matching_event
+import app.core.scheduler.matching_event
