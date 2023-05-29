@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "k8s-codelab-381104",
+  "private_key_id": "86fe71c3464f1e3fb1c2f8e3e8fb301bb088c73f",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC09bhXL9tUP5Rm\nGw5qrae6rdQ8y7MSp2VJtcRt2RcIRmwbfdYlhFaxKFMFDQGaDwTkrzW5O+raV1wO\nveZSMBdGI+EQa6WtYQhnvQA3WfE3LcrnRVeoCeMNkdea64tSOakfop7LMrfxM21i\nvyKjfd066YAJLha9o9/90sC/erXkaYZgC/+7OQF6f4xh0BXcPOT6wGrpCQNrxRn8\nSxFGxLdGFf3P2kDTlp/r9IKVefUuKcjmRsVszDj5m47lo+Jp+6/OPP9jb1zVoqyC\nSwimCC2Nb3G4xu07oCUxJxBLekZYrbwffmrvHCKUuZD5UWKd3dRBetahnExqmjh8\nV878TO29AgMBAAECggEAGsFU5NEu1s1CufkIn+W2ja+bWHTOsHSfEW+mUA5/rQnK\nfKMVmTzwm2dopO/IG5jaYpx0L0PIZMlzUzupFOBG5Kgz49tiptiYp0vmvwhVlZC3\n9gtG21HA6BX24JEwa3MaihKfc1A3qZous2Gqs60Nm2MAOvs9QgM7gDobpQP15kQj\nQY84nN/pnL+6cM6uZ4xFSy1koCWtUWH/rcaCJCGcpbNlWpWQbzSFZYRDvjvE52PT\n6PndvHMx7D8T3Ad8ydkem7eRuPBgcypxEvABFz2xurFMmxloHMj/QJngEf0IukWT\niVAkipbVCmphRmtYq5vuprjKh3q2hjQvw34ZZRsh4QKBgQDbOye3xr5FN+A8QmIR\neRwhj1sL7i4wz4oC5ZWbFSDXfBJCjPjynD5lyJIvkBt2Q/CxDccEPG3bfbYvnCJ0\njs7iTju1zW+//aiBcLEYIaFx83stzWFx+QXgogrQwJKhGFlCS4kutJIMj6bSFT04\nItbhHHgPv/eJ5UWSzRONmnWx4QKBgQDTT1yoYl8TCAjIKoyZUnIo8fCYPKNr7Ar6\ndKwLl+x+lulDnsvaLjRhKLkjmrS7h9mQnX1xpOhYYvL+0BkYl0x3xcLwSYfeUt1U\n2RnNqcVgHqILx8hJE9mgtwAsO8FgpQAusX7QHP4J3DehDHHfx7bRkwYcwg1vOni3\nr1YXdkMvXQKBgCL/OIHv6iPmnZdBCaK8cK8y0VgAN8N2/hMkT1OodcuwdMHG+17P\nbm6VLDEHkjq48c1x45lbhDYLxW+oPx/YRFKAJqwJFZPSjHnNYZf2lm04byuKo8mr\n9TI86/kTJNUuq+EXadjY3o++xuS2m0VA2oipIMly3bNXtFmQ/1QVmkBBAoGBAK0g\nxbrUNi9CkudlLSLlkNEJQOWKMR7YGzqO4vLwu3wQKvgTH9QXrSS5l86bD17idBfv\nYPr+cLsR/yNU3mruc2Fib1At/prh66N76I8/fI4/KudZ/TgagmER7ptPLiX/qkGX\nfV4HkwADJLTXnGkLmTbmLcjcGOO71XIxvuikJXGlAoGAXfS/D12sBFsnNErBuNkR\nM10Q101CooUvGaounJ2RpA3tbUybaYK1ys+jSjRk1enzNw/ryZ/Ek5AOcZJ9kn+N\nGq0WkNVo7wIVaJIu+m/upXRaqHbp/Wca11pCfa+0idCHUJIfFusFhB496fDNkU5c\nojfykcLNxc2BxZ1FpvBb2+c=\n-----END PRIVATE KEY-----\n",
+  "client_email": "k8s-codelab-381104@appspot.gserviceaccount.com",
+  "client_id": "107865795364008887142",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/k8s-codelab-381104%40appspot.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
