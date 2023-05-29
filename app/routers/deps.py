@@ -60,7 +60,7 @@ def get_current_active_user(
 
 
 def get_current_active_superuser(
-    current_user: models.user = Depends(get_current_user),
+    current_user: models.user = Depends(get_current_active_user),
 ) -> models.user:
     if not crud.user.is_admin(current_user):
         loguru.logger.info("The user doesn't have enough privileges")

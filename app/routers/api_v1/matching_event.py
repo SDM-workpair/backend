@@ -18,7 +18,7 @@ async def initiate_matching_event(
     *,
     db: Session = Depends(deps.get_db),
     matching_room_in: schemas.MatchingRoomForEvent,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
     """
     Initiate matching event.
