@@ -35,6 +35,11 @@ def join_matching_room(
             status_code=400,
             detail="Matching room does not exist in the system.",
         )
+    if matching_room.is_closed:
+        raise HTTPException(
+            status_code=400,
+            detail="Matching room is closed.",
+        )
 
     # Check if user already in matching room
     mr_member = crud.mr_member.get_by_room_uuid_and_user_uuid(
