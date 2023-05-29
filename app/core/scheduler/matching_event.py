@@ -96,10 +96,13 @@ async def matching_event(db: Session, matching_room: MatchingRoom):
                 gr_mem_list.append(gr_user.member_id)
                 # logger.info(gr_user)
                 # Create notify send object
-                notification_send_object = schemas.NotificationSendObjectModel(
-                    receiver_uuid=gr_user.user_uuid,
-                    template_uuid=notification_template.template_uuid,
-                    f_string=matching_room.name,
+                notification_send_object = (
+                    schemas.NotificationSendObjectModelWithGroupID(
+                        receiver_uuid=gr_user.user_uuid,
+                        template_uuid=notification_template.template_uuid,
+                        f_string=matching_room.name,
+                        group_id=new_group.group_id,
+                    )
                 )
                 await notify(db, notification_send_object)
             group_list.append(gr_mem_list)
