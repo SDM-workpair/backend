@@ -1,0 +1,183 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.28.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: postgres
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.28.0 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/sdm-project-teamatch-network: "true"
+        io.kompose.service: postgres
+    spec:
+      containers:
+        - env:
+            - name: ACCESS_TOKEN_EXPIRE_MINUTES
+              valueFrom:
+                configMapKeyRef:
+                  key: ACCESS_TOKEN_EXPIRE_MINUTES
+                  name: backend--env
+            - name: ADMIN_EMAIL
+              valueFrom:
+                configMapKeyRef:
+                  key: ADMIN_EMAIL
+                  name: backend--env
+            - name: ADMIN_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: ADMIN_NAME
+                  name: backend--env
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: ADMIN_PASSWORD
+                  name: backend--env
+            - name: CLIENT_ORIGIN
+              valueFrom:
+                configMapKeyRef:
+                  key: CLIENT_ORIGIN
+                  name: backend--env
+            - name: DATABASE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: DATABASE_PORT
+                  name: backend--env
+            - name: ENV
+              valueFrom:
+                configMapKeyRef:
+                  key: ENV
+                  name: backend--env
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: GOOGLE_CLIENT_ID
+                  name: backend--env
+            - name: GOOGLE_CLIENT_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  key: GOOGLE_CLIENT_SECRET
+                  name: backend--env
+            - name: GOOGLE_SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: GOOGLE_SECRET_KEY
+                  name: backend--env
+            - name: GUNICORN_WORKERS
+              valueFrom:
+                configMapKeyRef:
+                  key: GUNICORN_WORKERS
+                  name: backend--env
+            - name: JSON_LOGS
+              valueFrom:
+                configMapKeyRef:
+                  key: JSON_LOGS
+                  name: backend--env
+            - name: JWT_ALGORITHM
+              valueFrom:
+                configMapKeyRef:
+                  key: JWT_ALGORITHM
+                  name: backend--env
+            - name: JWT_PRIVATE_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: JWT_PRIVATE_KEY
+                  name: backend--env
+            - name: JWT_PUBLIC_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: JWT_PUBLIC_KEY
+                  name: backend--env
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  key: LOG_LEVEL
+                  name: backend--env
+            - name: POOL_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  key: POOL_SIZE
+                  name: backend--env
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_DB
+                  name: backend--env
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_HOST
+                  name: backend--env
+            - name: POSTGRES_HOSTNAME
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_HOSTNAME
+                  name: backend--env
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_PASSWORD
+                  name: backend--env
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_USER
+                  name: backend--env
+            - name: PRE_COMMIT_HOME
+              valueFrom:
+                configMapKeyRef:
+                  key: PRE_COMMIT_HOME
+                  name: backend--env
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: RABBITMQ_HOST
+                  name: backend--env
+            - name: REFRESH_TOKEN_EXPIRE_MINUTES
+              valueFrom:
+                configMapKeyRef:
+                  key: REFRESH_TOKEN_EXPIRE_MINUTES
+                  name: backend--env
+            - name: SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: SECRET_KEY
+                  name: backend--env
+            - name: SESSION_DURATION
+              valueFrom:
+                configMapKeyRef:
+                  key: SESSION_DURATION
+                  name: backend--env
+            - name: WATCHFILES_FORCE_POLLING
+              valueFrom:
+                configMapKeyRef:
+                  key: WATCHFILES_FORCE_POLLING
+                  name: backend--env
+          image: postgres:13.3
+          name: postgres
+          ports:
+            - containerPort: 5432
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-db
+      restartPolicy: Always
+      volumes:
+        - name: postgres-db
+          persistentVolumeClaim:
+            claimName: postgres-db
+status: {}

@@ -1,48 +1,37 @@
+import asyncio
+import atexit
 import json
-from typing import Any
 
 import requests
-from fastapi import APIRouter, Depends, HTTPException
+from apscheduler.schedulers.background import BackgroundScheduler
+from fastapi import HTTPException
 from loguru import logger
+from sqlalchemy import event
 from sqlalchemy.orm import Session
 
-from app import crud, models, schemas
+from app import crud, schemas
+from app.database.session import SessionLocal
+from app.models.matching_room import MatchingRoom
 from app.notifier import notify
-from app.routers import deps
 
-router = APIRouter()
+"""
+Matching event scheduler
+"""
+scheduler = BackgroundScheduler()
+scheduler.start()
 
 
-@router.post("/", response_model=schemas.GroupAfterMatchingEvent)
-async def initiate_matching_event(
-    *,
-    db: Session = Depends(deps.get_db),
-    matching_room_in: schemas.MatchingRoomForEvent,
-    current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
-    """
-    Initiate matching event.
-    """
-    matching_room = crud.matching_room.get_by_room_id(
-        db=db, room_id=matching_room_in.room_id
-    )
-    if not matching_room:
-        raise HTTPException(
-            status_code=400,
-            detail="Matching room with this room_id does not exist in this system.",
-        )
+async def matching_event(db: Session, matching_room: MatchingRoom):
+    logger.info("call matching_event service in scheduler")
 
     if matching_room.is_closed:
         raise HTTPException(
             status_code=400,
             detail="Matching room is already closed.",
         )
-
     """
     Call matching event micro-service
     """
-    # return matching_event(db=db, matching_room=matching_room)
-    logger.info("Start Micro service")
     url = "http://matching:8001/matching/create"
     payload = json.dumps(
         {
@@ -52,15 +41,14 @@ async def initiate_matching_event(
             "params": {
                 # "num_groups": 3,
                 # "max_users": 6,
-                "min_users": matching_room_in.min_member_num
+                "min_users": matching_room.min_member_num
             },
         }
     )
     headers = {"Content-Type": "application/json"}
     response = requests.request("POST", url, headers=headers, data=payload)
 
-    logger.info(response.text)
-
+    # return
     if response.status_code == 200:
         # Close matching room
         matching_room = crud.matching_room.close_by_room_id(
@@ -71,6 +59,7 @@ async def initiate_matching_event(
         Create Group and GR_Member
         """
         result = json.loads(response.text)["groups"]
+
         # Get notify template_uuid
         notification_template = crud.notification_template.get_by_template_id(
             db=db, template_id="matching_result"
@@ -105,7 +94,7 @@ async def initiate_matching_event(
                     db=db, member_id=new_gr_mem.member_id
                 )
                 gr_mem_list.append(gr_user.member_id)
-
+                # logger.info(gr_user)
                 # Create notify send object
                 notification_send_object = (
                     schemas.NotificationSendObjectModelWithGroupID(
@@ -117,7 +106,6 @@ async def initiate_matching_event(
                 )
                 await notify(db, notification_send_object)
             group_list.append(gr_mem_list)
-
         return {"message": "success", "data": group_list}
 
     else:
@@ -125,3 +113,27 @@ async def initiate_matching_event(
             status_code=response.status_code,
             detail=json.loads(response.text)["detail"],
         )
+
+
+def schedule_matching_event(matching_room: MatchingRoom, db: Session = SessionLocal()):
+    if scheduler.running:
+        logger.info("scheduler running")
+
+    scheduler.add_job(
+        lambda: asyncio.run(matching_event(db, matching_room)),
+        "date",
+        run_date=matching_room.due_time,
+    )
+
+    return
+
+
+@event.listens_for(MatchingRoom, "after_insert")
+def schedule_matching_room(mapper, connection, matching_room):
+    "listen for the 'after_insert' event"
+    schedule_matching_event(matching_room=matching_room)
+
+
+@atexit.register
+def shutdown_scheduler():
+    scheduler.shutdown()

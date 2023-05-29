@@ -67,9 +67,9 @@ def init_matching_room(db: Session):
         "room_id": ["IR001", "sdm001", "test_matching_room001"],
         "name": ["IR", "sdm", "test_matching_room"],
         "due_time": [
-            datetime.datetime.now(),
-            datetime.datetime.now(),
-            datetime.datetime.now(),
+            datetime.datetime.now() - datetime.timedelta(days=1),
+            datetime.datetime.now() - datetime.timedelta(days=1),
+            datetime.datetime.now() - datetime.timedelta(days=1),
         ],
         "min_member_num": [3, 3, 3],
         "description": [

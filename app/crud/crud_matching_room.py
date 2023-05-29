@@ -28,6 +28,16 @@ class CRUDMatchingRoom(CRUDBase[MatchingRoom, MatchingRoomCreate, MatchingRoomUp
     def get_by_room_id(self, db: Session, *, room_id: str) -> Optional[MatchingRoom]:
         return db.query(MatchingRoom).filter(MatchingRoom.room_id == room_id).first()
 
+    def close_by_room_id(self, db: Session, *, room_id: str) -> Optional[MatchingRoom]:
+        matching_room_in = (
+            db.query(MatchingRoom).filter(MatchingRoom.room_id == room_id).first()
+        )
+        if matching_room_in:
+            matching_room_in.is_closed = True
+            matching_room_in.finish_time = datetime.now()
+            db.commit()
+        return matching_room_in
+
     def search_with_user_and_name(
         self,
         db: Session,

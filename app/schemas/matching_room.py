@@ -78,21 +78,18 @@ class MatchingRoomWithMessage(BaseModel):
     data: Optional[MatchingRoom] = None
 
 
-class MatchingRoomWithRoomId(BaseModel):
-    message: str
-    room_id: str
-
-
 class MatchingRoomWithSearch(BaseModel):
     prompt: str
     query_all: bool
 
 
+class MatchingRoomWithRoomId(BaseModel):
+    message: str
+    room_id: str
+
+
 class MatchingRoomWithTagNum(MatchingRoomBase):
     tag_num = int
-
-
-# For Demo
 
 
 class MatchingRoomForEvent(MatchingRoomBase):
