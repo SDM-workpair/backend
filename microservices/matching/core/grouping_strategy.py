@@ -63,7 +63,8 @@ class RandomGrouping(GroupingStrategy):
 
         # Randomly assign users to groups
         while users_left and slot_left > 0:
-            group_index = random.randint(0, num_groups)
+            group_index = random.randint(0, num_groups - 1)
+            print("groups", groups)
             print("group_index: ", group_index)
             if len(groups[group_index]) < slots[group_index]:
                 user = users_left.pop(0)
@@ -117,6 +118,7 @@ if __name__ == "__main__":
         (4, [-1, 1, 0, 1]),
         # (5, [1, -1, -1, 1]),
     ]
+    users_pref_one = [(1, [0, 1, 1, -1])]
 
     # algorithm testing
     print("test")
@@ -132,6 +134,20 @@ if __name__ == "__main__":
     print("\nRandom")
     rg = RandomGrouping()
     groups_random = rg.group_users(users_pref, slots)
+
+    for i, group in groups_random.items():
+        print(f"Group {i+1}: {group}")
+
+    print("\nRandom edge 1 user")
+    rg = RandomGrouping()
+    groups_random = rg.group_users(users_pref_one, [1])
+
+    for i, group in groups_random.items():
+        print(f"Group {i+1}: {group}")
+
+    print("\nRandom edge 2 groups")
+    rg = RandomGrouping()
+    groups_random = rg.group_users(users_pref, [1, 3])
 
     for i, group in groups_random.items():
         print(f"Group {i+1}: {group}")
