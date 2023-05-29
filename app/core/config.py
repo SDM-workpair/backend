@@ -2,6 +2,7 @@ import json
 import os
 from typing import Any, Dict, List, Optional, Union
 
+import loguru
 from google.cloud import secretmanager
 from google.oauth2 import service_account
 from pydantic import AnyHttpUrl, BaseSettings, validator
@@ -20,6 +21,7 @@ def get_google_cloud_secret(key) -> Optional[str]:
             credentials = service_account.Credentials.from_service_account_file(
                 GCS_APP_KEY
             )
+            loguru.logger.info(GCS_APP_KEY)
             client = secretmanager.SecretManagerServiceClient(credentials=credentials)
         # no need using credentials when deployed to GCP
         else:
