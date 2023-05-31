@@ -3,6 +3,7 @@ from typing import Any
 
 import requests
 from fastapi import APIRouter, Depends, HTTPException
+from loguru import logger
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
@@ -17,7 +18,7 @@ async def initiate_matching_event(
     *,
     db: Session = Depends(deps.get_db),
     matching_room_in: schemas.MatchingRoomForEvent,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
     """
     Initiate matching event.
@@ -41,7 +42,7 @@ async def initiate_matching_event(
     Call matching event micro-service
     """
     # return matching_event(db=db, matching_room=matching_room)
-
+    logger.info("Start Micro service")
     url = "http://matching:8001/matching/create"
     payload = json.dumps(
         {
@@ -58,6 +59,8 @@ async def initiate_matching_event(
     )
     headers = {"Content-Type": "application/json"}
     response = requests.request("POST", url, headers=headers, data=payload)
+
+    logger.info(response.text)
 
     if response.status_code == 200:
         # Close matching room
@@ -105,10 +108,13 @@ async def initiate_matching_event(
                 gr_mem_list.append(gr_user.member_id)
 
                 # Create notify send object
-                notification_send_object = schemas.NotificationSendObjectModel(
-                    receiver_uuid=gr_user.user_uuid,
-                    template_uuid=notification_template.template_uuid,
-                    f_string=matching_room.name,
+                notification_send_object = (
+                    schemas.NotificationSendObjectModelWithGroupID(
+                        receiver_uuid=gr_user.user_uuid,
+                        template_uuid=notification_template.template_uuid,
+                        f_string=matching_room.name,
+                        group_id=new_group.group_id,
+                    )
                 )
                 await notify(db, notification_send_object)
             group_list.append(gr_mem_list)

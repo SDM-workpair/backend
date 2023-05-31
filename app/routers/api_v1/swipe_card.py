@@ -1,6 +1,7 @@
 from typing import Any
 
-from fastapi import APIRouter, Depends
+import loguru
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
@@ -26,8 +27,17 @@ def save_preference(
     """
     Save member's preference from the card he swiped.
     """
-    swipe_card_preference = crud.swipe_card.save_preference(db, obj_in=swiped_card_in)
-    return {"message": "success", "data": swipe_card_preference}
+    try:
+        swipe_card_preference = crud.swipe_card.save_preference(
+            db, obj_in=swiped_card_in
+        )
+        return {"message": "success", "data": swipe_card_preference}
+    except Exception as e:
+        loguru.logger.error(f"Error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"{e}",
+        )
 
 
 @router.post(

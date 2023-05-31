@@ -27,6 +27,7 @@ class MatchingEvent(BaseModel):
     room_id: str
     group_choice: GroupChoice = "random"
     slot_choice: SlotChoice = "fixed_group"
+    proximity: bool = True
     params: Params = {"num_groups": 3, "max_users": 6, "min_users": 3}
 
     @validator("params")

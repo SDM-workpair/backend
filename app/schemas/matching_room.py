@@ -78,17 +78,21 @@ class MatchingRoomWithMessage(BaseModel):
     data: Optional[MatchingRoom] = None
 
 
-class MatchingRoomWithRoomId(BaseModel):
-    message: str
-    room_id: str
-
-
 class MatchingRoomWithSearch(BaseModel):
     prompt: str
     query_all: bool
 
 
 # For Demo
+class MatchingRoomWithRoomId(BaseModel):
+    message: str
+    room_id: str
+
+
+class MatchingRoomWithTagNum(MatchingRoomBase):
+    tag_num = int
+
+
 class MatchingRoomForEvent(MatchingRoomBase):
     group_choice: str = "random"
     slot_choice: str = "fixed_min"

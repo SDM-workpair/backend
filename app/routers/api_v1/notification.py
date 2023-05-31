@@ -58,17 +58,20 @@ async def trigger_matching_event(
     #     template_uuid="9c1dc87f-e938-4fa1-9900-9b4ebd5701da",
     #     f_string="配對結果111",
     # )
-    notification_send_object_3 = schemas.NotificationSendObjectModel(
+    notification_send_object_3 = schemas.NotificationSendObjectModelWithGroupID(
+        # "70528b75-1ebc-4117-b3dc-c6127264fcff",
         receiver_uuid="70528b75-1ebc-4117-b3dc-c6127264fcff",
         sender_uuid="2be6b063-8914-42b6-9e8d-1bbe14317cc2",
         template_uuid="9c1dc87f-e938-4fa1-9900-9b4ebd5701da",
-        f_string="配對結果111",
+        f_string="配對結果SDM",
+        group_id="sdm001-group1",
     )
-    notification_send_object_4 = schemas.NotificationSendObjectModel(
+    notification_send_object_4 = schemas.NotificationSendObjectModelWithGroupID(
         receiver_uuid="397d0336-3df4-4325-a1b3-cc4ef8e8e0ab",
         sender_uuid="2be6b063-8914-42b6-9e8d-1bbe14317cc2",
         template_uuid="9c1dc87f-e938-4fa1-9900-9b4ebd5701da",
-        f_string="配對結果111",
+        f_string="配對結果SDM",
+        group_id="sdm001-group1",
     )
     # await notify(db, notification_send_object_1)
     # await notify(db, notification_send_object_2)

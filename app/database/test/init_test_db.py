@@ -12,6 +12,7 @@ from app.models.mr_liked_hated_member import MR_Liked_Hated_Member
 from app.models.mr_member import MR_Member
 from app.models.notification import Notification
 from app.models.notification_template import NotificationTemplate
+from app.models.tag import Tag
 from app.models.user import User
 
 # make sure all SQL Alchemy models are imported (app.db.base) before initializing DB
@@ -66,9 +67,9 @@ def init_matching_room(db: Session):
         "room_id": ["IR001", "sdm001", "test_matching_room001"],
         "name": ["IR", "sdm", "test_matching_room"],
         "due_time": [
-            datetime.datetime.now(),
-            datetime.datetime.now(),
-            datetime.datetime.now(),
+            datetime.datetime.now() - datetime.timedelta(days=1),
+            datetime.datetime.now() - datetime.timedelta(days=1),
+            datetime.datetime.now() - datetime.timedelta(days=1),
         ],
         "min_member_num": [3, 3, 3],
         "description": [
@@ -449,6 +450,52 @@ def init_mr_liked_hated_member(db: Session):
             db.refresh(db_obj)
 
 
+# init tag
+def init_tag(db: Session):
+    init_tag = {
+        "tag_uuid": [
+            "10eaae67-9ca5-4a5a-affd-90504479cc5e",
+            "8f31d735-360e-4704-b832-15c1daacd541",
+            "8308f3e1-d32a-4801-bd0d-6dcdb6ec5aed",
+            "008bccc5-b0a8-4962-8793-9b1105b50de0",
+            "193b2cc1-8a0a-4c4f-8a65-7f941aef0d82",
+        ],
+        "tag_text": [
+            "TAG1",
+            "TAG2",
+            "TAG3",
+            "TAG4",
+            "TAG5",
+        ],
+        "room_uuid": [
+            "15b14b78-7b33-4274-868f-e3aca152bd80",
+            "15b14b78-7b33-4274-868f-e3aca152bd80",
+            "15b14b78-7b33-4274-868f-e3aca152bd80",
+            "15b14b78-7b33-4274-868f-e3aca152bd80",
+            "15b14b78-7b33-4274-868f-e3aca152bd80",
+        ],
+        "mentioned_num": [
+            5,
+            4,
+            3,
+            2,
+            1,
+        ],
+    }
+    for i in range(len(init_tag["tag_uuid"])):
+        tag = db.query(Tag).filter(Tag.tag_uuid == init_tag["tag_uuid"][i]).first()
+        if not tag:
+            db_obj = Tag(
+                tag_uuid=init_tag["tag_uuid"][i],
+                tag_text=init_tag["tag_text"][i],
+                room_uuid=init_tag["room_uuid"][i],
+                mentioned_num=init_tag["mentioned_num"][i],
+            )
+            db.add(db_obj)
+            db.commit()
+            db.refresh(db_obj)
+
+
 def test_init_db(db: Session) -> None:
     # Tables should be created with Alembic migrations
     # But if you don't want to use migrations, create
@@ -478,3 +525,6 @@ def test_init_db(db: Session) -> None:
 
     # init mr_liked_hated_member
     init_mr_liked_hated_member(db)
+
+    # init tag
+    init_tag(db)
