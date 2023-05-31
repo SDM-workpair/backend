@@ -1,30 +1,16 @@
 import os
 from typing import Union
 
-from fastapi import (
-    Depends,
-    FastAPI,
-    HTTPException,
-    WebSocket,
-    WebSocketDisconnect,
-    status,
-)
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from jose import jwt
 from loguru import logger
-from pydantic import ValidationError
-from sqlalchemy.orm import Session
 
 # from fastapi_profiler import PyInstrumentProfilerMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
 
-from app import crud, schemas
-from app.core import security
 from app.core.config import settings
-from app.notifier import Notifier
-from app.routers import deps
 from app.routers.api_v1.api import api_router
 from app.utils import get_tw_time
 
@@ -127,6 +113,7 @@ async def test_google_sso(request: Request):
     # return HTMLResponse('<a href="/login">login</a>')
 
 
+"""
 @app.websocket("/ws/{token}")
 async def websocket_endpoint(
     websocket: WebSocket,
@@ -166,3 +153,4 @@ async def websocket_endpoint(
             await websocket.send_text(f"Message text from client was: {data}")
     except WebSocketDisconnect:
         notifier.remove(websocket)
+"""

@@ -47,12 +47,13 @@ async def initiate_matching_event(
     payload = json.dumps(
         {
             "room_id": matching_room.room_id,
-            "group_choice": "random",
-            "slot_choice": "fixed_min",
+            "group_choice": matching_room_in.group_choice,
+            "slot_choice": matching_room_in.slot_choice,
+            "proximity": matching_room_in.proximity,
             "params": {
-                # "num_groups": 3,
-                # "max_users": 6,
-                "min_users": matching_room_in.min_member_num
+                "num_groups": matching_room_in.num_groups,
+                "max_users": matching_room_in.max_users,
+                "min_users": matching_room_in.min_users,
             },
         }
     )
