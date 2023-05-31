@@ -89,7 +89,10 @@ class MatchingRoomWithSearch(BaseModel):
 
 
 # For Demo
-
-
 class MatchingRoomForEvent(MatchingRoomBase):
-    min_member_num: int
+    group_choice: str = "random"
+    slot_choice: str = "fixed_min"
+    proximity: bool = True
+    num_groups: int = None
+    max_users: int = None
+    min_users: int = None
