@@ -121,10 +121,40 @@ if __name__ == "__main__":
     generator = MaxUserSlot().set_num_users(10)
     slot_params = {"min_users": 2, "max_users": 4}
     slots = generator.generate_slots(params=slot_params)
-    print(f"Fixed max: {slot_params['max_users']} -> {slots}")
+    print(f"Fixed max ({9} {False}): {slot_params['max_users']} -> {slots}")
 
     # Generate slots with fixed max/min users
-    generator = MinUserSlot().set_num_users(4).set_proximity(False)
+    generator = MinUserSlot().set_num_users(5).set_proximity(False)
     slot_params = {"min_users": 3}
     slots = generator.generate_slots(params=slot_params)
-    print(f"Fixed min: {slot_params['min_users']} -> {slots}")
+    print(f"Fixed min ({5} {False}): {slot_params['min_users']} -> {slots}")
+
+    # Generate slots with fixed max/min users
+    generator = MinUserSlot().set_num_users(5).set_proximity(True)
+    slot_params = {"min_users": 3}
+    slots = generator.generate_slots(params=slot_params)
+    print(f"Fixed min ({5} {True} ): {slot_params['min_users']} -> {slots}")
+
+    # Generate slots with fixed max/min users
+    generator = MinUserSlot().set_num_users(6).set_proximity(False)
+    slot_params = {"min_users": 3}
+    slots = generator.generate_slots(params=slot_params)
+    print(f"Fixed min ({6} {False}): {slot_params['min_users']} -> {slots}")
+
+    # Generate slots with fixed max/min users
+    generator = MinUserSlot().set_num_users(6).set_proximity(True)
+    slot_params = {"min_users": 3}
+    slots = generator.generate_slots(params=slot_params)
+    print(f"Fixed min ({6} {True} ): {slot_params['min_users']} -> {slots}")
+
+    # Generate slots with fixed max/min users
+    generator = MinUserSlot().set_num_users(9).set_proximity(False)
+    slot_params = {"min_users": 4}
+    slots = generator.generate_slots(params=slot_params)
+    print(f"Fixed min ({6} {False}): {slot_params['min_users']} -> {slots}")
+
+    # Generate slots with fixed max/min users
+    generator = MinUserSlot().set_num_users(9).set_proximity(True)
+    slot_params = {"min_users": 4}
+    slots = generator.generate_slots(params=slot_params)
+    print(f"Fixed min ({6} {True} ): {slot_params['min_users']} -> {slots}")
