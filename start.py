@@ -11,6 +11,14 @@ from app.core.config import settings
 from app.main import app
 from app.utils import number_of_workers
 
+# import multiprocessing
+# from apscheduler.schedulers.background import BackgroundScheduler
+# from apscheduler.schedulers.background import BlockingScheduler
+
+# from app.core.scheduler.matching_event import scheduler
+# from app.core.scheduler.scheduler import scheduler
+
+
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
 JSON_LOGS = os.environ.get("JSON_LOGS", "0") == 1 if settings.ENV else True
 WORKERS = (
@@ -19,7 +27,11 @@ WORKERS = (
     else number_of_workers()
 )
 
-logger.add(sink=sys.stdout, serialize=JSON_LOGS)
+# remove logger sink
+logger.remove()
+logger.add(sys.stderr, level="INFO", filter=lambda x: "connection" not in x["message"])
+
+# logger.add(sink=sys.stdout, serialize=JSON_LOGS, level="INFO")
 logger.add(
     sink="/backend/logs/concise/concise.log",
     enqueue=True,
@@ -114,6 +126,15 @@ class StandaloneApplication(BaseApplication):
         return self.application
 
 
+# scheduler = BlockingScheduler()
+# logger.info(f"scheduler init: {scheduler.running}")
+# def start_scheduler():
+# conn = rpyc.connect('localhost', 8003)
+# job = conn.root.add_job('server:print_text', 'interval', args=['Hello, World'], seconds=2)
+# sleep(10)
+# conn.root.remove_job(job.id)
+
+
 def run():
     intercept_handler = InterceptHandler()
     # logging.basicConfig(handlers=[intercept_handler], level=LOG_LEVEL)
@@ -151,12 +172,50 @@ def run():
         "errorlog": "-",
         "worker_class": "uvicorn.workers.UvicornWorker",
         "logger_class": StubbedGunicornLogger,
+        "preload_app": True,
+        "preload": True,
+        "threads": 2,
     }
 
     if settings.ENV == "dev":
         uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
     else:
         StandaloneApplication(app, options).run()
+        # start_scheduler()
+
+    """
+    if settings.ENV == "dev":
+        uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    else:
+        # create multiprocess pool, one for standaloneapplication, the other for apscheduler
+        # Start the application process
+
+        logger.info(f'env: {os.environ.get("ENV")}')
+
+
+        # Start the scheduler process
+        scheduler_process = multiprocessing.Process(target=start_scheduler)
+        scheduler_process.start()
+        # start_scheduler()
+        logger.info(f"scheduler init start scheduler: {scheduler.running}")
+        logger.info('scheduler process started')
+
+
+        application_process = multiprocessing.Process(
+            target=StandaloneApplication(app, options).run
+        )
+        application_process.start()
+        logger.info(f"scheduler init stanalone: {scheduler.running}")
+        logger.info('application process started')
+
+
+
+
+
+        # Wait for both processes to finish
+        application_process.join()
+        # scheduler_process.join()
+    """
 
 
 if __name__ == "__main__":

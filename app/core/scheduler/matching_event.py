@@ -3,7 +3,6 @@ import atexit
 import json
 
 import requests
-from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import HTTPException
 from loguru import logger
 from sqlalchemy import event
@@ -13,17 +12,18 @@ from app import crud, schemas
 from app.database.session import SessionLocal
 from app.models.matching_room import MatchingRoom
 from app.notifier import notify
+from start import scheduler
 
 """
 Matching event scheduler
 """
-scheduler = BackgroundScheduler()
-scheduler.start()
+
+# scheduler = BackgroundScheduler()
+# scheduler.start()
 
 
 async def matching_event(db: Session, matching_room: MatchingRoom):
     logger.info("call matching_event service in scheduler")
-
     if matching_room.is_closed:
         raise HTTPException(
             status_code=400,
@@ -116,9 +116,11 @@ async def matching_event(db: Session, matching_room: MatchingRoom):
 
 
 def schedule_matching_event(matching_room: MatchingRoom, db: Session = SessionLocal()):
+    logger.info("call schedule matching event")
+    # time.sleep(1)
+    logger.info(f"schedule_matching_event scheduler running: {scheduler.running}")
     if scheduler.running:
         logger.info("scheduler running")
-
     scheduler.add_job(
         lambda: asyncio.run(matching_event(db, matching_room)),
         "date",
@@ -130,6 +132,7 @@ def schedule_matching_event(matching_room: MatchingRoom, db: Session = SessionLo
 
 @event.listens_for(MatchingRoom, "after_insert")
 def schedule_matching_room(mapper, connection, matching_room):
+    logger.info("after insert")
     "listen for the 'after_insert' event"
     schedule_matching_event(matching_room=matching_room)
 

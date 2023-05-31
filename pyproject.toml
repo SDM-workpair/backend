@@ -50,6 +50,7 @@ websockets = "^11.0.2"
 
 aio-pika = "^9.0.5"
 apscheduler = "^3.10.1"
+rpyc = "^5.3.1"
 
 
 [build-system]

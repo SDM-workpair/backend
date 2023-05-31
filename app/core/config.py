@@ -62,6 +62,9 @@ class Settings(BaseSettings):
     # origin
     CLIENT_ORIGIN: str
 
+    # scheduler
+    # SCHEDULER_TIMEZONE = "UTC"
+
     class Config:
         env_file = "./.env"
 
